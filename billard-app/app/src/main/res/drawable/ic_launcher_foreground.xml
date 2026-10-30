@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Hilfslinie -->
+    <path android:strokeColor="#CCFFFFFF" android:strokeWidth="2.5"
+        android:pathData="M30,74 L58,46" />
+    <path android:strokeColor="#FFF2B632" android:strokeWidth="2.5"
+        android:pathData="M64,46 L82,28" />
+    <!-- Weiße Kugel -->
+    <path android:fillColor="#FFF6F3EA"
+        android:pathData="M30,74 m-9,0 a9,9 0 1,0 18,0 a9,9 0 1,0 -18,0" />
+    <!-- Acht -->
+    <path android:fillColor="#FF141414"
+        android:pathData="M63,47 m-11,0 a11,11 0 1,0 22,0 a11,11 0 1,0 -22,0" />
+    <path android:fillColor="#FFFBFAF5"
+        android:pathData="M63,47 m-5,0 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0" />
+</vector>

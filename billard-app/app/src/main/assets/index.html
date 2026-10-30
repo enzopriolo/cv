@@ -1,0 +1,1120 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Billard Linien</title>
+<style>
+:root{--bg:#0d1512;--panel:#16231e;--line:#2c4a3e;--text:#eef4f0;--muted:#9fb5aa;--accent:#f2b632;--accent2:#3fb68b}
+html,body{margin:0;height:100%;background:var(--bg);overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;font-family:system-ui,-apple-system,Roboto,"Segoe UI",sans-serif;color:var(--text)}
+canvas{display:block;position:fixed;inset:0;width:100%;height:100%}
+.b{position:fixed;z-index:5;border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:10px;font-size:13px;font-weight:600;padding:0;cursor:pointer}
+.b:active{filter:brightness(1.3)}
+.b.on{background:#5a3d0b;border-color:var(--accent);color:var(--accent)}
+.shoot{background:linear-gradient(#e0412f,#a52418);border-color:#ff7a66;font-size:17px;letter-spacing:1px}
+.shoot:disabled,.b:disabled{opacity:.35}
+.hidden{display:none!important}
+.overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(5,10,8,.84);z-index:20}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 20px;max-width:92vw;max-height:92vh;overflow:auto;text-align:center;box-sizing:border-box}
+h1{margin:0 0 8px;font-size:22px;letter-spacing:1px}
+h1 span{color:var(--accent)}
+.row{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:6px 0}
+.row>span{color:var(--muted);font-size:14px;min-width:84px;text-align:left}
+.seg{display:flex;border:1px solid var(--line);border-radius:9px;overflow:hidden}
+.seg button{background:transparent;border:0;color:var(--text);padding:7px 12px;font-size:14px;cursor:pointer}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button.sel{background:var(--accent2);color:#06150f;font-weight:700}
+.actions{display:flex;gap:10px;justify-content:center;margin-top:12px;flex-wrap:wrap}
+.actions button{border:1px solid var(--line);background:#1f3029;color:var(--text);border-radius:10px;padding:9px 16px;font-size:15px;font-weight:600;cursor:pointer}
+.actions button.primary{background:var(--accent);color:#2a1a00;border-color:var(--accent)}
+.rules{text-align:left;font-size:13px;line-height:1.45;max-width:640px}
+.rules h2{font-size:15px;margin:10px 0 4px;color:var(--accent)}
+.rules ul{margin:0;padding-left:18px}
+#pushDlg{position:fixed;z-index:15;left:50%;top:50%;transform:translate(-50%,-50%);background:rgba(22,35,30,.96);border:1px solid var(--accent);border-radius:14px;padding:12px 16px;text-align:center;font-size:14px}
+#pushDlg .actions{margin-top:8px}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<button id="bMenu" class="b">☰ Menü</button>
+<button id="bPush" class="b hidden">Push-Out</button>
+<button id="bLines" class="b">Linien: Alle</button>
+<button id="bShoot" class="b shoot">STOSS</button>
+
+<div id="pushDlg" class="hidden">
+  <div id="pushTxt">Push-Out gespielt. Wie geht es weiter?</div>
+  <div class="actions"><button id="bTake" class="primary">Selbst spielen</button><button id="bPass">Zurückgeben</button></div>
+</div>
+
+<div id="menu" class="overlay">
+  <div class="panel">
+    <h1>Billard <span>Linien</span></h1>
+    <div class="row"><span>Spiel</span><div class="seg" data-k="mode"><button data-v="8">8-Ball</button><button data-v="9">9-Ball</button></div></div>
+    <div class="row"><span>Gegner</span><div class="seg" data-k="opp"><button data-v="ai">Computer</button><button data-v="human">2 Spieler</button></div></div>
+    <div class="row" id="rowDiff"><span>Stärke</span><div class="seg" data-k="diff"><button data-v="0">Leicht</button><button data-v="1">Mittel</button><button data-v="2">Schwer</button></div></div>
+    <div class="row"><span>8 ansagen</span><div class="seg" data-k="call"><button data-v="1">An</button><button data-v="0">Aus</button></div></div>
+    <div class="row"><span>Ton</span><div class="seg" data-k="sound"><button data-v="1">An</button><button data-v="0">Aus</button></div></div>
+    <div class="actions">
+      <button id="bResume" class="hidden">Weiterspielen</button>
+      <button id="bStart" class="primary">Neues Spiel</button>
+      <button id="bRules">Regeln</button>
+    </div>
+  </div>
+</div>
+
+<div id="rules" class="overlay hidden">
+  <div class="panel rules">
+    <h1>Regeln</h1>
+    <h2>Steuerung</h2>
+    <ul>
+      <li>Auf den Tisch tippen oder ziehen, um zu zielen. Mit dem Rad <b>Fein</b> rechts stellst du das Ziel genau ein.</li>
+      <li>Links stellst du die <b>Kraft</b> ein. Die Linien zeigen sofort, wohin alle Kugeln bei dieser Kraft rollen.</li>
+      <li>Mit <b>Effet</b> wählst du den Treffpunkt auf der Weißen: oben = Nachläufer, unten = Rückläufer, seitlich = Seiteneffet. Doppeltippen setzt den Effet zurück.</li>
+      <li><b>Linien</b> wechselt zwischen <i>Alle</i> (komplette Vorschau aller Kugeln), <i>Einfach</i> (nur Hilfslinie) und <i>Aus</i>.</li>
+      <li>Bei Ball in Hand ziehst du die Weiße an die gewünschte Stelle.</li>
+    </ul>
+    <h2>Allgemein</h2>
+    <ul>
+      <li>Nach dem Treffen einer Kugel muss eine Kugel versenkt werden oder irgendeine Kugel eine Bande berühren. Sonst ist es ein Foul.</li>
+      <li>Fouls sind: Weiße versenkt, keine Kugel getroffen, falsche Kugel zuerst getroffen, keine Bande nach dem Treffer. Nach einem Foul hat der Gegner Ball in Hand auf dem ganzen Tisch.</li>
+      <li>Ein gültiger Anstoß versenkt eine Kugel oder bringt mindestens 4 Objektkugeln an die Bande.</li>
+      <li>Wer regelgerecht versenkt, bleibt am Zug.</li>
+    </ul>
+    <h2>8-Ball</h2>
+    <ul>
+      <li>Nach dem Anstoß ist der Tisch offen. Die erste regelgerecht versenkte Kugel legt deine Gruppe fest: Volle (1–7) oder Halbe (9–15).</li>
+      <li>Du musst immer zuerst eine Kugel deiner Gruppe treffen. Bei offenem Tisch darf die 8 nicht zuerst getroffen werden.</li>
+      <li>Ist deine Gruppe abgeräumt, spielst du auf die 8. Wenn „8 ansagen“ eingeschaltet ist, tippst du dafür vorher auf eine Tasche.</li>
+      <li>Du gewinnst, wenn du die 8 regelgerecht in die angesagte Tasche versenkst. Du verlierst, wenn die 8 zu früh, mit einem Foul oder in eine andere Tasche fällt.</li>
+      <li>Fällt die 8 beim Anstoß, wird sie wieder aufgesetzt. Versenkst du beim Anstoß die Weiße, hat der Gegner Ball in Hand im Kopffeld (links von der Linie).</li>
+    </ul>
+    <h2>9-Ball</h2>
+    <ul>
+      <li>Du musst immer zuerst die niedrigste Kugel auf dem Tisch treffen.</li>
+      <li>Wer die 9 regelgerecht versenkt, gewinnt. Das gilt auch über eine Kombination oder beim Anstoß.</li>
+      <li>Fällt die 9 bei einem Foul, wird sie wieder aufgesetzt.</li>
+      <li>Push-Out: Direkt nach dem Anstoß darf der Spieler am Zug einen Push-Out ansagen. Dabei gelten nur die Regeln zur Weißen. Danach entscheidet der Gegner, ob er selbst spielt oder zurückgibt.</li>
+      <li>Wer dreimal in Folge foult, verliert das Spiel.</li>
+    </ul>
+    <div class="actions"><button id="bRulesClose" class="primary">Zurück</button></div>
+  </div>
+</div>
+
+<div id="over" class="overlay hidden">
+  <div class="panel">
+    <h1 id="overTitle">Gewonnen!</h1>
+    <div id="overText" style="color:var(--muted);font-size:15px"></div>
+    <div class="actions"><button id="bAgain" class="primary">Nochmal</button><button id="bOverMenu">Menü</button></div>
+  </div>
+</div>
+
+<script>
+'use strict';
+// ===================== Konstanten (Einheiten: cm, Sekunden) =====================
+const W = 254, H = 127, R = 2.85, TAU = Math.PI * 2;
+const CUSH = 3.2, WOOD = 7.2, BORDER = CUSH + WOOD;
+const CORNER_GAP = 8.6, SIDE_GAP = 6.5, CAP2 = 5.4 * 5.4;
+const FRIC = 24, DRAG = 0.24, STOPV = 1.2, E_BALL = 0.95, E_CUSH = 0.76, CUSH_T = 0.96, MAXV = 760;
+const SEGS = [
+  [CORNER_GAP, 0, W / 2 - SIDE_GAP, 0], [W / 2 + SIDE_GAP, 0, W - CORNER_GAP, 0],
+  [CORNER_GAP, H, W / 2 - SIDE_GAP, H], [W / 2 + SIDE_GAP, H, W - CORNER_GAP, H],
+  [0, CORNER_GAP, 0, H - CORNER_GAP], [W, CORNER_GAP, W, H - CORNER_GAP]
+];
+// Taschen: 0 oben links, 1 oben Mitte, 2 oben rechts, 3 unten links, 4 unten Mitte, 5 unten rechts
+const POCKETS = [{x: 0, y: 0}, {x: W / 2, y: -1}, {x: W, y: 0}, {x: 0, y: H}, {x: W / 2, y: H + 1}, {x: W, y: H}];
+const POCKET_DRAW = [{x: -1.6, y: -1.6, r: 7.2}, {x: W / 2, y: -2.6, r: 6.6}, {x: W + 1.6, y: -1.6, r: 7.2},
+  {x: -1.6, y: H + 1.6, r: 7.2}, {x: W / 2, y: H + 2.6, r: 6.6}, {x: W + 1.6, y: H + 1.6, r: 7.2}];
+const AIM_PTS = [{x: 0.6, y: 0.6}, {x: W / 2, y: -1.2}, {x: W - 0.6, y: 0.6}, {x: 0.6, y: H - 0.6}, {x: W / 2, y: H + 1.2}, {x: W - 0.6, y: H - 0.6}];
+const HEAD_X = W / 4, FOOT = {x: W * 0.75, y: H / 2};
+const BALL_COLORS = {1: '#f2c200', 2: '#1f4fd1', 3: '#d4231f', 4: '#5b2a8c', 5: '#f07a12', 6: '#12804a', 7: '#7a1d22', 8: '#141414'};
+const colorOf = n => n === 0 ? '#f6f3ea' : BALL_COLORS[n > 8 ? n - 8 : n];
+const groupOf = n => n >= 1 && n <= 7 ? 'solid' : n >= 9 && n <= 15 ? 'stripe' : null;
+const otherGroup = g => g === 'solid' ? 'stripe' : 'solid';
+const GROUP_NAME = {solid: 'Volle (1–7)', stripe: 'Halbe (9–15)'};
+const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
+const gauss = () => { let u = 0, v = 0; while (!u) u = Math.random(); while (!v) v = Math.random(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(TAU * v); };
+
+// ===================== Einstellungen =====================
+const CFG = {mode: 8, opp: 'ai', diff: 1, call: 1, sound: 1, lines: 'all'};
+try { Object.assign(CFG, JSON.parse(localStorage.getItem('billard_cfg') || '{}')); } catch (e) {}
+const saveCfg = () => { try { localStorage.setItem('billard_cfg', JSON.stringify(CFG)); } catch (e) {} };
+let TIME_SCALE = 1;
+
+// ===================== Physik =====================
+function cloneBalls(bs) { return bs.map(b => ({n: b.n, x: b.x, y: b.y, vx: b.vx, vy: b.vy, on: b.on})); }
+function getBall(bs, n) { for (const b of bs) if (b.n === n) return b; return null; }
+function onSet(bs) { const s = new Set(); for (const b of bs) if (b.on && b.n > 0) s.add(b.n); return s; }
+
+function newSim(balls, shot) {
+  const bs = cloneBalls(balls);
+  const cue = getBall(bs, 0);
+  const v = Math.max(0.02, shot.power) * MAXV;
+  cue.vx = Math.cos(shot.angle) * v; cue.vy = Math.sin(shot.angle) * v;
+  return {balls: bs, t: 0, sx: shot.sx || 0, sy: shot.sy || 0, spinUsed: false, cueTravel: 0, contact: null,
+    ev: {first: null, railAfter: false, railBalls: new Set(), potted: [], cuePotted: false}, paths: null, snd: null};
+}
+
+function pocketCheck(b) {
+  const x = b.x, y = b.y;
+  if (x * x + y * y < CAP2) return 0;
+  if ((W - x) * (W - x) + y * y < CAP2) return 2;
+  if (x * x + (H - y) * (H - y) < CAP2) return 3;
+  if ((W - x) * (W - x) + (H - y) * (H - y) < CAP2) return 5;
+  if (Math.abs(x - W / 2) < SIDE_GAP) { if (y < 0.8) return 1; if (y > H - 0.8) return 4; }
+  if (x < 0 || x > W || y < 0 || y > H) {
+    let best = 0, bd = Infinity;
+    for (let k = 0; k < 6; k++) { const d = (POCKETS[k].x - x) ** 2 + (POCKETS[k].y - y) ** 2; if (d < bd) { bd = d; best = k; } }
+    return best;
+  }
+  return -1;
+}
+
+function recPath(S, b, force) {
+  if (!S.paths) return;
+  const p = S.paths[b.n];
+  const l = p[p.length - 1];
+  if (force || (l[0] - b.x) ** 2 + (l[1] - b.y) ** 2 > 2.5) p.push([b.x, b.y]);
+}
+
+// Ein Simulationsschritt. Gibt false zurück, wenn alle Kugeln stehen.
+function stepSim(S) {
+  const bs = S.balls, ev = S.ev;
+  let maxv2 = 0;
+  for (const b of bs) if (b.on) { const v = b.vx * b.vx + b.vy * b.vy; if (v > maxv2) maxv2 = v; }
+  if (maxv2 === 0) return false;
+  const dt = Math.min(1 / 120, 0.8 / Math.sqrt(maxv2));
+  S.t += dt;
+  for (const b of bs) {
+    if (!b.on || (b.vx === 0 && b.vy === 0)) continue;
+    const v = Math.hypot(b.vx, b.vy);
+    let nv = v - (FRIC + DRAG * v) * dt;
+    if (nv < STOPV) nv = 0;
+    const k = nv / v; b.vx *= k; b.vy *= k;
+    b.x += b.vx * dt; b.y += b.vy * dt;
+    if (b.n === 0 && ev.first === null) S.cueTravel += nv * dt;
+    if (nv === 0) recPath(S, b, true);
+  }
+  // Kugel gegen Kugel
+  for (let i = 0; i < bs.length; i++) {
+    const a = bs[i]; if (!a.on) continue;
+    for (let j = i + 1; j < bs.length; j++) {
+      const b = bs[j]; if (!b.on) continue;
+      if (a.vx === 0 && a.vy === 0 && b.vx === 0 && b.vy === 0) continue;
+      const dx = b.x - a.x, dy = b.y - a.y, d2 = dx * dx + dy * dy;
+      if (d2 >= 4 * R * R) continue;
+      const d = Math.sqrt(d2) || 1e-6, nx = dx / d, ny = dy / d;
+      const ov = (2 * R - d) / 2;
+      a.x -= nx * ov; a.y -= ny * ov; b.x += nx * ov; b.y += ny * ov;
+      const rv = (a.vx - b.vx) * nx + (a.vy - b.vy) * ny;
+      if (rv <= 0) continue;
+      let cue = null, other = null;
+      if (a.n === 0) { cue = a; other = b; } else if (b.n === 0) { cue = b; other = a; }
+      const pre = cue && !S.spinUsed ? {vx: cue.vx, vy: cue.vy} : null;
+      const jm = (1 + E_BALL) / 2 * rv;
+      a.vx -= jm * nx; a.vy -= jm * ny; b.vx += jm * nx; b.vy += jm * ny;
+      if (pre) {
+        // Nachläufer / Rückläufer: wirkt bei der ersten Berührung, schwächer je weiter die Weiße vorher lief
+        S.spinUsed = true;
+        const sp = Math.hypot(pre.vx, pre.vy);
+        if (sp > 0) {
+          const decay = Math.exp(-S.cueTravel / 110);
+          const eff = S.sy * 0.8 * decay + 0.29 * (1 - decay);
+          const cnx = cue === a ? nx : -nx, cny = cue === a ? ny : -ny;
+          const vn = pre.vx * cnx + pre.vy * cny;
+          cue.vx += pre.vx / sp * vn * eff; cue.vy += pre.vy / sp * vn * eff;
+        }
+      }
+      if (cue && ev.first === null) {
+        ev.first = other.n;
+        S.contact = {x: cue.x, y: cue.y, n: other.n, ox: other.x, oy: other.y, ovx: other.vx, ovy: other.vy, cvx: cue.vx, cvy: cue.vy};
+      }
+      if (S.snd) S.snd.push({t: 'ball', v: rv});
+      recPath(S, a, true); recPath(S, b, true);
+    }
+  }
+  // Taschen und Banden
+  for (const b of bs) {
+    if (!b.on) continue;
+    const pk = pocketCheck(b);
+    if (pk >= 0) {
+      b.on = false; b.vx = b.vy = 0;
+      if (S.paths) S.paths[b.n].push([POCKETS[pk].x, POCKETS[pk].y]);
+      if (b.n === 0) ev.cuePotted = true; else ev.potted.push({n: b.n, pocket: pk});
+      if (S.snd) S.snd.push({t: 'pocket', v: 1});
+      continue;
+    }
+    if (b.x > R && b.x < W - R && b.y > R && b.y < H - R) { recPath(S, b, false); continue; }
+    for (const s of SEGS) {
+      const ex = s[2] - s[0], ey = s[3] - s[1];
+      let t = ((b.x - s[0]) * ex + (b.y - s[1]) * ey) / (ex * ex + ey * ey);
+      t = t < 0 ? 0 : t > 1 ? 1 : t;
+      const cx = s[0] + t * ex, cy = s[1] + t * ey, dx = b.x - cx, dy = b.y - cy, d2 = dx * dx + dy * dy;
+      if (d2 >= R * R) continue;
+      const d = Math.sqrt(d2) || 1e-6, nx = dx / d, ny = dy / d, vn = b.vx * nx + b.vy * ny;
+      b.x = cx + nx * R; b.y = cy + ny * R;
+      if (vn < 0) {
+        const tvx = b.vx - vn * nx, tvy = b.vy - vn * ny;
+        b.vx = tvx * CUSH_T - E_CUSH * vn * nx; b.vy = tvy * CUSH_T - E_CUSH * vn * ny;
+        if (b.n === 0 && S.sx !== 0) {
+          // Seiteneffet verändert den Abprallwinkel an der Bande
+          const k = -0.42 * S.sx * (-vn);
+          b.vx += k * ny; b.vy += k * -nx; S.sx *= 0.6;
+        }
+        if (ev.first !== null) ev.railAfter = true;
+        if (b.n > 0) ev.railBalls.add(b.n);
+        if (S.snd) S.snd.push({t: 'rail', v: -vn});
+        recPath(S, b, true);
+      }
+    }
+    recPath(S, b, false);
+  }
+  return true;
+}
+
+function runSim(balls, shot, withPaths) {
+  const S = newSim(balls, shot);
+  if (withPaths) { S.paths = {}; for (const b of S.balls) S.paths[b.n] = [[b.x, b.y]]; }
+  let n = 0;
+  while (stepSim(S) && S.t < 60 && n < 300000) n++;
+  if (withPaths) for (const b of S.balls) if (b.on) recPath(S, b, true);
+  return S;
+}
+
+// ===================== Aufbau =====================
+function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function rack(mode) {
+  const balls = [{n: 0, x: W * 0.2, y: H / 2, vx: 0, vy: 0, on: true}];
+  const dx = R * Math.sqrt(3) + 0.03, dy = R + 0.015;
+  const pos = [];
+  const rows = mode === 8 ? [1, 2, 3, 4, 5] : [1, 2, 3, 2, 1];
+  rows.forEach((c, r) => { for (let i = 0; i < c; i++) pos.push([FOOT.x + r * dx, FOOT.y + (i - (c - 1) / 2) * 2 * dy]); });
+  const order = new Array(pos.length);
+  if (mode === 8) {
+    const solids = shuffle([1, 2, 3, 4, 5, 6, 7]), stripes = shuffle([9, 10, 11, 12, 13, 14, 15]);
+    order[4] = 8;
+    if (Math.random() < 0.5) { order[10] = solids.pop(); order[14] = stripes.pop(); } else { order[10] = stripes.pop(); order[14] = solids.pop(); }
+    const rest = shuffle(solids.concat(stripes));
+    for (let i = 0; i < 15; i++) if (order[i] === undefined) order[i] = rest.pop();
+  } else {
+    order[0] = 1; order[4] = 9;
+    const rest = shuffle([2, 3, 4, 5, 6, 7, 8]);
+    for (let i = 0; i < 9; i++) if (order[i] === undefined) order[i] = rest.pop();
+  }
+  pos.forEach((p, i) => balls.push({n: order[i], x: p[0], y: p[1], vx: 0, vy: 0, on: true}));
+  return balls;
+}
+
+function placeOK(bs, x, y, kitchen) {
+  if (x < R || x > W - R || y < R || y > H - R) return false;
+  if (kitchen && x > HEAD_X) return false;
+  for (const b of bs) if (b.on && b.n !== 0 && (b.x - x) ** 2 + (b.y - y) ** 2 < (2 * R + 0.05) ** 2) return false;
+  return true;
+}
+function findFree(bs, x, y, kitchen) {
+  if (placeOK(bs, x, y, kitchen)) return {x, y};
+  for (let r = 1; r < 200; r += 1) for (let a = 0; a < TAU; a += 0.3) {
+    const px = x + Math.cos(a) * r, py = y + Math.sin(a) * r;
+    if (placeOK(bs, px, py, kitchen)) return {x: px, y: py};
+  }
+  return {x, y};
+}
+function respot(bs, n) {
+  const b = getBall(bs, n);
+  const free = (x, y) => { for (const o of bs) if (o.on && o !== b && (o.x - x) ** 2 + (o.y - y) ** 2 < (2 * R + 0.05) ** 2) return false; return true; };
+  let x = FOOT.x;
+  while (x < W - R && !free(x, FOOT.y)) x += 0.5;
+  if (x >= W - R) { x = FOOT.x; while (x > R && !free(x, FOOT.y)) x -= 0.5; }
+  b.x = x; b.y = FOOT.y; b.vx = b.vy = 0; b.on = true;
+}
+
+// ===================== Regeln =====================
+function legalTargets(mode, group, on) {
+  const arr = [...on];
+  if (mode === 9) return arr.length ? [Math.min(...arr)] : [];
+  if (!group) return arr.filter(n => n !== 8);
+  const own = arr.filter(n => groupOf(n) === group);
+  return own.length ? own : (on.has(8) ? [8] : []);
+}
+function needCall() {
+  if (G.mode !== 8 || !CFG.call || G.isBreak) return false;
+  const g = G.players[G.cur].group;
+  return !!g && legalTargets(8, g, onSet(G.balls))[0] === 8;
+}
+
+// Bewertet einen Stoß nach den Regeln, ohne den Spielstand zu verändern.
+function judge(before, ev, called) {
+  const me = G.cur, opp = 1 - me, P = G.players[me];
+  const r = {foul: false, reason: '', win: null, winReason: '', cont: false, assign: null, respot: [], bihKitchen: false, info: ''};
+  const pot = ev.potted.map(p => p.n);
+  const foul = why => { if (!r.foul) { r.foul = true; r.reason = why; } };
+  if (G.mode === 8) {
+    const group = P.group;
+    const onEight = !!group && ![...before].some(n => groupOf(n) === group);
+    if (ev.cuePotted) foul('Weiße versenkt');
+    if (ev.first === null) foul('Keine Kugel getroffen');
+    else if (G.isBreak) { if (!pot.length && ev.railBalls.size < 4) foul('Ungültiger Anstoß – weniger als 4 Kugeln an der Bande'); }
+    else {
+      if (!group) { if (ev.first === 8) foul('Bei offenem Tisch darf die 8 nicht zuerst getroffen werden'); }
+      else if (onEight) { if (ev.first !== 8) foul('Die 8 muss zuerst getroffen werden'); }
+      else if (groupOf(ev.first) !== group) foul('Zuerst eine Kugel der eigenen Gruppe treffen (' + GROUP_NAME[group] + ')');
+      if (!pot.length && !ev.railAfter) foul('Nach dem Treffer berührte keine Kugel eine Bande');
+    }
+    if (G.isBreak && ev.cuePotted) r.bihKitchen = true;
+    const eight = ev.potted.find(p => p.n === 8);
+    if (eight) {
+      if (G.isBreak) { r.respot.push(8); r.info = 'Die 8 fiel beim Anstoß und wird wieder aufgesetzt.'; }
+      else if (!onEight) { r.win = opp; r.winReason = 'Die 8 wurde zu früh versenkt.'; }
+      else if (r.foul) { r.win = opp; r.winReason = 'Die 8 fiel mit einem Foul (' + r.reason + ').'; }
+      else if (CFG.call && called !== null && called !== undefined && eight.pocket !== called) { r.win = opp; r.winReason = 'Die 8 fiel in eine andere als die angesagte Tasche.'; }
+      else { r.win = me; r.winReason = 'Die 8 wurde regelgerecht versenkt.'; }
+    }
+    if (r.win === null && !r.foul) {
+      const objs = pot.filter(n => n !== 8);
+      if (G.isBreak) r.cont = objs.length > 0;
+      else if (!group) { if (objs.length) { r.assign = groupOf(objs[0]); r.cont = true; } }
+      else r.cont = objs.some(n => groupOf(n) === group);
+    }
+  } else {
+    const lowest = before.size ? Math.min(...before) : 9;
+    if (G.pushShot) {
+      if (ev.cuePotted) foul('Weiße versenkt');
+      if (pot.includes(9)) r.respot.push(9);
+    } else {
+      if (ev.cuePotted) foul('Weiße versenkt');
+      if (ev.first === null) foul('Keine Kugel getroffen');
+      else if (ev.first !== lowest) foul('Zuerst muss die niedrigste Kugel (' + lowest + ') getroffen werden');
+      if (G.isBreak) { if (ev.first !== null && !pot.length && ev.railBalls.size < 4) foul('Ungültiger Anstoß – weniger als 4 Kugeln an der Bande'); }
+      else if (ev.first !== null && !pot.length && !ev.railAfter) foul('Nach dem Treffer berührte keine Kugel eine Bande');
+      if (pot.includes(9)) {
+        if (!r.foul) { r.win = me; r.winReason = G.isBreak ? 'Die 9 fiel beim Anstoß.' : 'Die 9 wurde regelgerecht versenkt.'; }
+        else r.respot.push(9);
+      }
+      if (r.foul && r.win === null && P.fouls + 1 >= 3) { r.win = opp; r.winReason = 'Drei Fouls in Folge (' + P.name + ').'; }
+      if (!r.foul) r.cont = pot.length > 0;
+    }
+  }
+  return r;
+}
+
+// ===================== Spielzustand =====================
+let G = null;
+let breaker = 0;
+function newGame() {
+  const ai = CFG.opp === 'ai';
+  G = {
+    mode: +CFG.mode, diff: +CFG.diff,
+    players: [{name: 'Spieler 1', group: null, fouls: 0}, {name: ai ? 'Computer' : 'Spieler 2', group: null, fouls: 0}],
+    ai: [false, ai], cur: breaker, balls: rack(+CFG.mode), isBreak: true, bih: 'kitchen',
+    state: 'aim', aim: 0, power: 0.85, sx: 0, sy: 0, called: null, calledManual: false,
+    pushAvail: false, pushShot: false, ver: 0, pred: null, predKey: '', toast: null, live: null
+  };
+  breaker = 1 - breaker;
+  hide('over'); hide('menu');
+  startTurn();
+}
+
+function aimDefault() {
+  const cue = getBall(G.balls, 0);
+  let tx = FOOT.x, ty = FOOT.y;
+  if (!G.isBreak) {
+    const t = legalTargets(G.mode, G.players[G.cur].group, onSet(G.balls));
+    let bd = Infinity;
+    for (const n of t) { const b = getBall(G.balls, n), d = (b.x - cue.x) ** 2 + (b.y - cue.y) ** 2; if (d < bd) { bd = d; tx = b.x; ty = b.y; } }
+  }
+  G.aim = Math.atan2(ty - cue.y, tx - cue.x);
+}
+
+function startTurn() {
+  G.state = 'aim'; G.sx = 0; G.sy = 0; G.called = null; G.calledManual = false; G.pushShot = false;
+  aimDefault();
+  if (G.isBreak) G.power = 0.9; else if (G.power > 0.7) G.power = 0.5;
+  if (G.ai[G.cur]) startAI();
+  updateUI();
+}
+
+const isHumanTurn = () => G && G.state === 'aim' && !G.ai[G.cur];
+
+function shoot() {
+  if (!isHumanTurn() && G.state !== 'aipreview') return;
+  if (needCall() && G.called === null) {
+    if (G.state === 'aipreview') G.called = 0;
+    else { toast('Tippe auf eine Tasche, um die 8 anzusagen.'); return; }
+  }
+  initAudio();
+  G.before = onSet(G.balls);
+  G.shotCalled = G.called;
+  const S = newSim(G.balls, {angle: G.aim, power: G.power, sx: G.sx, sy: G.sy});
+  S.snd = [];
+  G.live = S; G.state = 'moving'; G.pred = null;
+  playSound('cue', G.power);
+  updateUI();
+}
+
+function finishShot() {
+  const S = G.live; G.live = null;
+  G.balls = S.balls; G.ver++;
+  const r = judge(G.before, S.ev, G.shotCalled);
+  const me = G.cur, opp = 1 - me, P = G.players[me];
+  if (G.mode === 9 && !G.pushShot) { if (r.foul) P.fouls++; else P.fouls = 0; }
+  if (r.win !== null) { endGame(r.win, r.winReason); return; }
+  for (const n of r.respot) respot(G.balls, n);
+  if (r.assign) { P.group = r.assign; G.players[opp].group = otherGroup(r.assign); }
+  const wasBreak = G.isBreak, wasPush = G.pushShot;
+  G.isBreak = false;
+  const cue = getBall(G.balls, 0);
+  if (r.foul) {
+    G.bih = r.bihKitchen ? 'kitchen' : 'any';
+    if (!cue.on) { const p = findFree(G.balls, W * 0.2, H / 2, r.bihKitchen); cue.x = p.x; cue.y = p.y; cue.on = true; cue.vx = cue.vy = 0; }
+  } else G.bih = null;
+  if (!r.cont) G.cur = opp;
+  let msg = '';
+  if (r.foul) msg = 'Foul: ' + r.reason + '. Ball in Hand' + (r.bihKitchen ? ' im Kopffeld' : '') + ' für ' + G.players[G.cur].name + '.';
+  if (r.assign) msg = P.name + ' spielt ' + GROUP_NAME[r.assign] + '.';
+  if (r.info) msg = r.info + (msg ? ' ' + msg : '');
+  if (r.respot.includes(9)) msg = 'Die 9 wird wieder aufgesetzt. ' + msg;
+  if (G.mode === 9 && r.foul && G.players[me].fouls === 2) msg += ' Achtung: ' + G.players[me].name + ' hat 2 Fouls in Folge!';
+  if (msg) toast(msg, 3500);
+  if (G.mode === 9) {
+    G.pushAvail = wasBreak;
+    if (wasPush && !r.foul) { G.pushAvail = false; G.state = 'push'; G.sx = G.sy = 0; G.pushShot = false; showPushDecision(); updateUI(); return; }
+  }
+  startTurn();
+}
+
+function showPushDecision() {
+  if (G.ai[G.cur]) {
+    // Computer entscheidet: selbst spielen, wenn ein vernünftiger Stoß da ist
+    const e = bestEase(G.balls, G.players[G.cur].group);
+    if (e > 0.18) { toast(G.players[G.cur].name + ' spielt selbst weiter.'); startTurn(); }
+    else { toast(G.players[G.cur].name + ' gibt zurück.'); G.cur = 1 - G.cur; startTurn(); }
+    return;
+  }
+  document.getElementById('pushTxt').textContent = G.players[1 - G.cur].name + ' hat einen Push-Out gespielt. ' + G.players[G.cur].name + ', wie geht es weiter?';
+  show('pushDlg');
+}
+
+function endGame(winner, reason) {
+  G.state = 'over';
+  updateUI();
+  document.getElementById('overTitle').textContent = G.players[winner].name + ' gewinnt!';
+  document.getElementById('overText').textContent = reason;
+  setTimeout(() => show('over'), 600);
+}
+
+// ===================== Computer =====================
+function pathClear(bs, x1, y1, x2, y2, ex1, ex2) {
+  const ex = x2 - x1, ey = y2 - y1, l2 = ex * ex + ey * ey || 1e-9;
+  for (const b of bs) {
+    if (!b.on || b.n === ex1 || b.n === ex2) continue;
+    let t = ((b.x - x1) * ex + (b.y - y1) * ey) / l2; t = clamp(t, 0, 1);
+    if ((x1 + t * ex - b.x) ** 2 + (y1 + t * ey - b.y) ** 2 < (2 * R - 0.2) ** 2) return false;
+  }
+  return true;
+}
+function ease(cx, cy, gx, gy, ux, uy, d2) {
+  const ax = gx - cx, ay = gy - cy, d1 = Math.hypot(ax, ay);
+  const c = d1 < 0.5 ? 1 : (ax * ux + ay * uy) / d1;
+  if (c < 0.25) return 0;
+  return c * c * 70 / (40 + d1 + d2 * 1.4);
+}
+// Liste möglicher direkter Stöße (Zielkugel -> Tasche)
+function combos(bs, targets, cue, bih, kitchen) {
+  const out = [];
+  for (const t of targets) {
+    const tb = getBall(bs, t); if (!tb) continue;
+    for (let k = 0; k < 6; k++) {
+      const ap = AIM_PTS[k];
+      let ux = ap.x - tb.x, uy = ap.y - tb.y; const dd = Math.hypot(ux, uy); ux /= dd; uy /= dd;
+      if ((k === 1 || k === 4) && Math.abs(uy) < 0.4) continue;
+      if (!pathClear(bs, tb.x, tb.y, ap.x, ap.y, 0, t)) continue;
+      const gx = tb.x - ux * 2 * R, gy = tb.y - uy * 2 * R;
+      if (bih) {
+        for (const D of [16, 30, 48]) for (const off of [0, 0.3, -0.3]) {
+          const a = Math.atan2(uy, ux) + off, px = gx - Math.cos(a) * D, py = gy - Math.sin(a) * D;
+          if (!placeOK(bs, px, py, kitchen) || !pathClear(bs, px, py, gx, gy, 0, t)) continue;
+          out.push({t, k, place: {x: px, y: py}, gx, gy, e: ease(px, py, gx, gy, ux, uy, dd)});
+        }
+      } else {
+        if (!pathClear(bs, cue.x, cue.y, gx, gy, 0, t)) continue;
+        const e = ease(cue.x, cue.y, gx, gy, ux, uy, dd);
+        if (e > 0) out.push({t, k, place: null, gx, gy, e});
+      }
+    }
+  }
+  return out;
+}
+function bestEase(bs, group) {
+  const cue = getBall(bs, 0);
+  if (!cue.on) return 1;
+  let best = 0;
+  for (const c of combos(bs, legalTargets(G.mode, group, onSet(bs)), cue, false, false)) if (c.e > best) best = c.e;
+  return best;
+}
+function evalShot(base, place, shot, called) {
+  let bs = base;
+  if (place) { bs = cloneBalls(base); const c = getBall(bs, 0); c.x = place.x; c.y = place.y; c.on = true; }
+  const S = runSim(bs, shot, false);
+  if (called === null) { const e = S.ev.potted.find(p => p.n === 8); called = e ? e.pocket : null; }
+  const r = judge(onSet(base), S.ev, called);
+  const me = G.cur;
+  if (r.win === me) return {score: 1e5, called};
+  if (r.win !== null) return {score: -1e5, called};
+  if (r.foul) return {score: -3000, called};
+  if (r.cont) return {score: 1000 + bestEase(S.balls, r.assign || G.players[me].group) * 800, called};
+  const og = r.assign ? otherGroup(r.assign) : G.players[1 - me].group;
+  return {score: 200 - bestEase(S.balls, og) * 800, called};
+}
+function* aiThink() {
+  const me = G.cur, diff = G.diff, base = G.balls;
+  if (G.isBreak) {
+    const pos = findFree(base, W * 0.2, H / 2 + (Math.random() - 0.5) * H * 0.5, true);
+    return {place: pos, angle: Math.atan2(FOOT.y - pos.y, FOOT.x - pos.x) + gauss() * 0.004, power: 0.95, sx: 0, sy: 0, called: null};
+  }
+  const cue = getBall(base, 0), kitchen = G.bih === 'kitchen';
+  const list = combos(base, legalTargets(G.mode, G.players[me].group, onSet(base)), cue, !!G.bih, kitchen).sort((a, b) => b.e - a.e);
+  const powers = [[0.42], [0.32, 0.55], [0.26, 0.4, 0.58, 0.8]][diff];
+  const spins = diff === 2 ? [0, -0.6, 0.5] : [0];
+  let best = null;
+  const consider = c => { if (!best || c.score > best.score) best = c; };
+  for (const cb of list.slice(0, [3, 6, 10][diff])) {
+    const px = cb.place ? cb.place.x : cue.x, py = cb.place ? cb.place.y : cue.y;
+    const angle = Math.atan2(cb.gy - py, cb.gx - px);
+    for (const power of powers) for (const sy of spins) {
+      const res = evalShot(base, cb.place, {angle, power, sx: 0, sy}, cb.k);
+      consider({place: cb.place, angle, power, sx: 0, sy, called: res.called, score: res.score});
+      yield;
+    }
+  }
+  if (!best || best.score < 500) {
+    // Kein sicherer Stoß: Winkel absuchen (Sicherheitsstoß, Bandenstoß)
+    const place = G.bih ? (best && best.place) || findFree(base, W * 0.22, H / 2, kitchen) : null;
+    const step = [6, 4, 3][diff] * Math.PI / 180;
+    for (let a = 0; a < TAU; a += step) for (const power of diff ? [0.3, 0.55] : [0.45]) {
+      const res = evalShot(base, place, {angle: a, power, sx: 0, sy: 0}, null);
+      consider({place, angle: a, power, sx: 0, sy: 0, called: res.called, score: res.score});
+      if (Math.floor(a / step) % 4 === 0) yield;
+    }
+  }
+  best.angle += gauss() * [0.02, 0.007, 0.0022][diff];
+  best.power = clamp(best.power * (1 + gauss() * [0.08, 0.04, 0.015][diff]), 0.05, 1);
+  return best;
+}
+function startAI() { G.state = 'ai'; G.aiGen = aiThink(); G.aiStart = performance.now(); }
+function runAI() {
+  const t0 = performance.now();
+  while (performance.now() - t0 < 14) {
+    const r = G.aiGen.next();
+    if (r.done) {
+      const c = r.value;
+      if (c.place) { const cue = getBall(G.balls, 0); cue.x = c.place.x; cue.y = c.place.y; cue.on = true; }
+      G.aim = c.angle; G.power = c.power; G.sx = c.sx; G.sy = c.sy;
+      G.called = c.called; G.ver++;
+      G.state = 'aipreview'; G.aiT = performance.now();
+      return;
+    }
+  }
+}
+
+// ===================== Ton =====================
+let AC = null, noiseBuf = null;
+function initAudio() {
+  if (AC || !CFG.sound) return;
+  try {
+    AC = new (window.AudioContext || window.webkitAudioContext)();
+    const len = Math.floor(AC.sampleRate * 0.06);
+    noiseBuf = AC.createBuffer(1, len, AC.sampleRate);
+    const d = noiseBuf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (len * 0.07));
+  } catch (e) { AC = null; }
+}
+function playSound(type, v) {
+  if (!AC || !CFG.sound || TIME_SCALE > 1) return;
+  try {
+    const s = AC.createBufferSource(); s.buffer = noiseBuf;
+    const g = AC.createGain();
+    if (type === 'ball') { s.playbackRate.value = 1.6; g.gain.value = Math.min(0.9, v / 300); }
+    else if (type === 'rail') { s.playbackRate.value = 0.5; g.gain.value = Math.min(0.5, v / 500); }
+    else if (type === 'pocket') { s.playbackRate.value = 0.3; g.gain.value = 0.7; }
+    else { s.playbackRate.value = 1.0; g.gain.value = 0.25 + v * 0.5; }
+    s.connect(g); g.connect(AC.destination); s.start();
+  } catch (e) {}
+}
+
+// ===================== Layout & Zeichnen =====================
+const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+let VW = 0, VH = 0, DPR = 1, L = null;
+function layout() {
+  DPR = Math.min(window.devicePixelRatio || 1, 3); VW = innerWidth; VH = innerHeight;
+  cv.width = Math.round(VW * DPR); cv.height = Math.round(VH * DPR);
+  const left = 58, right = 104, pad = 4;
+  const aw = VW - left - right - pad * 2, ah = VH - pad * 2;
+  const tw = W + 2 * BORDER, th = H + 2 * BORDER;
+  const s = Math.max(0.5, Math.min(aw / tw, ah / th));
+  L = {s, left, rx: VW - right, right,
+    ox: left + pad + (aw - tw * s) / 2 + BORDER * s, oy: pad + (ah - th * s) / 2 + BORDER * s};
+  L.power = {x: 12, y: 30, w: 34, h: VH - 48};
+  const bx = L.rx + 6, bw = right - 12;
+  place('bMenu', bx, 6, bw, 32);
+  L.spin = {cx: L.rx + right / 2, cy: 6 + 32 + 14 + 32, r: 30};
+  const shootTop = VH - 6 - 58;
+  place('bShoot', bx, shootTop, bw, 58);
+  place('bLines', bx, shootTop - 8 - 32, bw, 32);
+  place('bPush', bx, shootTop - 8 - 32 - 6 - 32, bw, 32);
+  const wTop = L.spin.cy + L.spin.r + 22;
+  const wBot = shootTop - 8 - 32 - 6 - 32 - 8;
+  L.wheel = {x: bx + 18, y: wTop, w: bw - 36, h: Math.max(30, wBot - wTop)};
+}
+function place(id, x, y, w, h) { const e = document.getElementById(id).style; e.left = x + 'px'; e.top = y + 'px'; e.width = w + 'px'; e.height = h + 'px'; }
+
+function tableTransform() { ctx.setTransform(DPR * L.s, 0, 0, DPR * L.s, DPR * L.ox, DPR * L.oy); }
+function roundRect(x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
+
+let tableCache = null, tableCacheKey = '';
+function drawTableBase() {
+  const key = VW + 'x' + VH + '@' + DPR;
+  if (tableCacheKey !== key) {
+    tableCacheKey = key;
+    tableCache = document.createElement('canvas');
+    tableCache.width = cv.width; tableCache.height = cv.height;
+    paintTable(tableCache.getContext('2d'));
+  }
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.drawImage(tableCache, 0, 0);
+}
+function paintTable(c) {
+  c.setTransform(DPR * L.s, 0, 0, DPR * L.s, DPR * L.ox, DPR * L.oy);
+  // Holzrahmen
+  const g = c.createLinearGradient(0, -BORDER, 0, H + BORDER);
+  g.addColorStop(0, '#6b3d1f'); g.addColorStop(0.5, '#4a2812'); g.addColorStop(1, '#6b3d1f');
+  c.fillStyle = g;
+  c.beginPath(); const rr = 4, x0 = -BORDER, y0 = -BORDER, w0 = W + 2 * BORDER, h0 = H + 2 * BORDER;
+  c.moveTo(x0 + rr, y0); c.arcTo(x0 + w0, y0, x0 + w0, y0 + h0, rr); c.arcTo(x0 + w0, y0 + h0, x0, y0 + h0, rr); c.arcTo(x0, y0 + h0, x0, y0, rr); c.arcTo(x0, y0, x0 + w0, y0, rr); c.fill();
+  c.strokeStyle = 'rgba(0,0,0,.5)'; c.lineWidth = 0.6; c.stroke();
+  // Diamanten
+  c.fillStyle = '#e9dcc0';
+  const dm = (x, y) => { c.beginPath(); c.moveTo(x, y - 0.9); c.lineTo(x + 0.7, y); c.lineTo(x, y + 0.9); c.lineTo(x - 0.7, y); c.fill(); };
+  for (let i = 1; i < 8; i++) if (i !== 4) { dm(W * i / 8, -CUSH - WOOD / 2); dm(W * i / 8, H + CUSH + WOOD / 2); }
+  for (let i = 1; i < 4; i++) { dm(-CUSH - WOOD / 2, H * i / 4); dm(W + CUSH + WOOD / 2, H * i / 4); }
+  // Tuch (inkl. Bandenbereich)
+  c.fillStyle = '#0f4f63';
+  c.fillRect(-CUSH, -CUSH, W + 2 * CUSH, H + 2 * CUSH);
+  const cg = c.createRadialGradient(W / 2, H / 2, 10, W / 2, H / 2, W * 0.6);
+  cg.addColorStop(0, '#1b7a8f'); cg.addColorStop(1, '#13606f');
+  c.fillStyle = cg; c.fillRect(0, 0, W, H);
+  // Taschen
+  for (const p of POCKET_DRAW) {
+    c.beginPath(); c.arc(p.x, p.y, p.r, 0, TAU); c.fillStyle = '#050505'; c.fill();
+    c.strokeStyle = '#2b2b2b'; c.lineWidth = 0.6; c.stroke();
+  }
+  // Banden (Gummi) mit schrägen Enden
+  c.fillStyle = '#0d4656';
+  const cush = (ax, ay, bx, by, ox, oy) => {
+    const len = Math.hypot(bx - ax, by - ay), tx = (bx - ax) / len, ty = (by - ay) / len, b = CUSH * 1.1;
+    c.beginPath(); c.moveTo(ax, ay); c.lineTo(bx, by);
+    c.lineTo(bx + ox * CUSH - tx * b * 0.6, by + oy * CUSH - ty * b * 0.6);
+    c.lineTo(ax + ox * CUSH + tx * b * 0.6, ay + oy * CUSH + ty * b * 0.6); c.closePath(); c.fill();
+  };
+  cush(SEGS[0][0], 0, SEGS[0][2], 0, 0, -1); cush(SEGS[1][0], 0, SEGS[1][2], 0, 0, -1);
+  cush(SEGS[2][0], H, SEGS[2][2], H, 0, 1); cush(SEGS[3][0], H, SEGS[3][2], H, 0, 1);
+  cush(0, SEGS[4][1], 0, SEGS[4][3], -1, 0); cush(W, SEGS[5][1], W, SEGS[5][3], 1, 0);
+  c.strokeStyle = 'rgba(255,255,255,.08)'; c.lineWidth = 0.3;
+  for (const s of SEGS) { c.beginPath(); c.moveTo(s[0], s[1]); c.lineTo(s[2], s[3]); c.stroke(); }
+  // Kopflinie und Fußpunkt
+  c.strokeStyle = 'rgba(255,255,255,.13)'; c.lineWidth = 0.35;
+  c.beginPath(); c.moveTo(HEAD_X, 0); c.lineTo(HEAD_X, H); c.stroke();
+  c.fillStyle = 'rgba(255,255,255,.25)';
+  c.beginPath(); c.arc(FOOT.x, FOOT.y, 0.6, 0, TAU); c.fill();
+  c.beginPath(); c.arc(HEAD_X, H / 2, 0.6, 0, TAU); c.fill();
+}
+
+function drawBall(n, x, y, alpha) {
+  ctx.save(); ctx.translate(x, y); ctx.globalAlpha = alpha === undefined ? 1 : alpha;
+  ctx.beginPath(); ctx.arc(0, 0, R, 0, TAU);
+  if (n > 8) {
+    ctx.fillStyle = '#f4f1e8'; ctx.fill();
+    ctx.save(); ctx.clip(); ctx.fillStyle = colorOf(n); ctx.fillRect(-R, -R * 0.56, 2 * R, R * 1.12); ctx.restore();
+  } else { ctx.fillStyle = colorOf(n); ctx.fill(); }
+  if (n > 0) {
+    ctx.beginPath(); ctx.arc(0, 0, R * 0.5, 0, TAU); ctx.fillStyle = '#fbfaf5'; ctx.fill();
+    ctx.fillStyle = '#111'; ctx.font = 'bold ' + (R * 0.66).toFixed(2) + 'px sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(String(n), 0, R * 0.05);
+  }
+  const g = ctx.createRadialGradient(-R * 0.35, -R * 0.4, R * 0.08, 0, 0, R);
+  g.addColorStop(0, 'rgba(255,255,255,.6)'); g.addColorStop(0.3, 'rgba(255,255,255,0)'); g.addColorStop(1, 'rgba(0,0,0,.38)');
+  ctx.beginPath(); ctx.arc(0, 0, R, 0, TAU); ctx.fillStyle = g; ctx.fill();
+  ctx.restore();
+}
+
+function lineCol(n, a) {
+  if (n === 0) return 'rgba(255,255,255,' + a + ')';
+  if (n === 8) return 'rgba(200,200,200,' + a + ')';
+  const c = colorOf(n), r = parseInt(c.slice(1, 3), 16), g = parseInt(c.slice(3, 5), 16), b = parseInt(c.slice(5, 7), 16);
+  const m = v => Math.min(255, Math.round(v + (255 - v) * 0.35));
+  return 'rgba(' + m(r) + ',' + m(g) + ',' + m(b) + ',' + a + ')';
+}
+
+function getPrediction() {
+  const cue = getBall(G.balls, 0);
+  const key = [G.aim, G.power, G.sx, G.sy, cue.x, cue.y, G.ver].join('|');
+  if (key !== G.predKey) { G.predKey = key; G.pred = runSim(G.balls, {angle: G.aim, power: G.power, sx: G.sx, sy: G.sy}, true); }
+  return G.pred;
+}
+
+function drawPrediction(S) {
+  const px = 1 / L.s;
+  if (CFG.lines === 'all') {
+    for (const k in S.paths) {
+      const n = +k, p = S.paths[k];
+      if (p.length < 2) continue;
+      let moved = false;
+      for (const q of p) if (Math.abs(q[0] - p[0][0]) > 0.3 || Math.abs(q[1] - p[0][1]) > 0.3) { moved = true; break; }
+      if (!moved) continue;
+      ctx.strokeStyle = lineCol(n, n === 0 ? 0.9 : 0.85);
+      ctx.lineWidth = (n === 0 ? 1.6 : 1.8) * px;
+      ctx.setLineDash(n === 0 ? [6 * px, 4 * px] : []);
+      ctx.beginPath(); ctx.moveTo(p[0][0], p[0][1]);
+      for (let i = 1; i < p.length; i++) ctx.lineTo(p[i][0], p[i][1]);
+      ctx.stroke();
+      const b = getBall(S.balls, n);
+      ctx.setLineDash([]);
+      if (b.on) { ctx.beginPath(); ctx.arc(b.x, b.y, R, 0, TAU); ctx.lineWidth = 1.2 * px; ctx.strokeStyle = lineCol(n, 0.9); ctx.stroke(); }
+    }
+    ctx.setLineDash([]);
+  } else if (CFG.lines === 'guide') {
+    const cue = getBall(G.balls, 0), c = S.contact;
+    ctx.strokeStyle = 'rgba(255,255,255,.85)'; ctx.lineWidth = 1.4 * px;
+    ctx.beginPath(); ctx.moveTo(cue.x, cue.y);
+    if (c) {
+      ctx.lineTo(c.x, c.y); ctx.stroke();
+      const ol = Math.hypot(c.ovx, c.ovy), cl = Math.hypot(c.cvx, c.cvy);
+      if (ol > 0) { ctx.strokeStyle = lineCol(c.n, 0.95); ctx.lineWidth = 1.8 * px; ctx.beginPath(); ctx.moveTo(c.ox, c.oy); ctx.lineTo(c.ox + c.ovx / ol * 30, c.oy + c.ovy / ol * 30); ctx.stroke(); }
+      if (cl > 0) { ctx.strokeStyle = 'rgba(255,255,255,.5)'; ctx.setLineDash([4 * px, 4 * px]); ctx.beginPath(); ctx.moveTo(c.x, c.y); ctx.lineTo(c.x + c.cvx / cl * 20, c.y + c.cvy / cl * 20); ctx.stroke(); ctx.setLineDash([]); }
+    } else {
+      const p = S.paths[0]; let len = 0;
+      for (let i = 1; i < p.length && len < 90; i++) { len += Math.hypot(p[i][0] - p[i - 1][0], p[i][1] - p[i - 1][1]); ctx.lineTo(p[i][0], p[i][1]); }
+      ctx.stroke();
+    }
+  }
+  if (CFG.lines !== 'off' && S.contact) {
+    ctx.beginPath(); ctx.arc(S.contact.x, S.contact.y, R, 0, TAU);
+    ctx.strokeStyle = 'rgba(255,255,255,.8)'; ctx.lineWidth = 1.2 * px; ctx.stroke();
+  }
+  if (CFG.lines !== 'off') {
+    for (const p of S.ev.potted) {
+      const d = POCKET_DRAW[p.pocket];
+      ctx.beginPath(); ctx.arc(d.x, d.y, d.r - 1, 0, TAU); ctx.strokeStyle = lineCol(p.n, 0.95); ctx.lineWidth = 2.2 * px; ctx.stroke();
+    }
+    if (S.ev.cuePotted) {
+      const p = S.paths ? S.paths[0][S.paths[0].length - 1] : null;
+      if (p) { ctx.strokeStyle = '#ff5544'; ctx.lineWidth = 2.5 * px; ctx.beginPath(); ctx.moveTo(p[0] - 3, p[1] - 3); ctx.lineTo(p[0] + 3, p[1] + 3); ctx.moveTo(p[0] + 3, p[1] - 3); ctx.lineTo(p[0] - 3, p[1] + 3); ctx.stroke(); }
+    }
+  }
+}
+
+function drawCue(cue) {
+  const a = G.aim, ca = Math.cos(a), sa = Math.sin(a);
+  const pull = 2 + G.power * 16;
+  const off = (G.sx * R * 0.6);
+  const sxp = -sa * off, syp = ca * off;
+  const x1 = cue.x - ca * (R + pull) + sxp, y1 = cue.y - sa * (R + pull) + syp;
+  const len = 145, x2 = x1 - ca * len, y2 = y1 - sa * len;
+  const nx = -sa, ny = ca;
+  const w1 = 0.65, w2 = 1.5;
+  const g = ctx.createLinearGradient(x1, y1, x2, y2);
+  g.addColorStop(0, '#eaf2f8'); g.addColorStop(0.012, '#eaf2f8'); g.addColorStop(0.014, '#d8c19a'); g.addColorStop(0.6, '#b98a4e'); g.addColorStop(0.62, '#2a1a10'); g.addColorStop(1, '#1a0f08');
+  ctx.fillStyle = g;
+  ctx.beginPath(); ctx.moveTo(x1 + nx * w1, y1 + ny * w1); ctx.lineTo(x2 + nx * w2, y2 + ny * w2); ctx.lineTo(x2 - nx * w2, y2 - ny * w2); ctx.lineTo(x1 - nx * w1, y1 - ny * w1); ctx.closePath(); ctx.fill();
+}
+
+function drawHUD() {
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  // Spieler-Anzeige auf der oberen Holzbande
+  const s = L.s, top = L.oy - BORDER * s, railH = WOOD * s;
+  const fs = Math.max(10, Math.min(14, railH * 0.62));
+  const midY = top + railH / 2 + 1;
+  ctx.textBaseline = 'middle';
+  for (let i = 0; i < 2; i++) {
+    const P = G.players[i], active = G.cur === i && G.state !== 'over';
+    const x = i === 0 ? L.ox + 4 : L.ox + W * s - 4;
+    ctx.font = (active ? 'bold ' : '') + fs + 'px system-ui,sans-serif';
+    ctx.textAlign = i === 0 ? 'left' : 'right';
+    ctx.fillStyle = active ? '#ffd76a' : 'rgba(255,255,255,.7)';
+    const label = (active ? '▶ ' : '') + P.name;
+    const lw0 = ctx.measureText(label).width;
+    ctx.save(); ctx.fillStyle = 'rgba(40,20,8,.92)'; roundRect(i === 0 ? x - 4 : x - lw0 - 4, midY - fs * 0.7, lw0 + 8, fs * 1.4, fs * 0.7); ctx.fill(); ctx.restore();
+    ctx.fillText(label, x, midY);
+    const lw = ctx.measureText(label).width;
+    // Restkugeln der Gruppe bzw. Fouls
+    const br = Math.max(3, railH * 0.26);
+    let bxs = i === 0 ? x + lw + 8 + br : x - lw - 8 - br;
+    const dir = i === 0 ? 1 : -1;
+    if (G.mode === 8 && P.group) {
+      const on = onSet(G.balls);
+      const list = (P.group === 'solid' ? [1, 2, 3, 4, 5, 6, 7] : [9, 10, 11, 12, 13, 14, 15]).filter(n => on.has(n));
+      if (!list.length) list.push(8);
+      for (const n of list) { miniBall(n, bxs, midY, br); bxs += dir * (br * 2 + 2); }
+    } else if (G.mode === 9 && P.fouls > 0) {
+      ctx.fillStyle = '#ff6655'; ctx.font = 'bold ' + (fs - 1) + 'px system-ui,sans-serif';
+      ctx.fillText('Fouls: ' + P.fouls, bxs - dir * br, midY);
+    }
+  }
+  // Statuszeile auf der unteren Holzbande
+  const by = L.oy + (H + CUSH) * s + railH / 2 + 1;
+  ctx.textAlign = 'center'; ctx.font = fs + 'px system-ui,sans-serif';
+  const st = statusText(), sw = ctx.measureText(st).width + 16;
+  ctx.fillStyle = 'rgba(40,20,8,.92)'; roundRect(L.ox + W * s / 2 - sw / 2, by - fs * 0.7, sw, fs * 1.4, fs * 0.7); ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,.88)';
+  ctx.fillText(st, L.ox + W * s / 2, by);
+  // Toast
+  if (G.toast && performance.now() < G.toast.until) {
+    const a = Math.min(1, (G.toast.until - performance.now()) / 400);
+    ctx.font = 'bold ' + Math.max(12, fs) + 'px system-ui,sans-serif';
+    const lines = wrap(G.toast.text, W * s * 0.8);
+    const lh = Math.max(12, fs) + 4, bw = Math.min(W * s * 0.86, Math.max(...lines.map(l => ctx.measureText(l).width)) + 24), bh = lines.length * lh + 14;
+    const x = L.ox + W * s / 2 - bw / 2, y = L.oy + 10;
+    ctx.globalAlpha = a; ctx.fillStyle = 'rgba(8,14,12,.86)'; roundRect(x, y, bw, bh, 8); ctx.fill();
+    ctx.strokeStyle = 'rgba(242,182,50,.7)'; ctx.lineWidth = 1; ctx.stroke();
+    ctx.fillStyle = '#fff'; lines.forEach((l, i) => ctx.fillText(l, L.ox + W * s / 2, y + 7 + lh / 2 + i * lh));
+    ctx.globalAlpha = 1;
+  }
+}
+function wrap(t, maxw) {
+  const words = t.split(' '), out = []; let cur = '';
+  for (const w of words) { const n = cur ? cur + ' ' + w : w; if (ctx.measureText(n).width > maxw && cur) { out.push(cur); cur = w; } else cur = n; }
+  if (cur) out.push(cur); return out;
+}
+function miniBall(n, x, y, r) {
+  ctx.save(); ctx.translate(x, y); ctx.scale(r / R, r / R); drawBall(n, 0, 0); ctx.restore();
+}
+function statusText() {
+  if (!G) return '';
+  const P = G.players[G.cur];
+  if (G.state === 'over') return 'Spiel beendet';
+  let t = P.name;
+  if (G.state === 'ai') t += ' überlegt …';
+  else if (G.state === 'moving') t += ' hat gestoßen';
+  else if (G.state === 'push') t += ' entscheidet nach Push-Out';
+  else t += ' ist am Zug';
+  if (G.isBreak) t += ' · Anstoß';
+  else if (G.mode === 8) {
+    if (!P.group) t += ' · Offener Tisch';
+    else if (legalTargets(8, P.group, onSet(G.balls))[0] === 8) t += ' · Auf die 8' + (CFG.call ? (G.called === null ? ' – Tasche antippen' : ' – Tasche angesagt') : '');
+    else t += ' · ' + GROUP_NAME[P.group];
+  } else {
+    const t9 = legalTargets(9, null, onSet(G.balls))[0];
+    t += ' · Ziel: Kugel ' + t9;
+    if (G.pushShot) t += ' · PUSH-OUT';
+  }
+  if (G.bih && G.state === 'aim') t += G.bih === 'kitchen' ? ' · Ball in Hand (Kopffeld)' : ' · Ball in Hand';
+  return t;
+}
+
+function drawControls() {
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  const active = isHumanTurn();
+  ctx.globalAlpha = active ? 1 : 0.45;
+  // Kraft
+  const p = L.power;
+  ctx.fillStyle = '#16231e'; roundRect(p.x - 4, p.y - 4, p.w + 8, p.h + 8, 10); ctx.fill();
+  ctx.strokeStyle = '#2c4a3e'; ctx.lineWidth = 1; ctx.stroke();
+  const fh = p.h * G.power;
+  const g = ctx.createLinearGradient(0, p.y + p.h, 0, p.y);
+  g.addColorStop(0, '#3fb68b'); g.addColorStop(0.55, '#f2b632'); g.addColorStop(1, '#e0412f');
+  ctx.fillStyle = g; roundRect(p.x, p.y + p.h - fh, p.w, Math.max(4, fh), 6); ctx.fill();
+  ctx.strokeStyle = 'rgba(255,255,255,.18)';
+  for (let i = 1; i < 10; i++) { const y = p.y + p.h * i / 10; ctx.beginPath(); ctx.moveTo(p.x + 4, y); ctx.lineTo(p.x + p.w - 4, y); ctx.stroke(); }
+  ctx.fillStyle = '#fff'; ctx.fillRect(p.x - 3, p.y + p.h - fh - 1.5, p.w + 6, 3);
+  ctx.font = 'bold 12px system-ui,sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillStyle = '#9fb5aa'; ctx.fillText('Kraft', p.x + p.w / 2, 13);
+  ctx.fillStyle = '#fff'; ctx.fillText(Math.round(G.power * 100) + '%', p.x + p.w / 2, p.y + p.h + 12);
+  // Effet
+  const sp = L.spin;
+  ctx.fillStyle = '#9fb5aa'; ctx.fillText('Effet', sp.cx, sp.cy - sp.r - 10);
+  ctx.beginPath(); ctx.arc(sp.cx, sp.cy, sp.r, 0, TAU);
+  const sg = ctx.createRadialGradient(sp.cx - 8, sp.cy - 10, 3, sp.cx, sp.cy, sp.r);
+  sg.addColorStop(0, '#ffffff'); sg.addColorStop(1, '#c9c4b4'); ctx.fillStyle = sg; ctx.fill();
+  ctx.strokeStyle = 'rgba(0,0,0,.25)';
+  ctx.beginPath(); ctx.moveTo(sp.cx - sp.r, sp.cy); ctx.lineTo(sp.cx + sp.r, sp.cy); ctx.moveTo(sp.cx, sp.cy - sp.r); ctx.lineTo(sp.cx, sp.cy + sp.r); ctx.stroke();
+  ctx.beginPath(); ctx.arc(sp.cx + G.sx * sp.r, sp.cy - G.sy * sp.r, 5.5, 0, TAU); ctx.fillStyle = '#d4231f'; ctx.fill();
+  // Feinjustierung
+  const wh = L.wheel;
+  ctx.fillStyle = '#9fb5aa'; ctx.fillText('Fein', wh.x + wh.w / 2, wh.y - 9);
+  ctx.fillStyle = '#16231e'; roundRect(wh.x, wh.y, wh.w, wh.h, 8); ctx.fill(); ctx.strokeStyle = '#2c4a3e'; ctx.stroke();
+  ctx.save(); roundRect(wh.x, wh.y, wh.w, wh.h, 8); ctx.clip();
+  const off = ((G.aim * 900) % 10 + 10) % 10;
+  ctx.strokeStyle = 'rgba(255,255,255,.35)';
+  for (let y = wh.y - 10 + off; y < wh.y + wh.h + 10; y += 10) { ctx.beginPath(); ctx.moveTo(wh.x + 6, y); ctx.lineTo(wh.x + wh.w - 6, y); ctx.stroke(); }
+  const shade = ctx.createLinearGradient(0, wh.y, 0, wh.y + wh.h);
+  shade.addColorStop(0, 'rgba(0,0,0,.6)'); shade.addColorStop(0.5, 'rgba(0,0,0,0)'); shade.addColorStop(1, 'rgba(0,0,0,.6)');
+  ctx.fillStyle = shade; ctx.fillRect(wh.x, wh.y, wh.w, wh.h);
+  ctx.restore();
+  ctx.globalAlpha = 1;
+}
+
+function draw() {
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.fillStyle = '#0d1512'; ctx.fillRect(0, 0, cv.width, cv.height);
+  if (!G) { drawTableBase(); return; }
+  drawTableBase();
+  tableTransform();
+  const px = 1 / L.s;
+  const balls = G.live ? G.live.balls : G.balls;
+  const cue = getBall(balls, 0);
+  const aiming = (G.state === 'aim' && !G.ai[G.cur]) || G.state === 'aipreview';
+  // Kopffeld bei Ball in Hand
+  if (aiming && G.bih === 'kitchen') { ctx.fillStyle = 'rgba(255,255,255,.05)'; ctx.fillRect(0, 0, HEAD_X, H); }
+  // Taschenansage
+  if (aiming && needCall()) {
+    for (let k = 0; k < 6; k++) {
+      const d = POCKET_DRAW[k];
+      ctx.beginPath(); ctx.arc(d.x, d.y, d.r + 1.4, 0, TAU);
+      ctx.strokeStyle = G.called === k ? '#f2b632' : 'rgba(255,255,255,.3)'; ctx.lineWidth = (G.called === k ? 3 : 1.2) * px; ctx.stroke();
+      if (G.called === k) { ctx.fillStyle = '#f2b632'; ctx.font = 'bold 5px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('8', d.x, d.y); }
+    }
+  }
+  // Schatten
+  ctx.fillStyle = 'rgba(0,0,0,.28)';
+  for (const b of balls) if (b.on) { ctx.beginPath(); ctx.ellipse(b.x + 0.7, b.y + 0.9, R, R * 0.9, 0, 0, TAU); ctx.fill(); }
+  // Vorschau
+  let S = null;
+  if (aiming && cue.on) {
+    S = getPrediction();
+    if (!G.calledManual && needCall() && G.state === 'aim') { const e = S.ev.potted.find(p => p.n === 8); G.called = e ? e.pocket : null; }
+    drawPrediction(S);
+  }
+  for (const b of balls) if (b.on) drawBall(b.n, b.x, b.y);
+  if (aiming && cue.on) {
+    ctx.save(); ctx.beginPath(); ctx.rect(-BORDER, -BORDER, W + 2 * BORDER, H + 2 * BORDER); ctx.clip();
+    if (G.bih) {
+      ctx.setLineDash([2 * px, 3 * px]); ctx.strokeStyle = '#f2b632'; ctx.lineWidth = 1.5 * px;
+      ctx.beginPath(); ctx.arc(cue.x, cue.y, R + 2.2, 0, TAU); ctx.stroke(); ctx.setLineDash([]);
+    }
+    drawCue(cue);
+    ctx.restore();
+  }
+  drawHUD();
+  drawControls();
+}
+
+// ===================== Eingabe =====================
+const ptrs = new Map();
+let lastSpinTap = 0;
+function toTable(x, y) { return {x: (x - L.ox) / L.s, y: (y - L.oy) / L.s}; }
+cv.addEventListener('pointerdown', e => {
+  if (!G) return;
+  initAudio();
+  const x = e.clientX, y = e.clientY, p = L.power, sp = L.spin, wh = L.wheel;
+  let kind = null;
+  if (x < L.left && y > p.y - 20 && y < p.y + p.h + 20) kind = 'power';
+  else if (Math.hypot(x - sp.cx, y - sp.cy) < sp.r + 12) kind = 'spin';
+  else if (x > L.rx && y > wh.y - 10 && y < wh.y + wh.h + 10) kind = 'wheel';
+  else if (x >= L.left && x <= L.rx) kind = 'table';
+  if (!kind || !isHumanTurn()) return;
+  e.preventDefault();
+  try { cv.setPointerCapture(e.pointerId); } catch (err) {}
+  const st = {kind, ly: y, drag: false};
+  ptrs.set(e.pointerId, st);
+  if (kind === 'spin') { const now = performance.now(); if (now - lastSpinTap < 300) { G.sx = G.sy = 0; st.kind = 'none'; lastSpinTap = 0; return; } lastSpinTap = now; }
+  if (kind === 'table') {
+    const t = toTable(x, y), cue = getBall(G.balls, 0);
+    if (G.bih && Math.hypot(t.x - cue.x, t.y - cue.y) < R * 3.5) { st.drag = true; st.dx = cue.x - t.x; st.dy = cue.y - t.y; return; }
+    if (needCall()) {
+      for (let k = 0; k < 6; k++) { const d = POCKET_DRAW[k]; if (Math.hypot(t.x - d.x, t.y - d.y) < 9) { G.called = k; G.calledManual = true; st.kind = 'none'; return; } }
+    }
+  }
+  handlePtr(st, x, y);
+});
+cv.addEventListener('pointermove', e => { const st = ptrs.get(e.pointerId); if (st && isHumanTurn()) handlePtr(st, e.clientX, e.clientY); });
+const endPtr = e => ptrs.delete(e.pointerId);
+cv.addEventListener('pointerup', endPtr); cv.addEventListener('pointercancel', endPtr);
+
+function handlePtr(st, x, y) {
+  if (st.kind === 'power') G.power = clamp((L.power.y + L.power.h - y) / L.power.h, 0.02, 1);
+  else if (st.kind === 'spin') {
+    let sx = (x - L.spin.cx) / L.spin.r, sy = -(y - L.spin.cy) / L.spin.r;
+    const m = Math.hypot(sx, sy); if (m > 0.8) { sx *= 0.8 / m; sy *= 0.8 / m; }
+    G.sx = sx; G.sy = sy;
+  } else if (st.kind === 'wheel') { G.aim += (y - st.ly) * 0.0011; st.ly = y; }
+  else if (st.kind === 'table') {
+    const t = toTable(x, y), cue = getBall(G.balls, 0);
+    if (st.drag) {
+      const nx = t.x + st.dx, ny = t.y + st.dy, kitchen = G.bih === 'kitchen';
+      let px = clamp(nx, R, kitchen ? HEAD_X : W - R), py = clamp(ny, R, H - R);
+      if (placeOK(G.balls, px, py, kitchen)) { cue.x = px; cue.y = py; cue.on = true; G.ver++; }
+    } else if (Math.hypot(t.x - cue.x, t.y - cue.y) > 1) G.aim = Math.atan2(t.y - cue.y, t.x - cue.x);
+  }
+}
+
+// ===================== UI =====================
+const $ = id => document.getElementById(id);
+const show = id => $(id).classList.remove('hidden');
+const hide = id => $(id).classList.add('hidden');
+function toast(text, ms) { if (G) G.toast = {text, until: performance.now() + (ms || 2600)}; }
+const LINE_NAMES = {all: 'Alle', guide: 'Einfach', off: 'Aus'};
+function updateUI() {
+  $('bLines').textContent = 'Linien: ' + LINE_NAMES[CFG.lines];
+  if (!G) return;
+  $('bShoot').disabled = !isHumanTurn();
+  const canPush = G.mode === 9 && G.pushAvail && isHumanTurn();
+  $('bPush').classList.toggle('hidden', !canPush);
+  $('bPush').classList.toggle('on', !!G.pushShot);
+}
+function syncMenu() {
+  document.querySelectorAll('.seg').forEach(seg => {
+    const k = seg.dataset.k;
+    seg.querySelectorAll('button').forEach(b => b.classList.toggle('sel', String(CFG[k]) === b.dataset.v));
+  });
+  $('rowDiff').style.display = CFG.opp === 'ai' ? '' : 'none';
+  $('bResume').classList.toggle('hidden', !G || G.state === 'over');
+}
+document.querySelectorAll('.seg').forEach(seg => seg.addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  const k = seg.dataset.k, v = b.dataset.v;
+  CFG[k] = (k === 'opp') ? v : +v;
+  saveCfg(); syncMenu();
+}));
+$('bStart').onclick = () => { initAudio(); newGame(); };
+$('bResume').onclick = () => hide('menu');
+$('bMenu').onclick = () => { syncMenu(); show('menu'); };
+$('bRules').onclick = () => show('rules');
+$('bRulesClose').onclick = () => hide('rules');
+$('bAgain').onclick = () => newGame();
+$('bOverMenu').onclick = () => { hide('over'); syncMenu(); show('menu'); };
+$('bShoot').onclick = () => shoot();
+$('bLines').onclick = () => { CFG.lines = CFG.lines === 'all' ? 'guide' : CFG.lines === 'guide' ? 'off' : 'all'; saveCfg(); updateUI(); };
+$('bPush').onclick = () => { if (!isHumanTurn()) return; G.pushShot = !G.pushShot; if (G.pushShot) toast('Push-Out angesagt: Nur die Regeln zur Weißen gelten.'); updateUI(); };
+$('bTake').onclick = () => { hide('pushDlg'); startTurn(); };
+$('bPass').onclick = () => { hide('pushDlg'); G.cur = 1 - G.cur; toast('Zurückgegeben – ' + G.players[G.cur].name + ' ist am Zug.'); startTurn(); };
+window.onAndroidBack = () => {
+  if (!$('rules').classList.contains('hidden')) { hide('rules'); return true; }
+  if ($('menu').classList.contains('hidden')) { syncMenu(); show('menu'); return true; }
+  if (G && G.state !== 'over') { hide('menu'); return true; }
+  return false;
+};
+
+// ===================== Hauptschleife =====================
+let lastT = performance.now();
+function frame(now) {
+  const dt = Math.min(0.05, (now - lastT) / 1000); lastT = now;
+  if (G) {
+    if (G.state === 'moving' && G.live) {
+      const S = G.live, target = S.t + dt * TIME_SCALE;
+      let moving = true;
+      while (S.t < target) { if (!stepSim(S)) { moving = false; break; } }
+      if (S.snd.length) { let n = 0; for (const s of S.snd) { if (n++ > 4) break; playSound(s.t, s.v); } S.snd.length = 0; }
+      if (!moving) finishShot();
+    } else if (G.state === 'ai') {
+      runAI();
+    } else if (G.state === 'aipreview' && now - G.aiT > 900 / TIME_SCALE) {
+      shoot();
+    }
+  }
+  draw();
+  requestAnimationFrame(frame);
+}
+window.addEventListener('resize', () => { layout(); });
+layout(); syncMenu(); updateUI();
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

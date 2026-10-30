@@ -1,0 +1,49 @@
+name: Billard APK bauen
+
+on:
+  push:
+    paths:
+      - 'billard-app/**'
+      - '.github/workflows/build-apk.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.14.3'
+
+      - name: APK bauen
+        working-directory: billard-app
+        run: gradle assembleRelease --no-daemon --stacktrace
+
+      - name: APK umbenennen
+        run: cp billard-app/app/build/outputs/apk/release/app-release.apk BillardLinien.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: BillardLinien-apk
+          path: BillardLinien.apk
+
+      - name: Release mit APK erstellen
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: billard-${{ github.run_number }}
+          name: Billard Linien (Build ${{ github.run_number }})
+          target_commitish: ${{ github.sha }}
+          body: |
+            APK zum Installieren auf Android: **BillardLinien.apk** unten unter *Assets* herunterladen und öffnen.
+            Beim ersten Mal muss die Installation aus unbekannten Quellen erlaubt werden.
+          files: BillardLinien.apk

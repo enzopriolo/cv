@@ -105,8 +105,32 @@ html.dev-phone .lobbyBar button{padding:7px 10px;font-size:13px}
 .tile b{font-size:24px;letter-spacing:.3px}.tile small{font-size:13px;opacity:.9;color:#ffe28a}
 .t1{background:linear-gradient(135deg,#1f6f8f,#0d3447)}.t2{background:linear-gradient(135deg,#2f7d4f,#123a24)}.t3{background:linear-gradient(135deg,#6a3fa8,#2a1450)}
 .t4{background:linear-gradient(135deg,#c58a12,#5e3b05)}.t5{background:linear-gradient(135deg,#c23a2a,#5a120a)}.t6{background:linear-gradient(135deg,#3a6f7a,#122e33)}
+.t7{background:linear-gradient(135deg,#7a3ad0,#2a0f55)}.t8{background:linear-gradient(135deg,#d0503a,#4a1208)}.t9{background:linear-gradient(135deg,#2fa35a,#0b3a1c)}
+.lobbyBar button{position:relative}
+.badge{position:absolute;top:-6px;right:-6px;min-width:18px;height:18px;border-radius:9px;background:#ff3b30;color:#fff;font-size:11px;font-style:normal;line-height:18px;padding:0 4px;box-shadow:0 0 0 2px rgba(0,0,0,.4);animation:bpulse 1.2s infinite}
+@keyframes bpulse{50%{transform:scale(1.15)}}
+.questPanel,.wheelPanel{width:min(720px,96vw);padding-top:0}
+#questList{display:flex;flex-direction:column;gap:8px;max-height:60vh;overflow-y:auto;padding:2px}
+.quest{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.quest.done{opacity:.55}
+.quest .qtxt{flex:1;text-align:left;min-width:0;display:flex;flex-direction:column;gap:3px}
+.quest small{color:var(--muted);font-size:12px}
+.qbar{height:7px;border-radius:4px;background:rgba(255,255,255,.1);overflow:hidden}
+.qbar i{display:block;height:100%;background:linear-gradient(90deg,#3fb68b,#f2b632);border-radius:4px}
+.quest button{background:#1f3029;border:1px solid var(--line);color:var(--text);border-radius:9px;padding:8px 12px;font-weight:700;min-width:84px;cursor:pointer}
+.quest button.claim{background:linear-gradient(135deg,#ffd75a,#f29b20);color:#2a1600;border:0;animation:cglow 1.2s infinite}
+@keyframes cglow{50%{box-shadow:0 0 14px 3px rgba(255,200,60,.75)}}
+.quest button:disabled{cursor:default}
+.aicon{font-size:26px;width:36px;text-align:center}
+.wheelBox{position:relative;width:min(300px,70vw,52vh);margin:6px auto}
+#wheelCv{width:100%;aspect-ratio:1;display:block;filter:drop-shadow(0 10px 22px rgba(0,0,0,.6))}
+.wheelPin{position:absolute;left:50%;top:-4px;transform:translateX(-50%);width:0;height:0;border-left:13px solid transparent;border-right:13px solid transparent;border-top:26px solid #ff3b30;filter:drop-shadow(0 2px 3px rgba(0,0,0,.6))}
+#wheelMsg{min-height:22px;font-weight:700;color:var(--accent)}
 #lbMsg{color:var(--accent);font-size:13px;text-align:center;min-height:16px}
-.lobbyBar{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.lobbyBar{display:flex;gap:8px;justify-content:safe center;flex-wrap:nowrap;overflow-x:auto;padding:8px 6px 4px;max-width:100%;scrollbar-width:none}
+.lobbyBar::-webkit-scrollbar{display:none}
+.lobbyBar button{flex:0 0 auto;white-space:nowrap}
+.badge{top:-7px!important;right:-4px!important}
 .lobbyBar button{background:#1f3029;border:1px solid var(--line);color:var(--text);border-radius:10px;padding:8px 14px;font-size:14px;font-weight:600}
 #bResume{background:var(--accent);color:#2a1a00;border-color:var(--accent)}
 #overReward{display:flex;gap:12px;justify-content:center;margin-top:8px;font-weight:800;font-size:17px}
@@ -281,19 +305,41 @@ input.name{background:#0c1512;color:var(--text);border:1px solid var(--line);bor
       <button class="carArrow l" id="carL">‹</button>
       <div id="carousel">
         <button class="tile t1" data-go="ai"><em>🤖</em><b>Gegen Computer</b><small id="tAi"></small><p>Spiele 8-Ball oder 9-Ball gegen drei Stärken.</p><span class="play">Spielen ▶</span></button>
-        <button class="tile t4" data-go="levels"><em>🏆</em><b>Herausforderungen</b><small id="tLv"></small><p>Lektionen und 20 Aufgaben mit Belohnungen.</p><span class="play">Spielen ▶</span></button>
+        <button class="tile t4" data-go="levels"><em>🏆</em><b>Herausforderungen</b><small id="tLv"></small><p>6 Lektionen und 90 Aufgaben mit Belohnungen.</p><span class="play">Spielen ▶</span></button>
         <button class="tile t3" data-go="online"><em>🌐</em><b>Online</b><small>Mit Freunden, ohne Server</small><p>Direkt von Handy zu Handy per Code.</p><span class="play">Spielen ▶</span></button>
         <button class="tile t5" data-go="arcade"><em>⚡</em><b>Trefferserie</b><small id="tArc"></small><p>Endlos versenken, Serie aufbauen, Rekord jagen.</p><span class="play">Spielen ▶</span></button>
         <button class="tile t2" data-go="human"><em>👥</em><b>2 Spieler</b><small>An einem Handy</small><p>Abwechselnd stoßen, ohne Internet.</p><span class="play">Spielen ▶</span></button>
         <button class="tile t6" data-go="training"><em>🎯</em><b>Training</b><small>Kugeln frei setzen</small><p>Jeden Stoß in Ruhe üben – mit allen Linien.</p><span class="play">Spielen ▶</span></button>
+        <button class="tile t7" data-go="tourn"><em>🏟</em><b>Turnier</b><small>Startgeld 100 🪙 · Sieg 1.200 🪙</small><p>Viertelfinale, Halbfinale, Finale – drei Siege in Folge.</p><span class="play">Spielen ▶</span></button>
+        <button class="tile t8" data-go="target"><em>🎯</em><b>Zielscheibe</b><small id="tTgt"></small><p>Weiße genau ins Zentrum legen. 5 Stöße.</p><span class="play">Spielen ▶</span></button>
+        <button class="tile t9" data-go="lucky"><em>🍀</em><b>Glücksstoß</b><small id="tLucky"></small><p>Jede Tasche ein Preis – bis 800 🪙!</p><span class="play">Spielen ▶</span></button>
       </div>
       <button class="carArrow r" id="carR">›</button>
     </div>
     <div id="lbMsg"></div>
     <div class="lobbyBar">
       <button id="bResume" class="hidden">▶ Weiterspielen</button>
-      <button id="bInv">🎒 Inventar</button><button id="bShop">🛒 Shop</button><button id="bStats">📊 Statistik</button><button id="bSettings">⚙ Einstellungen</button><button id="bRules">📖 Regeln</button>
+      <button id="bQuests">📋 Aufgaben<i class="badge hidden" id="qBadge"></i></button><button id="bWheel">🎡 Glücksrad<i class="badge hidden" id="wBadge">!</i></button><button id="bInv">🎒 Inventar</button><button id="bShop">🛒 Shop</button><button id="bStats">📊 Statistik</button><button id="bSettings">⚙ Einstellungen</button><button id="bRules">📖 Regeln</button>
     </div>
+  </div>
+</div>
+
+<div id="quests" class="overlay hidden">
+  <div class="panel questPanel">
+    <div class="lvTop"><button id="bQuestTop">← Menü</button><h1>Aufgaben & Erfolge</h1><span></span></div>
+    <div class="tabs" id="questTabs"><button data-tab="daily">📋 Tagesaufgaben</button><button data-tab="ach">🏅 Erfolge</button></div>
+    <div id="questList"></div>
+    <div id="questMsg" class="muted center"></div>
+  </div>
+</div>
+
+<div id="wheel" class="overlay hidden">
+  <div class="panel wheelPanel">
+    <div class="lvTop"><button id="bWheelTop">← Menü</button><h1>Glücksrad</h1><span></span></div>
+    <div class="wheelBox"><canvas id="wheelCv"></canvas><div class="wheelPin"></div></div>
+    <div id="wheelMsg" class="center"></div>
+    <div class="actions"><button id="bSpin" class="primary">🎡 Drehen</button></div>
+    <div class="muted center">Jeden Tag einmal gratis drehen – Münzen, Erfahrung oder ein neuer Skin.</div>
   </div>
 </div>
 
@@ -345,8 +391,14 @@ input.name{background:#0c1512;color:var(--text);border:1px solid var(--line);bor
       <li><b>⟲ Replay</b> zeigt deinen letzten Stoß noch einmal in Zeitlupe. Tippen beendet die Wiederholung.</li>
       <li><b>Am PC:</b> Das Mausrad dreht das Ziel fein, die Pfeiltasten in 0,01°-Schritten (mit Umschalt schneller). Die Leertaste stößt mit der zuletzt eingestellten Kraft.</li>
       <li><b>Online:</b> Einer erstellt einen Raum und bekommt einen Raumcode (zum Beispiel KQTR3), der andere gibt ihn unter „Raum beitreten“ ein. Mit „Freund einladen“ verschickst du auch einen Link, mit dem man im Browser direkt beitritt. Mit 💬 schickst du kurze Nachrichten.</li>
-      <li><b>Münzen und Erfahrungspunkte</b> bekommst du für Siege, Herausforderungen, die Trefferserie und den Tagesbonus. Im <b>Shop</b> schaltest du damit Queues und Tücher frei. Mit Erfahrungspunkten steigst du im Level auf und bekommst Bonus-Münzen.</li>
+      <li><b>Münzen und Erfahrungspunkte</b> bekommst du für Siege, Herausforderungen, die Trefferserie und den Tagesbonus. Im <b>Shop</b> schaltest du damit Tische, Queues, Kugeln und Tücher frei (je 30 Stück). Mit Erfahrungspunkten steigst du im Level auf und bekommst Bonus-Münzen.</li>
       <li>In den <b>Einstellungen</b> änderst du deinen Namen, den Ton und die Vibration.</li>
+      <li><b>📋 Tagesaufgaben:</b> Jeden Tag drei neue Aufgaben mit Münzen und Erfahrung als Belohnung. Erledigte Aufgaben holst du in der Lobby unter „Aufgaben“ ab.</li>
+      <li><b>🏅 Erfolge:</b> 33 dauerhafte Ziele – vom ersten Treffer bis zur kompletten Skin-Sammlung.</li>
+      <li><b>🎡 Glücksrad:</b> Einmal am Tag gratis drehen, jede weitere Drehung kostet 150 Münzen.</li>
+      <li><b>🍀 Glücksstoß:</b> Ein Stoß auf die 1 – jede Tasche hat einen anderen Preis bis 800 Münzen. Einmal täglich gratis, danach 50 Münzen.</li>
+      <li><b>🎯 Zielscheibe:</b> Fünf Stöße nur mit der Weißen. Bleibt sie im Zentrum liegen, gibt es 100 Punkte, im Ring 50, außen 20.</li>
+      <li><b>🏟 Turnier:</b> Startgeld 100 Münzen. Viertelfinale (leicht), Halbfinale (mittel), Finale (schwer) – wer alle drei gewinnt, bekommt 1.200 Münzen.</li>
     </ul>
     <h2>Allgemein</h2>
     <ul>
@@ -891,6 +943,7 @@ function finishShotLocal() {
     G.run = r.cont ? G.run + n : 0;
     STATS.best = Math.max(STATS.best, r.cont ? G.run : 0, r.foul ? 0 : n);
     saveStats();
+    if (!r.foul && n) { trackPots(S.ev); if (G.isBreak) track('breakpot'); }
   }
   if (r.foul) { const c = getBall(G.balls, 0); floatText('Foul!', c.on ? c.x : W / 2, c.on ? c.y - 8 : H / 2, '#ff6655'); playSound('foul', 0); }
   else if (S.ev.potted.length > 1) floatText(S.ev.potted.length + ' Kugeln!', W / 2, H / 2);
@@ -941,10 +994,22 @@ function endGame(winner, reason) {
   if (winner === li && (G.ai[1] || G.online)) STATS.wins++;
   saveStats();
   rewardGame(winner);
+  track('game');
+  if (winner === li && (G.ai[1] || G.online)) track('win');
+  if (G.online) track('online');
+  $('bNext').classList.add('hidden');
+  let extra = '';
+  if (G.tourn && TOURN) {
+    if (winner === li) {
+      TOURN.round++;
+      if (TOURN.round >= 3) { const c = gain(TOURN_PRIZE, 300); track('tourn'); extra = ' 🏆 Turniersieg! +' + c + ' Münzen.'; TOURN = null; }
+      else { extra = ' Weiter ins ' + TOURN_NAMES[TOURN.round] + '!'; $('bNext').textContent = '🏟 ' + TOURN_NAMES[TOURN.round]; $('bNext').classList.remove('hidden'); }
+    } else { extra = ' Im ' + TOURN_NAMES[TOURN.round] + ' ausgeschieden.'; TOURN = null; }
+  }
   if (G.ai[winner] || (G.online && winner !== NET.me)) playSound('foul', 0);
   else { confetti(); playSound('win', 0); vibrate(60); }
   document.getElementById('overTitle').textContent = G.players[winner].name + ' gewinnt!';
-  document.getElementById('overText').textContent = reason;
+  document.getElementById('overText').textContent = reason + extra;
   setTimeout(() => show('over'), 600);
 }
 
@@ -995,7 +1060,7 @@ const LINES_MULT = {all: 1, guide: 1.5, off: 2};
 function soloTargets(on) {
   const so = G.solo;
   let arr = [...on];
-  if (so.type === 'training' || so.type === 'lesson') return [];
+  if (so.type === 'training' || so.type === 'lesson' || so.type === 'target') return [];
   if (so.type === 'levels') {
     const lv = LEVELS[so.idx];
     if (lv.targets) arr = arr.filter(n => lv.targets.includes(n));
@@ -1014,6 +1079,11 @@ function newSolo(type, idx) {
     balls = [{n: 0, x: lv.cue[0], y: lv.cue[1], vx: 0, vy: 0, on: true}].concat(lv.balls.map(b => ({n: b[0], x: b[1], y: b[2], vx: 0, vy: 0, on: true})));
   } else if (type === 'training') {
     balls = rack(8);
+  } else if (type === 'lucky') {
+    balls = [{n: 0, x: W * 0.25, y: H / 2, vx: 0, vy: 0, on: true}];
+    const x = W * 0.5 + Math.random() * W * 0.3, y = H * 0.25 + Math.random() * H * 0.5;
+    balls.push({n: 1, x, y, vx: 0, vy: 0, on: true});
+    so.prizes = shuffle(LUCKY_PRIZES.slice());
   } else {
     balls = [{n: 0, x: W * 0.2, y: H / 2, vx: 0, vy: 0, on: true}];
     for (let n = 1; n <= 15; n++) balls.push({n, x: 0, y: 0, vx: 0, vy: 0, on: false});
@@ -1027,9 +1097,11 @@ function newSolo(type, idx) {
   };
   initOrient();
   if (type === 'arcade') spawnBalls(5);
-  else if (LEVELS[so.idx].sol && LEVELS[so.idx].sol[0]) G.power = 0.5;
+  if (type === 'target') placeTarget();
   ['over', 'menu', 'levels', 'stats', 'settings'].forEach(hide);
   if (type === 'levels') toast(LEVELS[so.idx].desc, 3500);
+  else if (type === 'lucky') toast('Glücksstoß: Ein Stoß – in welche Tasche fällt die gelbe 1? Jede Tasche hat einen anderen Preis.', 4500);
+  else if (type === 'target') toast('Zielscheibe: Lass die Weiße möglichst genau im Zentrum liegen bleiben. 5 Stöße – Mitte 100, Ring 50, außen 20 Punkte.', 4500);
   else if (type === 'training') toast('Training: Kugel kurz gedrückt halten und ziehen, um sie zu versetzen. ↶ macht den letzten Stoß rückgängig.', 4500);
   else toast('Trefferserie: Jeder Fehlstoß kostet ein Leben. Mit weniger Linien gibt es mehr Punkte!', 3500);
   const p = G.power;
@@ -1056,6 +1128,30 @@ function soloFinish(ev) {
   const placeCue = () => { G.bih = 'any'; if (!cue.on) { const p = findFree(G.balls, W * 0.25, H / 2, false); cue.x = p.x; cue.y = p.y; cue.on = true; cue.vx = cue.vy = 0; } };
   if (so.type === 'lesson') { G.state = 'lessondone'; updateUI(); return; }
   G.bih = null;
+  if (so.type === 'lucky') {
+    track('lucky');
+    const p = ev.potted.find(q => q.n === 1);
+    if (p && !scratch) { so.prize = so.prizes[p.pocket]; return endSolo(true, 'Treffer! Die 1 fiel in die Tasche mit ' + so.prize + ' Münzen.'); }
+    so.prize = 10;
+    return endSolo(false, scratch ? 'Die Weiße ist gefallen – 10 Trostmünzen.' : 'Leider daneben – 10 Trostmünzen.');
+  }
+  if (so.type === 'target') {
+    so.shots++;
+    let pts = 0;
+    if (!scratch) { const d = Math.hypot(cue.x - so.tgt.x, cue.y - so.tgt.y); pts = d <= 3 ? 100 : d <= 7 ? 50 : d <= 12 ? 20 : 0; }
+    so.score += pts;
+    floatText(pts ? '+' + pts : scratch ? 'Gefallen!' : 'Daneben', so.tgt.x, so.tgt.y - 15, pts >= 100 ? '#7dffb0' : pts ? '#ffd75a' : '#ff6655');
+    if (pts >= 100) { playSound('win', 0); vibrate(30); }
+    if (scratch) placeCue();
+    if (so.shots >= 5) {
+      track('target', so.score);
+      const rec = so.score > (SOLO.tHi || 0); if (rec) { SOLO.tHi = so.score; saveSolo(); }
+      return endSolo(true, so.score + ' Punkte' + (rec ? ' – neuer Rekord!' : ' (Rekord: ' + (SOLO.tHi || 0) + ')'));
+    }
+    placeTarget();
+    return startTurn();
+  }
+  if (!scratch) trackPots(ev);
   if (so.type === 'training') {
     so.shots++; so.pots = (so.pots || 0) + ev.potted.length;
     if (ev.potted.length) floatText(ev.potted.length > 1 ? ev.potted.length + ' versenkt!' : 'Drin!', W / 2, H / 2, '#7dffb0');
@@ -1130,22 +1226,25 @@ function endSolo(win, text, stars) {
   updateUI();
   let title;
   showReward(0, 0);
-  if (so.type === 'arcade') { const c = Math.min(400, Math.floor(so.score / 40)), xp = Math.floor(so.score / 120); showReward(gain(c, xp), xp); }
+  if (so.type === 'arcade') { track('arcade', so.score); const c = Math.min(400, Math.floor(so.score / 40)), xp = Math.floor(so.score / 120); showReward(gain(c, xp), xp); }
+  if (so.type === 'lucky') { showReward(gain(so.prize || 10, 10), 10); if (win) { confetti(); playSound('win', 0); } title = win ? '🍀 Glückstreffer!' : 'Kein Glück'; }
+  if (so.type === 'target') { const c = Math.floor(so.score / 10), xp = Math.floor(so.score / 20); showReward(gain(c, xp), xp); if (so.score >= 200) confetti(); title = '🎯 ' + so.score + ' Punkte'; }
   if (so.type === 'levels') {
     if (win) {
       const prev = SOLO.stars[so.idx] || 0;
       const coins = (prev ? 0 : LEVEL_REWARDS[so.idx]) + Math.max(0, stars - prev) * 20, xp = 10 + stars * 10;
       showReward(gain(coins, xp), xp);
       if (!prev) text += ' Erstmals geschafft – Belohnung freigeschaltet!';
-      confetti(); playSound('win', 0); SOLO.stars[so.idx] = Math.max(prev, stars); saveSolo();
+      confetti(); playSound('win', 0); SOLO.stars[so.idx] = Math.max(prev, stars); saveSolo(); track('level');
       const tr = checkTopicReward(topicOf(so.idx));
       if (tr) { const c2 = gain(tr, 50); text += ' 🎁 Thema „' + TOPICS[topicOf(so.idx)].name + '“ komplett: +' + c2 + ' Münzen!'; showReward(coins + c2, xp + 50); } title = '★'.repeat(stars) + '☆'.repeat(3 - stars) + ' Geschafft!'; }
     else title = 'Nicht geschafft';
-  } else title = 'Spiel vorbei';
+  } else if (!title) title = 'Spiel vorbei';
   $('overTitle').textContent = title;
   $('overText').textContent = text;
   const nx = so.type === 'levels' && win ? nextLevelInTopic(so.idx) : -1;
   $('bNext').classList.toggle('hidden', !(nx >= 0 && levelUnlocked(nx)));
+  $('bNext').textContent = 'Nächstes Level';
   G.nextLevel = nx;
   setTimeout(() => show('over'), 600);
 }
@@ -1186,6 +1285,7 @@ function showLevels(focus) {
 
 function drawSoloTable() {
   const px = 1 / L.s, so = G.solo;
+  if (so.type === 'lucky' || so.type === 'target') return drawMiniGames(performance.now());
   if (so.type !== 'levels') return;
   const lv = LEVELS[so.idx];
   if (lv.zone) {
@@ -2020,6 +2120,12 @@ function renderLobby() {
   const stars = SOLO.stars.reduce((x, y) => x + (y || 0), 0);
   $('tLv').textContent = '★ ' + stars + ' / ' + LEVELS.length * 3;
   $('tArc').textContent = 'Rekord: ' + fmt(SOLO.hi);
+  if (typeof claimable === 'function') {
+    const q = claimable(); $('qBadge').textContent = q; $('qBadge').classList.toggle('hidden', !q);
+    $('wBadge').classList.toggle('hidden', !wheelFree());
+    $('tTgt').textContent = 'Rekord: ' + fmt(SOLO.tHi || 0);
+    $('tLucky').textContent = PROFILE.luckyDay === dayKey(new Date()) ? 'Nochmal: 50 🪙' : '1× täglich gratis';
+  }
 }
 // Belohnung für eine beendete Partie (8-Ball / 9-Ball)
 function rewardGame(winner) {
@@ -2369,6 +2475,246 @@ function tryFullscreen() {
   try {
     if (!document.fullscreenElement && el.requestFullscreen) el.requestFullscreen().then(() => { try { screen.orientation.lock('landscape').catch(() => {}); } catch (e) {} }).catch(() => {});
   } catch (e) {}
+}
+
+// ===================== Tagesaufgaben, Erfolge, Glücksrad, Turnier =====================
+PROFILE.cnt = PROFILE.cnt || {};
+const CNT = PROFILE.cnt;
+const QUEST_POOL = [
+  {ev: 'pot', goals: [15, 25, 40], text: 'Versenke {n} Kugeln'},
+  {ev: 'win', goals: [1, 2, 3], text: 'Gewinne {n} Partien gegen Computer oder online'},
+  {ev: 'game', goals: [2, 3], text: 'Spiele {n} Partien 8-Ball oder 9-Ball'},
+  {ev: 'bank', goals: [2, 4], text: 'Versenke {n} Kugeln über die Bande'},
+  {ev: 'multi', goals: [1, 2], text: 'Versenke {n}× mehrere Kugeln mit einem Stoß'},
+  {ev: 'spin', goals: [5, 10], text: 'Versenke {n} Kugeln mit Effet'},
+  {ev: 'level', goals: [1, 3], text: 'Schaffe {n} Herausforderungen'},
+  {ev: 'arcade', goals: [1500, 3000], text: 'Erreiche {n} Punkte in der Trefferserie', max: true},
+  {ev: 'target', goals: [150, 250], text: 'Erziele {n} Punkte an der Zielscheibe', max: true},
+  {ev: 'lucky', goals: [1], text: 'Spiele einen Glücksstoß'}
+];
+function todayQuests() {
+  const day = dayKey(new Date());
+  if (PROFILE.quests && PROFILE.quests.day === day) return PROFILE.quests.list;
+  const rnd = seeded(day.split('-').reduce((a, v) => a * 37 + +v, 7) % 2147483646 + 1), pool = QUEST_POOL.slice(), list = [];
+  while (list.length < 3) {
+    const q = pool.splice(Math.floor(rnd() * pool.length), 1)[0], gi = Math.floor(rnd() * q.goals.length), goal = q.goals[gi];
+    list.push({ev: q.ev, goal, text: q.text.replace('{n}', fmt(goal)), max: !!q.max, prog: 0, claimed: false, coins: 60 + gi * 50 + Math.floor(rnd() * 3) * 10, xp: 30 + gi * 20});
+  }
+  PROFILE.quests = {day, list}; saveProfile();
+  return list;
+}
+// Fortschritt melden (Aufgaben und Erfolge)
+function track(ev, n) {
+  n = n === undefined ? 1 : n;
+  if (n <= 0) return;
+  const maxEv = ev === 'arcade' || ev === 'target';
+  CNT[ev] = maxEv ? Math.max(CNT[ev] || 0, n) : (CNT[ev] || 0) + n;
+  let done = false;
+  for (const q of todayQuests()) {
+    if (q.ev !== ev || q.prog >= q.goal) continue;
+    q.prog = q.max ? Math.max(q.prog, n) : Math.min(q.goal, q.prog + n);
+    if (q.prog >= q.goal) { q.prog = q.goal; done = true; }
+  }
+  saveProfile();
+  if (done) toast('📋 Tagesaufgabe erledigt! Belohnung in der Lobby abholen.', 3000);
+}
+function trackPots(ev) {
+  const n = ev.potted.length; if (!n) return;
+  track('pot', n);
+  if (n > 1) track('multi');
+  const banks = ev.potted.filter(p => ev.railCount[p.n] > 0).length; if (banks) track('bank', banks);
+  if (G.sx || G.sy) track('spin', n);
+}
+const ownedCount = () => PROFILE.cues.length + PROFILE.tables.length + PROFILE.ballsets.length + PROFILE.cloths.length;
+const starsTotal = () => SOLO.stars.reduce((a, b) => a + (b || 0), 0);
+const levelsDone = () => SOLO.stars.filter(x => x > 0).length;
+const ACHIEVEMENTS = [
+  ['pot1', '🎱', 'Erster Treffer', 'Versenke deine erste Kugel', () => CNT.pot || 0, 1, 50],
+  ['pot100', '🎱', 'Treffsicher', 'Versenke 100 Kugeln', () => CNT.pot || 0, 100, 200],
+  ['pot500', '🎱', 'Kugelmaschine', 'Versenke 500 Kugeln', () => CNT.pot || 0, 500, 500],
+  ['pot2000', '🎱', 'Legende am Tisch', 'Versenke 2.000 Kugeln', () => CNT.pot || 0, 2000, 1500],
+  ['win1', '🏆', 'Erster Sieg', 'Gewinne eine Partie', () => CNT.win || 0, 1, 100],
+  ['win10', '🏆', 'Siegertyp', 'Gewinne 10 Partien', () => CNT.win || 0, 10, 300],
+  ['win50', '🏆', 'Champion', 'Gewinne 50 Partien', () => CNT.win || 0, 50, 1000],
+  ['game25', '🎮', 'Stammgast', 'Spiele 25 Partien', () => CNT.game || 0, 25, 250],
+  ['bank10', '↗️', 'Bandenkünstler', 'Versenke 10 Kugeln über die Bande', () => CNT.bank || 0, 10, 200],
+  ['bank100', '↗️', 'Bandenkönig', 'Versenke 100 Kugeln über die Bande', () => CNT.bank || 0, 100, 800],
+  ['multi5', '💥', 'Doppelschlag', 'Versenke 5× mehrere Kugeln mit einem Stoß', () => CNT.multi || 0, 5, 250],
+  ['multi50', '💥', 'Kettenreaktion', 'Versenke 50× mehrere Kugeln mit einem Stoß', () => CNT.multi || 0, 50, 900],
+  ['spin50', '🌀', 'Effet-Meister', 'Versenke 50 Kugeln mit Effet', () => CNT.spin || 0, 50, 400],
+  ['break10', '💣', 'Sprengmeister', 'Versenke 10× beim Anstoß eine Kugel', () => CNT.breakpot || 0, 10, 300],
+  ['online5', '🌐', 'Weltenbummler', 'Spiele 5 Online-Partien', () => CNT.online || 0, 5, 300],
+  ['tourn1', '🏟', 'Turniersieger', 'Gewinne ein Turnier', () => CNT.tourn || 0, 1, 500],
+  ['tourn5', '🏟', 'Turnierlegende', 'Gewinne 5 Turniere', () => CNT.tourn || 0, 5, 1500],
+  ['lesson1', '🎓', 'Lehrling', 'Schließe eine Lektion ab', () => (SOLO.lessons || []).filter(Boolean).length, 1, 100],
+  ['lesson6', '🎓', 'Meisterschüler', 'Schließe alle 6 Lektionen ab', () => (SOLO.lessons || []).filter(Boolean).length, 6, 600],
+  ['lv15', '🧩', 'Herausforderer', 'Schaffe 15 Herausforderungen', levelsDone, 15, 400],
+  ['lv45', '🧩', 'Problemlöser', 'Schaffe 45 Herausforderungen', levelsDone, 45, 1000],
+  ['lv90', '🧩', 'Großmeister', 'Schaffe alle 90 Herausforderungen', levelsDone, 90, 3000],
+  ['star135', '⭐', 'Sternensammler', 'Sammle 135 Sterne', starsTotal, 135, 1200],
+  ['star270', '⭐', 'Sternenhimmel', 'Sammle alle 270 Sterne', starsTotal, 270, 4000],
+  ['arc5k', '⚡', 'Serientäter', 'Erreiche 5.000 Punkte in der Trefferserie', () => CNT.arcade || 0, 5000, 300],
+  ['arc20k', '⚡', 'Unaufhaltsam', 'Erreiche 20.000 Punkte in der Trefferserie', () => CNT.arcade || 0, 20000, 1000],
+  ['target300', '🎯', 'Scharfschütze', 'Erziele 300 Punkte an der Zielscheibe', () => CNT.target || 0, 300, 500],
+  ['lucky10', '🍀', 'Glückspilz', 'Spiele 10 Glücksstöße', () => CNT.lucky || 0, 10, 300],
+  ['skin20', '🎨', 'Sammler', 'Besitze 20 Skins', ownedCount, 20, 400],
+  ['skin60', '🎨', 'Kurator', 'Besitze 60 Skins', ownedCount, 60, 1500],
+  ['skin120', '🎨', 'Komplettsammlung', 'Besitze alle 120 Skins', ownedCount, 120, 5000],
+  ['level10', '📈', 'Aufsteiger', 'Erreiche Level 10', () => levelOf(PROFILE.xp), 10, 500],
+  ['level25', '📈', 'Profi', 'Erreiche Level 25', () => levelOf(PROFILE.xp), 25, 1500]
+];
+const achClaimed = id => (PROFILE.ach || []).includes(id);
+const claimable = () => todayQuests().filter(q => q.prog >= q.goal && !q.claimed).length + ACHIEVEMENTS.filter(a => !achClaimed(a[0]) && a[4]() >= a[5]).length;
+let questTab = 'daily';
+function showQuests() { renderQuests(); hide('menu'); show('quests'); }
+function renderQuests() {
+  document.querySelectorAll('#questTabs button').forEach(b => b.classList.toggle('sel', b.dataset.tab === questTab));
+  const box = $('questList'); box.innerHTML = '';
+  if (questTab === 'daily') {
+    for (const q of todayQuests()) {
+      const el = document.createElement('div'); el.className = 'quest' + (q.claimed ? ' done' : '');
+      el.innerHTML = '<div class="qtxt"><b>' + q.text + '</b><div class="qbar"><i style="width:' + Math.round(q.prog / q.goal * 100) + '%"></i></div><small>' + fmt(q.prog) + ' / ' + fmt(q.goal) + '</small></div>';
+      const b = document.createElement('button');
+      b.textContent = q.claimed ? '✓ Abgeholt' : q.prog >= q.goal ? '🎁 +' + q.coins + ' 🪙' : '+' + q.coins + ' 🪙';
+      b.disabled = q.claimed || q.prog < q.goal; b.className = q.prog >= q.goal && !q.claimed ? 'claim' : '';
+      b.onclick = () => { q.claimed = true; const c = gain(q.coins, q.xp); saveProfile(); playSound('win', 0); confetti(); $('questMsg').textContent = '+' + c + ' Münzen, +' + q.xp + ' EP'; renderQuests(); };
+      el.appendChild(b); box.appendChild(el);
+    }
+    $('questMsg').textContent = $('questMsg').textContent || 'Jeden Tag gibt es drei neue Aufgaben.';
+  } else {
+    const list = ACHIEVEMENTS.slice().sort((a, b) => (achClaimed(a[0]) - achClaimed(b[0])) || (b[4]() >= b[5]) - (a[4]() >= a[5]));
+    for (const a of list) {
+      const [id, icon, name, desc, val, goal, coins] = a, v = Math.min(val(), goal), got = achClaimed(id);
+      const el = document.createElement('div'); el.className = 'quest ach' + (got ? ' done' : '');
+      el.innerHTML = '<span class="aicon">' + icon + '</span><div class="qtxt"><b>' + name + '</b><small>' + desc + '</small><div class="qbar"><i style="width:' + Math.round(v / goal * 100) + '%"></i></div><small>' + fmt(v) + ' / ' + fmt(goal) + '</small></div>';
+      const b = document.createElement('button');
+      b.textContent = got ? '✓' : v >= goal ? '🎁 +' + coins + ' 🪙' : coins + ' 🪙';
+      b.disabled = got || v < goal; b.className = v >= goal && !got ? 'claim' : '';
+      b.onclick = () => { PROFILE.ach = PROFILE.ach || []; PROFILE.ach.push(id); const c = gain(coins, 50); saveProfile(); playSound('win', 0); confetti(); renderQuests(); $('questMsg').textContent = '🏅 ' + name + ': +' + c + ' Münzen'; };
+      el.appendChild(b); box.appendChild(el);
+    }
+    $('questMsg').textContent = ACHIEVEMENTS.filter(a => achClaimed(a[0])).length + ' von ' + ACHIEVEMENTS.length + ' Erfolgen erreicht';
+  }
+}
+
+// ---------- Glücksrad ----------
+const WHEEL = [
+  {t: 'coins', v: 50, col: '#3fb68b', w: 22}, {t: 'xp', v: 60, col: '#4fa3ff', w: 16}, {t: 'coins', v: 100, col: '#f2b632', w: 18}, {t: 'skin', col: '#c07cff', w: 8},
+  {t: 'coins', v: 75, col: '#e0412f', w: 18}, {t: 'coins', v: 500, col: '#ffd75a', w: 3}, {t: 'xp', v: 150, col: '#2a8aa3', w: 9}, {t: 'coins', v: 200, col: '#ff7a20', w: 6}
+];
+const wheelFree = () => PROFILE.wheelDay !== dayKey(new Date());
+let WH = {ang: 0, spinning: false};
+function showWheel() { hide('menu'); show('wheel'); renderWheelUI(); drawWheel(); }
+function renderWheelUI() {
+  $('bSpin').textContent = wheelFree() ? '🎡 Gratis drehen' : '🎡 Drehen (150 🪙)';
+  $('bSpin').disabled = WH.spinning;
+}
+function drawWheel() {
+  const c = $('wheelCv'), sz = c.clientWidth || 260, d = Math.min(window.devicePixelRatio || 1, 2);
+  if (c.width !== Math.round(sz * d)) { c.width = c.height = Math.round(sz * d); }
+  const g = c.getContext('2d'), r = c.width / 2 - 6 * d, cx = c.width / 2, cy = c.height / 2, n = WHEEL.length, seg = TAU / n;
+  g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, c.width, c.height);
+  for (let i = 0; i < n; i++) {
+    const a0 = WH.ang + i * seg - Math.PI / 2, s = WHEEL[i];
+    const gr = g.createRadialGradient(cx, cy, r * 0.2, cx, cy, r);
+    gr.addColorStop(0, '#ffffff'); gr.addColorStop(0.15, s.col); gr.addColorStop(1, s.col);
+    g.beginPath(); g.moveTo(cx, cy); g.arc(cx, cy, r, a0, a0 + seg); g.closePath(); g.fillStyle = gr; g.fill();
+    g.strokeStyle = 'rgba(0,0,0,.35)'; g.lineWidth = 2 * d; g.stroke();
+    g.save(); g.translate(cx, cy); g.rotate(a0 + seg / 2); g.fillStyle = '#1a1206'; g.font = 'bold ' + Math.round(15 * d) + 'px system-ui,sans-serif'; g.textAlign = 'right'; g.textBaseline = 'middle';
+    g.fillText(s.t === 'coins' ? s.v + ' 🪙' : s.t === 'xp' ? s.v + ' EP' : '🎁 Skin', r - 10 * d, 0); g.restore();
+  }
+  g.beginPath(); g.arc(cx, cy, r, 0, TAU); g.strokeStyle = '#ffd75a'; g.lineWidth = 5 * d; g.stroke();
+  for (let i = 0; i < 24; i++) { const a = i * TAU / 24 + WH.ang; g.beginPath(); g.arc(cx + Math.cos(a) * (r - 1), cy + Math.sin(a) * (r - 1), 3 * d, 0, TAU); g.fillStyle = i % 2 ? '#fff6c8' : '#ffb020'; g.fill(); }
+  g.beginPath(); g.arc(cx, cy, r * 0.13, 0, TAU); g.fillStyle = '#1a1206'; g.fill(); g.strokeStyle = '#ffd75a'; g.lineWidth = 3 * d; g.stroke();
+}
+function spinWheel() {
+  if (WH.spinning) return;
+  if (!wheelFree()) { if (PROFILE.coins < 150) { $('wheelMsg').textContent = 'Du brauchst 150 Münzen für eine Extra-Drehung.'; return; } PROFILE.coins -= 150; }
+  else PROFILE.wheelDay = dayKey(new Date());
+  saveProfile();
+  const tot = WHEEL.reduce((a, s) => a + s.w, 0); let r = Math.random() * tot, idx = 0;
+  for (; idx < WHEEL.length; idx++) { r -= WHEEL[idx].w; if (r <= 0) break; }
+  idx = Math.min(idx, WHEEL.length - 1);
+  const seg = TAU / WHEEL.length, target = -(idx * seg + seg / 2) + TAU * (5 + Math.floor(Math.random() * 2)) + (Math.random() - 0.5) * seg * 0.6;
+  const start = WH.ang % TAU, t0 = performance.now(), dur = 4200;
+  WH.spinning = true; renderWheelUI(); $('wheelMsg').textContent = '';
+  let lastTick = 0;
+  const anim = now => {
+    const t = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - t, 4);
+    WH.ang = start + (target - start) * e; drawWheel();
+    const tick = Math.floor(WH.ang / seg); if (tick !== lastTick) { lastTick = tick; playSound('tick', 0); }
+    if (t < 1) requestAnimationFrame(anim); else { WH.spinning = false; wheelPrize(WHEEL[idx]); renderWheelUI(); }
+  };
+  requestAnimationFrame(anim);
+}
+function wheelPrize(s) {
+  let txt;
+  if (s.t === 'coins') { gain(s.v, 0); txt = '+' + s.v + ' Münzen!'; }
+  else if (s.t === 'xp') { gain(0, s.v); txt = '+' + s.v + ' Erfahrungspunkte!'; }
+  else {
+    const pool = [];
+    for (const [tab] of INV_TABS) { const all = SHOP_DEF[tab].items(), own = SHOP_DEF[tab].owned(); for (const id in all) if (!own.includes(id) && (all[id].tier || 0) <= 1 && !all[id].levelOnly) pool.push([tab, id]); }
+    if (pool.length) { const [tab, id] = pool[Math.floor(Math.random() * pool.length)]; SHOP_DEF[tab].owned().push(id); saveProfile(); txt = 'Neuer Skin: ' + ITEM_KIND[tab][0] + ' „' + SHOP_DEF[tab].items()[id].name + '“!'; }
+    else { gain(300, 0); txt = '+300 Münzen!'; }
+  }
+  $('wheelMsg').textContent = '🎉 ' + txt; confetti(); playSound('win', 0); syncMenu();
+}
+
+// ---------- Minispiele: Glücksstoß und Zielscheibe ----------
+const LUCKY_PRIZES = [25, 50, 100, 150, 300, 800];
+function newLucky() {
+  if (PROFILE.luckyDay === dayKey(new Date())) {
+    if (PROFILE.coins < 50) { $('lbMsg').textContent = 'Der Gratis-Glücksstoß ist heute schon gespielt. Ein weiterer kostet 50 Münzen.'; return; }
+    PROFILE.coins -= 50;
+  } else PROFILE.luckyDay = dayKey(new Date());
+  saveProfile();
+  newSolo('lucky');
+}
+function newTarget() { newSolo('target'); }
+function placeTarget() {
+  const so = G.solo, rnd = Math.random;
+  for (let k = 0; k < 200; k++) {
+    const x = 30 + rnd() * (W - 60), y = 22 + rnd() * (H - 44), c = getBall(G.balls, 0);
+    if (Math.hypot(x - c.x, y - c.y) > 50) { so.tgt = {x, y}; return; }
+  }
+  so.tgt = {x: W * 0.75, y: H / 2};
+}
+function drawMiniGames(now) {
+  const so = G.solo, px = 1 / L.s;
+  if (so.type === 'target' && so.tgt) {
+    const {x, y} = so.tgt;
+    for (const [r, col] of [[12, 'rgba(255,255,255,.18)'], [7, 'rgba(242,182,50,.35)'], [3, 'rgba(255,77,61,.6)']]) {
+      ctx.beginPath(); ctx.arc(x, y, r, 0, TAU); ctx.fillStyle = col; ctx.fill(); ctx.strokeStyle = 'rgba(255,255,255,.7)'; ctx.lineWidth = 1 * px; ctx.stroke();
+    }
+    ctx.fillStyle = '#fff'; ctx.font = 'bold ' + (10 * px).toFixed(2) + 'px system-ui'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('100', x, y); ctx.fillText('50', x, y - 5.2); ctx.fillText('20', x, y - 9.6);
+  }
+  if (so.type === 'lucky') {
+    for (let k = 0; k < 6; k++) {
+      const d = POCKET_DRAW[k], v = so.prizes[k], pulse = 0.5 + 0.5 * Math.sin(now / 250 + k);
+      ctx.beginPath(); ctx.arc(d.x, d.y, d.r + 1 + pulse, 0, TAU); ctx.strokeStyle = v >= 300 ? '#ffd75a' : 'rgba(255,255,255,.5)'; ctx.lineWidth = 1.5 * px; ctx.stroke();
+      lessonLabel(v + ' 🪙', d.x + (d.x < W / 2 ? 14 : d.x > W / 2 + 1 ? -14 : 0), d.y + (d.y < H / 2 ? 12 : -12), v >= 300 ? '#ffd75a' : '#fff');
+    }
+  }
+}
+
+// ---------- Turnier ----------
+let TOURN = null;
+const TOURN_FEE = 100, TOURN_PRIZE = 1200, TOURN_NAMES = ['Viertelfinale', 'Halbfinale', 'Finale'];
+const TOURN_OPP = ['Kreide-Kalle', 'Banden-Bea', 'Effet-Emil'];
+function startTournament() {
+  if (PROFILE.coins < TOURN_FEE) { $('lbMsg').textContent = 'Das Startgeld für das Turnier beträgt ' + TOURN_FEE + ' Münzen.'; return; }
+  PROFILE.coins -= TOURN_FEE; saveProfile();
+  TOURN = {round: 0, mode: +CFG.mode};
+  tournRound();
+}
+function tournRound() {
+  const savedDiff = CFG.diff, savedOpp = CFG.opp;
+  CFG.diff = TOURN.round; CFG.opp = 'ai';
+  newGame({mode: TOURN.mode, names: [myName(), TOURN_OPP[TOURN.round]]});
+  CFG.diff = savedDiff; CFG.opp = savedOpp;
+  G.tourn = true;
+  toast('🏟 ' + TOURN_NAMES[TOURN.round] + ' gegen ' + TOURN_OPP[TOURN.round] + '!', 3500);
 }
 
 // ===================== Wiederholung =====================
@@ -3433,6 +3779,7 @@ function lineCol(n, a) {
 // Linienmodus (manche Herausforderungen schreiben ihn vor)
 function linesMode() {
   if (G && G.mode === 0 && G.solo.type === 'lesson') return 'all';
+  if (G && G.mode === 0 && (G.solo.type === 'lucky' || G.solo.type === 'target') && CFG.lines === 'all') return 'guide';
   if (G && G.mode === 0 && G.solo.type === 'levels' && LEVELS[G.solo.idx].lines) return LEVELS[G.solo.idx].lines;
   return CFG.lines;
 }
@@ -3558,8 +3905,9 @@ function drawPrediction(S) {
     pathArrows(p, 'rgba(255,255,255,.85)', px, 22);
   }
   // Bahn der Weißen: immer durchgehend bis dorthin, wo sie liegen bleibt
-  const cp = S.paths[0];
-  if (cp.length > 1) {
+  const tgtMode = G.mode === 0 && G.solo.type === 'target', cp = tgtMode ? trimPath(S.paths[0], 45) : S.paths[0];
+  if (tgtMode) { if (cp.length > 1) fadeLine(cp, a => 'rgba(255,255,255,' + a + ')', 1.9 * px); }
+  else if (cp.length > 1) {
     glowLine(cp, a => 'rgba(255,255,255,' + a + ')', 1.9 * px);
     pathArrows(cp, 'rgba(255,255,255,.75)', px, 30);
   }
@@ -3572,7 +3920,7 @@ function drawPrediction(S) {
   }
   // Endposition der Weißen
   const cf = getBall(S.balls, 0);
-  if (cf.on && movedPath(S, 0)) {
+  if (cf.on && movedPath(S, 0) && !tgtMode) {
     ctx.setLineDash([2 * px, 2 * px]); ctx.beginPath(); ctx.arc(cf.x, cf.y, R, 0, TAU);
     ctx.strokeStyle = 'rgba(255,255,255,.85)'; ctx.lineWidth = 1.3 * px; ctx.stroke(); ctx.setLineDash([]);
   }
@@ -3751,8 +4099,8 @@ function drawHUD() {
   ctx.textBaseline = 'middle';
   if (G.mode === 0) {
     const so = G.solo, lv = so.type === 'lesson' ? LESSON_LEVELS[so.level] : LEVELS[so.idx];
-    const left = so.type === 'lesson' ? '🎓 Lern-Modus' : so.type === 'levels' ? 'Level ' + (so.idx + 1) + ': ' + lv.name : so.type === 'training' ? 'Training' : 'Punkte: ' + so.score;
-    const right = so.type === 'lesson' ? TOPICS[so.topic].name : so.type === 'levels' ? 'Stöße: ' + so.shots + ' / ' + lv.shots + ' · Par ' + lv.par
+    const left = so.type === 'lucky' ? '🍀 Glücksstoß' : so.type === 'target' ? '🎯 Zielscheibe · ' + so.score + ' Punkte' : so.type === 'lesson' ? '🎓 Lern-Modus' : so.type === 'levels' ? 'Level ' + (so.idx + 1) + ': ' + lv.name : so.type === 'training' ? 'Training' : 'Punkte: ' + so.score;
+    const right = so.type === 'lucky' ? 'Hauptpreis: 800 🪙' : so.type === 'target' ? 'Stoß ' + Math.min(5, so.shots + 1) + ' / 5' : so.type === 'lesson' ? TOPICS[so.topic].name : so.type === 'levels' ? 'Stöße: ' + so.shots + ' / ' + lv.shots + ' · Par ' + lv.par
       : so.type === 'training' ? 'Stöße: ' + so.shots + ' · Versenkt: ' + (so.pots || 0)
       : '❤'.repeat(so.lives) + '  · Serie ×' + Math.max(1, so.combo);
     ctx.font = 'bold ' + fs + 'px system-ui,sans-serif';
@@ -3803,6 +4151,7 @@ function drawHUD() {
     let label = 'Ziel:', list = tg;
     if (G.isBreak) { label = 'Anstoß'; list = []; }
     else if (G.mode === 0 && G.solo.type === 'training') { label = 'Freies Spiel'; list = []; }
+    else if (G.mode === 0 && G.solo.type === 'target') { label = '🎯 Weiße ins Zentrum'; list = []; }
     else if (G.mode === 0 && G.solo.type === 'lesson') { label = 'Lektion ' + (G.solo.step + 1) + ' / ' + LESSONS[G.solo.topic].length; list = []; }
     else if (G.mode === 8 && !G.players[G.cur].group) { label = 'Ziel: Volle oder Halbe (nicht die 8)'; list = []; }
     else if (list.length > 7) list = list.slice(0, 7);
@@ -3850,6 +4199,8 @@ function statusText() {
     const so = G.solo;
     if (so.type === 'training') return 'Training · Kugel halten & ziehen · ⟲ Replay · ↶ Zurück';
     if (so.type === 'lesson') return G.state === 'lessonaim' ? 'Die Linien zeigen den Lösungsstoß – tippe auf „Vorführen“' : 'Lektion – lies die Erklärung rechts';
+    if (so.type === 'lucky') return 'Ein Stoß: Versenke die 1 in der Tasche mit dem höchsten Preis';
+    if (so.type === 'target') return 'Lass die Weiße im Zentrum der Zielscheibe liegen';
     let t = so.type === 'levels' ? LEVELS[so.idx].desc : 'Rekord: ' + SOLO.hi + ' · Linien-Bonus ×' + LINES_MULT[CFG.lines];
     if (G.bih && G.state === 'aim') t += ' · Ball in Hand';
     return t;
@@ -4270,10 +4621,18 @@ document.querySelectorAll('.tile').forEach(t => t.onclick = () => {
   if (go === 'ai' || go === 'human') { CFG.opp = go; saveCfg(); if (G && G.online) netReset(); newGame(); }
   else if (go === 'online') { CFG.opp = 'online'; saveCfg(); openOnline(); }
   else if (go === 'levels') showLevels();
+  else if (go === 'tourn') { if (G && G.online) netReset(); startTournament(); }
+  else if (go === 'lucky') newLucky();
   else newSolo(go);
 });
 $('bDaily').onclick = () => claimDaily();
 $('bInv').onclick = () => showInventory();
+$('bQuests').onclick = () => { $('questMsg').textContent = ''; showQuests(); };
+$('bQuestTop').onclick = () => { hide('quests'); syncMenu(); show('menu'); };
+document.querySelectorAll('#questTabs button').forEach(b => b.onclick = () => { questTab = b.dataset.tab; $('questMsg').textContent = ''; renderQuests(); });
+$('bWheel').onclick = () => { $('wheelMsg').textContent = ''; showWheel(); };
+$('bWheelTop').onclick = () => { if (WH.spinning) return; hide('wheel'); syncMenu(); show('menu'); };
+$('bSpin').onclick = () => spinWheel();
 $('bInvTop').onclick = () => { hide('inv'); syncMenu(); show('menu'); };
 $('pcard').onclick = () => showTrack();
 $('bTrackClose').onclick = () => { hide('track'); syncMenu(); show('menu'); };
@@ -4302,12 +4661,13 @@ $('lsNext').onclick = () => { if (!G) return; const n = LESSONS[G.solo.topic].le
 $('lsDemo').onclick = () => lessonDemo();
 $('lsClose').onclick = () => lessonExit();
 $('bRulesClose').onclick = () => { hide('rules'); };
-$('bNext').onclick = () => newSolo('levels', G.nextLevel);
+$('bNext').onclick = () => { if (G.mode !== 0 && TOURN) { hide('over'); tournRound(); } else newSolo('levels', G.nextLevel); };
 $('bResume').onclick = () => hide('menu');
 $('bMenu').onclick = () => { syncMenu(); show('menu'); };
 $('bRules').onclick = () => show('rules');
 $('bAgain').onclick = () => {
-  if (G.mode === 0) newSolo(G.solo.type, G.solo.idx);
+  if (G.mode === 0 && G.solo.type === 'lucky') { const g0 = G; newLucky(); if (G === g0) { hide('over'); syncMenu(); show('menu'); } }
+  else if (G.mode === 0) newSolo(G.solo.type, G.solo.idx);
   else if (G.online && NET.on) { if (NET.role === 'host') netStartGame(); else { netSend({t: 'rematch'}); hide('over'); toast('Revanche angefragt …'); } }
   else newGame();
 };
@@ -4391,6 +4751,8 @@ window.onAndroidBack = () => {
   if (!$('shop').classList.contains('hidden')) { $('bShopClose').onclick(); return true; }
   if (!$('inv').classList.contains('hidden')) { $('bInvTop').onclick(); return true; }
   if (!$('track').classList.contains('hidden')) { $('bTrackClose').onclick(); return true; }
+  if (!$('quests').classList.contains('hidden')) { $('bQuestTop').onclick(); return true; }
+  if (!$('wheel').classList.contains('hidden')) { $('bWheelTop').onclick(); return true; }
   if (!$('online').classList.contains('hidden')) { $('bOnlineBack').onclick(); return true; }
   if (G && G.state === 'replay') { endReplay(); return true; }
   if (!$('lessonBox').classList.contains('hidden')) { lessonExit(); return true; }
@@ -4405,7 +4767,7 @@ window.onAndroidBack = () => {
 let lastT = performance.now(), LAST_DT = 0;
 function frame(now) {
   const dt = Math.min(0.05, (now - lastT) / 1000); lastT = now; LAST_DT = dt;
-  const paused = G && !G.online && ['menu', 'shop', 'stats', 'settings', 'levels', 'rules', 'online', 'track', 'inv'].some(id => !$(id).classList.contains('hidden'));
+  const paused = G && !G.online && ['menu', 'shop', 'stats', 'settings', 'levels', 'rules', 'online', 'track', 'inv', 'quests', 'wheel'].some(id => !$(id).classList.contains('hidden'));
   if (G && !paused) {
     netTick(now);
     pointerTick(now);

@@ -30,6 +30,12 @@ h1 span{color:var(--accent)}
 .rules{text-align:left;font-size:13px;line-height:1.45;max-width:640px}
 .rules h2{font-size:15px;margin:10px 0 4px;color:var(--accent)}
 .rules ul{margin:0;padding-left:18px}
+#levelGrid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:6px}
+.lvl{display:flex;flex-direction:column;align-items:center;gap:2px;background:#1f3029;border:1px solid var(--line);border-radius:10px;color:var(--text);padding:6px 4px;min-width:96px;cursor:pointer}
+.lvl b{font-size:17px}
+.lvl span{font-size:11px;color:var(--muted);white-space:nowrap}
+.lvl i{font-style:normal;color:var(--accent);font-size:13px;letter-spacing:1px}
+.lvl.locked{opacity:.4;cursor:default}
 #pushDlg{position:fixed;z-index:15;left:50%;top:50%;transform:translate(-50%,-50%);background:rgba(22,35,30,.96);border:1px solid var(--accent);border-radius:14px;padding:12px 16px;text-align:center;font-size:14px}
 #pushDlg .actions{margin-top:8px}
 </style>
@@ -49,10 +55,11 @@ h1 span{color:var(--accent)}
 <div id="menu" class="overlay">
   <div class="panel">
     <h1>Billard <span>Linien</span></h1>
-    <div class="row"><span>Spiel</span><div class="seg" data-k="mode"><button data-v="8">8-Ball</button><button data-v="9">9-Ball</button></div></div>
-    <div class="row"><span>Gegner</span><div class="seg" data-k="opp"><button data-v="ai">Computer</button><button data-v="human">2 Spieler</button></div></div>
+    <div class="row"><span>Spiel</span><div class="seg" data-k="mode"><button data-v="8">8-Ball</button><button data-v="9">9-Ball</button><button data-v="0">Solo</button></div></div>
+    <div class="row" id="rowSolo"><span>Solo-Modus</span><div class="seg" data-k="solo"><button data-v="levels">Herausforderungen</button><button data-v="arcade">Trefferserie</button></div></div>
+    <div class="row" id="rowOpp"><span>Gegner</span><div class="seg" data-k="opp"><button data-v="ai">Computer</button><button data-v="human">2 Spieler</button></div></div>
     <div class="row" id="rowDiff"><span>Stärke</span><div class="seg" data-k="diff"><button data-v="0">Leicht</button><button data-v="1">Mittel</button><button data-v="2">Schwer</button></div></div>
-    <div class="row"><span>8 ansagen</span><div class="seg" data-k="call"><button data-v="1">An</button><button data-v="0">Aus</button></div></div>
+    <div class="row" id="rowCall"><span>8 ansagen</span><div class="seg" data-k="call"><button data-v="1">An</button><button data-v="0">Aus</button></div></div>
     <div class="row"><span>Ton</span><div class="seg" data-k="sound"><button data-v="1">An</button><button data-v="0">Aus</button></div></div>
     <div class="actions">
       <button id="bResume" class="hidden">Weiterspielen</button>
@@ -96,7 +103,21 @@ h1 span{color:var(--accent)}
       <li>Push-Out: Direkt nach dem Anstoß darf der Spieler am Zug einen Push-Out ansagen. Dabei gelten nur die Regeln zur Weißen. Danach entscheidet der Gegner, ob er selbst spielt oder zurückgibt.</li>
       <li>Wer dreimal in Folge foult, verliert das Spiel.</li>
     </ul>
+    <h2>Solo</h2>
+    <ul>
+      <li><b>Herausforderungen:</b> In 10 Leveln löst du Aufgaben mit einer begrenzten Zahl an Stößen. Schaffst du es in Par, gibt es 3 Sterne. Mit jedem geschafften Level wird das nächste freigeschaltet.</li>
+      <li>Rot markierte Kugeln darfst du nicht berühren. Eine farbig markierte Tasche ist für die Kugel mit dieser Farbe vorgeschrieben. Im goldenen Kreis muss die Weiße liegen bleiben.</li>
+      <li><b>Trefferserie:</b> Du hast 3 Leben, und jeder Stoß ohne versenkte Kugel kostet eines. Jede Kugel bringt 100 Punkte, die 8 bringt 300. Pro Bandenberührung vor dem Versenken gibt es +75. Fallen mehrere Kugeln, wird multipliziert, und die Serie zählt bis ×10. Mit „Linien: Einfach“ gibt es ×1,5 Punkte, mit „Aus“ ×2. Alle 3000 Punkte bekommst du ein Extraleben.</li>
+    </ul>
     <div class="actions"><button id="bRulesClose" class="primary">Zurück</button></div>
+  </div>
+</div>
+
+<div id="levels" class="overlay hidden">
+  <div class="panel">
+    <h1>Herausforderungen</h1>
+    <div id="levelGrid"></div>
+    <div class="actions"><button id="bLevelsBack">Zurück</button></div>
   </div>
 </div>
 
@@ -104,7 +125,7 @@ h1 span{color:var(--accent)}
   <div class="panel">
     <h1 id="overTitle">Gewonnen!</h1>
     <div id="overText" style="color:var(--muted);font-size:15px"></div>
-    <div class="actions"><button id="bAgain" class="primary">Nochmal</button><button id="bOverMenu">Menü</button></div>
+    <div class="actions"><button id="bNext" class="primary hidden">Nächstes Level</button><button id="bAgain" class="primary">Nochmal</button><button id="bOverMenu">Menü</button></div>
   </div>
 </div>
 
@@ -135,7 +156,7 @@ const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
 const gauss = () => { let u = 0, v = 0; while (!u) u = Math.random(); while (!v) v = Math.random(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(TAU * v); };
 
 // ===================== Einstellungen =====================
-const CFG = {mode: 8, opp: 'ai', diff: 1, call: 1, sound: 1, lines: 'all'};
+const CFG = {mode: 8, opp: 'ai', diff: 1, call: 1, sound: 1, lines: 'all', solo: 'levels'};
 try { Object.assign(CFG, JSON.parse(localStorage.getItem('billard_cfg') || '{}')); } catch (e) {}
 const saveCfg = () => { try { localStorage.setItem('billard_cfg', JSON.stringify(CFG)); } catch (e) {} };
 let TIME_SCALE = 1;
@@ -151,7 +172,7 @@ function newSim(balls, shot) {
   const v = Math.max(0.02, shot.power) * MAXV;
   cue.vx = Math.cos(shot.angle) * v; cue.vy = Math.sin(shot.angle) * v;
   return {balls: bs, t: 0, sx: shot.sx || 0, sy: shot.sy || 0, spinUsed: false, cueTravel: 0, contact: null,
-    ev: {first: null, railAfter: false, railBalls: new Set(), potted: [], cuePotted: false}, paths: null, snd: null};
+    ev: {first: null, railAfter: false, railBalls: new Set(), railCount: {}, touched: new Set(), potted: [], cuePotted: false}, paths: null, snd: null};
 }
 
 function pocketCheck(b) {
@@ -228,6 +249,7 @@ function stepSim(S) {
         ev.first = other.n;
         S.contact = {x: cue.x, y: cue.y, n: other.n, ox: other.x, oy: other.y, ovx: other.vx, ovy: other.vy, cvx: cue.vx, cvy: cue.vy};
       }
+      ev.touched.add(a.n); ev.touched.add(b.n);
       if (S.snd) S.snd.push({t: 'ball', v: rv});
       recPath(S, a, true); recPath(S, b, true);
     }
@@ -261,7 +283,7 @@ function stepSim(S) {
           b.vx += k * ny; b.vy += k * -nx; S.sx *= 0.6;
         }
         if (ev.first !== null) ev.railAfter = true;
-        if (b.n > 0) ev.railBalls.add(b.n);
+        if (b.n > 0) { ev.railBalls.add(b.n); ev.railCount[b.n] = (ev.railCount[b.n] || 0) + 1; }
         if (S.snd) S.snd.push({t: 'rail', v: -vn});
         recPath(S, b, true);
       }
@@ -330,6 +352,7 @@ function respot(bs, n) {
 // ===================== Regeln =====================
 function legalTargets(mode, group, on) {
   const arr = [...on];
+  if (mode === 0) return soloTargets(on);
   if (mode === 9) return arr.length ? [Math.min(...arr)] : [];
   if (!group) return arr.filter(n => n !== 8);
   const own = arr.filter(n => groupOf(n) === group);
@@ -427,7 +450,7 @@ function aimDefault() {
 function startTurn() {
   G.state = 'aim'; G.sx = 0; G.sy = 0; G.called = null; G.calledManual = false; G.pushShot = false;
   aimDefault();
-  if (G.isBreak) G.power = 0.9; else if (G.power > 0.7) G.power = 0.5;
+  if (G.isBreak) G.power = 0.9; else if (G.power > 0.7 || G.power < 0.05) G.power = 0.5;
   if (G.ai[G.cur]) startAI();
   updateUI();
 }
@@ -443,6 +466,7 @@ function shoot() {
   initAudio();
   G.before = onSet(G.balls);
   G.shotCalled = G.called;
+  G.shotLines = CFG.lines;
   const S = newSim(G.balls, {angle: G.aim, power: G.power, sx: G.sx, sy: G.sy});
   S.snd = [];
   G.live = S; G.state = 'moving'; G.pred = null;
@@ -453,6 +477,7 @@ function shoot() {
 function finishShot() {
   const S = G.live; G.live = null;
   G.balls = S.balls; G.ver++;
+  if (G.mode === 0) { soloFinish(S.ev); return; }
   const r = judge(G.before, S.ev, G.shotCalled);
   const me = G.cur, opp = 1 - me, P = G.players[me];
   if (G.mode === 9 && !G.pushShot) { if (r.foul) P.fouls++; else P.fouls = 0; }
@@ -500,6 +525,205 @@ function endGame(winner, reason) {
   document.getElementById('overText').textContent = reason;
   setTimeout(() => show('over'), 600);
 }
+
+// ===================== Einzelspieler =====================
+// Hilfen für Level-Aufbau: Punkt auf der Linie von einer Tasche ins Feld
+function fromPocket(k, dx, dy, dist) { const l = Math.hypot(dx, dy); return [POCKETS[k].x + dx / l * dist, POCKETS[k].y + dy / l * dist]; }
+const LEVELS = (() => {
+  const l3b2 = fromPocket(3, 1, -0.5, 30), l3b1 = [l3b2[0] + 0.894 * (2 * R + 0.4), l3b2[1] - 0.447 * (2 * R + 0.4)];
+  const dia = []; { const dx = R * Math.sqrt(3) + 0.03, dy = R + 0.015, rows = [1, 2, 3, 2, 1], ord = [1, 2, 3, 4, 9, 5, 6, 7, 8]; let i = 0;
+    rows.forEach((c, r) => { for (let j = 0; j < c; j++) dia.push([ord[i++], FOOT.x + r * dx, FOOT.y + (j - (c - 1) / 2) * 2 * dy]); }); }
+  return [
+    {name: 'Der erste Stoß', desc: 'Versenke die 1.', cue: [146.4, 73.2], balls: [[1, 200, 100]], shots: 2, par: 1},
+    {name: 'Der Schnitt', desc: 'Schneide die 3 in die Ecke.', cue: [150, 40], balls: [[3, 225, 22]], shots: 2, par: 1},
+    {name: 'Kombination', desc: 'Versenke die 2 – triff aber zuerst die 1.', cue: [l3b1[0] + 0.894 * 50, l3b1[1] - 0.447 * 50], balls: [[1, l3b1[0], l3b1[1]], [2, l3b2[0], l3b2[1]]], targets: [2], first: 1, shots: 2, par: 1},
+    {name: 'Über die Bande', desc: 'Versenke die 1. Die rot markierte 8 darf nicht berührt werden.', cue: [60, 63.5], balls: [[1, 215, 105], [8, 138, 84.4]], bomb: [8], shots: 3, par: 1},
+    {name: 'Der Reihe nach', desc: 'Versenke 1, 2 und 3 – immer zuerst die niedrigste treffen.', cue: [127, 63.5], balls: [[1, 180, 30], [2, 90, 100], [3, 200, 95]], order: true, shots: 5, par: 3},
+    {name: 'Seitentasche', desc: 'Die 5 muss in die obere Mitteltasche, die 4 in irgendeine Tasche.', cue: [150, 75], balls: [[5, 140, 22], [4, 200, 40]], pocket: {5: 1}, shots: 3, par: 2},
+    {name: 'Stellungsspiel', desc: 'Versenke die 1 und lass die Weiße im goldenen Kreis liegen (Rückläufer!).', cue: [146.4, 73.2], balls: [[1, 200, 100]], zone: {x: 112, y: 56, r: 12}, shots: 2, par: 1},
+    {name: 'Minenfeld', desc: 'Versenke 1 bis 4. Die rot markierten Kugeln dürfen nicht berührt werden.', cue: [127, 63.5], balls: [[1, 30, 15], [2, 127, 110], [3, 230, 20], [4, 220, 110], [8, 127, 40], [11, 70, 85], [12, 185, 70]], bomb: [8, 11, 12], shots: 7, par: 4},
+    {name: 'Aufräumen', desc: 'Räume alle sieben Kugeln ab.', cue: [127, 63.5], balls: [[1, 40, 30], [2, 90, 100], [3, 140, 30], [4, 180, 90], [5, 215, 40], [6, 60, 70], [7, 230, 105]], shots: 9, par: 7},
+    {name: 'Meisterstück', desc: 'Anstoß und dann 1 bis 9 der Reihe nach abräumen.', cue: [W * 0.2, H / 2], balls: dia, order: true, shots: 14, par: 9}
+  ];
+})();
+const SOLO = {stars: [], hi: 0};
+try { Object.assign(SOLO, JSON.parse(localStorage.getItem('billard_solo') || '{}')); } catch (e) {}
+const saveSolo = () => { try { localStorage.setItem('billard_solo', JSON.stringify(SOLO)); } catch (e) {} };
+const LINES_MULT = {all: 1, guide: 1.5, off: 2};
+
+function soloTargets(on) {
+  const so = G.solo;
+  let arr = [...on];
+  if (so.type === 'levels') {
+    const lv = LEVELS[so.idx];
+    if (lv.targets) arr = arr.filter(n => lv.targets.includes(n));
+    else if (lv.bomb) arr = arr.filter(n => !lv.bomb.includes(n));
+    if (lv.first && arr.length) return on.has(lv.first) ? [lv.first] : arr;
+    if (lv.order && arr.length) return [Math.min(...arr)];
+  }
+  return arr;
+}
+
+function newSolo(type, idx) {
+  const so = {type, idx: idx || 0, shots: 0, score: 0, combo: 0, lives: 3, lifeMarks: 0, best: 0};
+  let balls;
+  if (type === 'levels') {
+    const lv = LEVELS[so.idx];
+    balls = [{n: 0, x: lv.cue[0], y: lv.cue[1], vx: 0, vy: 0, on: true}].concat(lv.balls.map(b => ({n: b[0], x: b[1], y: b[2], vx: 0, vy: 0, on: true})));
+  } else {
+    balls = [{n: 0, x: W * 0.2, y: H / 2, vx: 0, vy: 0, on: true}];
+    for (let n = 1; n <= 15; n++) balls.push({n, x: 0, y: 0, vx: 0, vy: 0, on: false});
+  }
+  G = {
+    mode: 0, solo: so, diff: 0,
+    players: [{name: 'Du', group: null, fouls: 0}, {name: '', group: null, fouls: 0}],
+    ai: [false, false], cur: 0, balls, isBreak: false, bih: null,
+    state: 'aim', aim: 0, power: 0.5, sx: 0, sy: 0, called: null, calledManual: false,
+    pushAvail: false, pushShot: false, ver: 0, pred: null, predKey: '', toast: null, live: null
+  };
+  if (type === 'arcade') spawnBalls(5);
+  else if (LEVELS[so.idx].order && so.idx === LEVELS.length - 1) G.power = 0.9;
+  ['over', 'menu', 'levels'].forEach(hide);
+  if (type === 'levels') toast(LEVELS[so.idx].desc, 3500);
+  else toast('Trefferserie: Jeder Fehlstoß kostet ein Leben. Mit weniger Linien gibt es mehr Punkte!', 3500);
+  const p = G.power;
+  startTurn();
+  G.power = p;
+}
+
+function spawnBalls(k) {
+  const on = onSet(G.balls), cue = getBall(G.balls, 0);
+  const free = shuffle([...Array(15).keys()].map(i => i + 1).filter(n => !on.has(n)));
+  for (let i = 0; i < k && free.length; i++) {
+    const b = getBall(G.balls, free.pop());
+    for (let t = 0; t < 400; t++) {
+      const x = 14 + Math.random() * (W - 28), y = 12 + Math.random() * (H - 24);
+      if (placeOK(G.balls, x, y, false) && (x - cue.x) ** 2 + (y - cue.y) ** 2 > 18 * 18) { b.x = x; b.y = y; b.vx = b.vy = 0; b.on = true; break; }
+    }
+  }
+  G.ver++;
+}
+
+function soloFinish(ev) {
+  const so = G.solo, cue = getBall(G.balls, 0);
+  const scratch = ev.cuePotted;
+  const placeCue = () => { G.bih = 'any'; if (!cue.on) { const p = findFree(G.balls, W * 0.25, H / 2, false); cue.x = p.x; cue.y = p.y; cue.on = true; cue.vx = cue.vy = 0; } };
+  G.bih = null;
+  if (so.type === 'levels') {
+    const lv = LEVELS[so.idx];
+    so.shots++;
+    let fail = null;
+    for (const b of lv.bomb || []) if (ev.touched.has(b)) fail = 'Die Sperrkugel ' + b + ' wurde berührt.';
+    if (lv.pocket) for (const p of ev.potted) if (lv.pocket[p.n] !== undefined && lv.pocket[p.n] !== p.pocket) fail = 'Die ' + p.n + ' fiel in die falsche Tasche.';
+    const need = soloTargets(G.before);
+    if (!fail && ev.first !== null && (lv.order || lv.first) && need.length && ev.first !== need[0]) fail = 'Zuerst muss die ' + need[0] + ' getroffen werden.';
+    const left = soloTargets(onSet(G.balls));
+    if (fail) return endSolo(false, fail);
+    if (!left.length) {
+      if (lv.zone && (scratch || (cue.x - lv.zone.x) ** 2 + (cue.y - lv.zone.y) ** 2 > lv.zone.r ** 2)) return endSolo(false, 'Die Weiße liegt nicht im goldenen Kreis.');
+      if (scratch) return endSolo(false, 'Die Weiße ist mit dem letzten Stoß gefallen.');
+      const stars = so.shots <= lv.par ? 3 : so.shots <= lv.par + 1 ? 2 : 1;
+      return endSolo(true, 'Geschafft mit ' + so.shots + (so.shots === 1 ? ' Stoß' : ' Stößen') + ' (Par ' + lv.par + ').', stars);
+    }
+    if (so.shots >= lv.shots) return endSolo(false, 'Keine Stöße mehr übrig.');
+    if (scratch) { placeCue(); toast('Weiße versenkt – Ball in Hand. Der Stoß zählt trotzdem.'); }
+    return startTurn();
+  }
+  // Trefferserie
+  const pots = ev.potted;
+  let msg = '';
+  if (scratch || !pots.length) {
+    so.lives--; so.combo = 0;
+    msg = scratch ? 'Weiße versenkt – ein Leben weniger.' : 'Daneben – ein Leben weniger.';
+    if (scratch) placeCue();
+  } else {
+    so.combo = Math.min(so.combo + 1, 10);
+    let base = 0, banks = 0;
+    for (const p of pots) { const rails = ev.railCount[p.n] || 0; banks += rails; base += (p.n === 8 ? 300 : 100) + 75 * rails; }
+    const mult = LINES_MULT[G.shotLines] || 1;
+    const pts = Math.round(base * pots.length * so.combo * mult);
+    so.score += pts;
+    msg = '+' + pts;
+    const extras = [];
+    if (pots.length > 1) extras.push(pots.length + 'er-Treffer');
+    if (banks) extras.push('Bande');
+    if (pots.some(p => p.n === 8)) extras.push('Schwarze 8 ×3');
+    if (so.combo > 1) extras.push('Serie ×' + so.combo);
+    if (mult > 1) extras.push('Linien-Bonus ×' + mult);
+    if (extras.length) msg += ' · ' + extras.join(' · ');
+    const marks = Math.floor(so.score / 3000);
+    if (marks > so.lifeMarks) { so.lifeMarks = marks; if (so.lives < 5) { so.lives++; msg += ' · Extraleben!'; } }
+  }
+  if (so.lives <= 0) {
+    const rec = so.score > SOLO.hi;
+    if (rec) { SOLO.hi = so.score; saveSolo(); }
+    return endSolo(false, so.score + ' Punkte' + (rec ? ' – neuer Rekord!' : ' (Rekord: ' + SOLO.hi + ')'));
+  }
+  const n = onSet(G.balls).size;
+  spawnBalls(n < 3 ? 4 - n : n < 9 ? 1 : 0);
+  toast(msg, 2600);
+  startTurn();
+}
+
+function endSolo(win, text, stars) {
+  const so = G.solo;
+  G.state = 'over';
+  updateUI();
+  let title;
+  if (so.type === 'levels') {
+    if (win) { SOLO.stars[so.idx] = Math.max(SOLO.stars[so.idx] || 0, stars); saveSolo(); title = '★'.repeat(stars) + '☆'.repeat(3 - stars) + ' Geschafft!'; }
+    else title = 'Nicht geschafft';
+  } else title = 'Spiel vorbei';
+  $('overTitle').textContent = title;
+  $('overText').textContent = text;
+  $('bNext').classList.toggle('hidden', !(so.type === 'levels' && win && so.idx < LEVELS.length - 1));
+  setTimeout(() => show('over'), 600);
+}
+
+function showLevels() {
+  const box = $('levelGrid');
+  box.innerHTML = '';
+  LEVELS.forEach((lv, i) => {
+    const b = document.createElement('button');
+    const unlocked = i === 0 || (SOLO.stars[i - 1] || 0) > 0;
+    const st = SOLO.stars[i] || 0;
+    b.className = 'lvl' + (unlocked ? '' : ' locked');
+    b.innerHTML = '<b>' + (i + 1) + '</b><span>' + (unlocked ? lv.name : 'Gesperrt') + '</span><i>' + (unlocked ? '★'.repeat(st) + '☆'.repeat(3 - st) : '🔒') + '</i>';
+    if (unlocked) b.onclick = () => { initAudio(); newSolo('levels', i); };
+    box.appendChild(b);
+  });
+  hide('menu'); show('levels');
+}
+
+function drawSoloTable() {
+  const px = 1 / L.s, so = G.solo;
+  if (so.type !== 'levels') return;
+  const lv = LEVELS[so.idx];
+  if (lv.zone) {
+    ctx.setLineDash([2.5 * px, 2.5 * px]); ctx.strokeStyle = '#f2b632'; ctx.lineWidth = 2 * px;
+    ctx.fillStyle = 'rgba(242,182,50,.12)';
+    ctx.beginPath(); ctx.arc(lv.zone.x, lv.zone.y, lv.zone.r, 0, TAU); ctx.fill(); ctx.stroke(); ctx.setLineDash([]);
+  }
+  if (lv.pocket) for (const n in lv.pocket) {
+    const d = POCKET_DRAW[lv.pocket[n]];
+    ctx.beginPath(); ctx.arc(d.x, d.y, d.r + 1.4, 0, TAU); ctx.strokeStyle = lineCol(+n, 1); ctx.lineWidth = 3 * px; ctx.stroke();
+    if (getBall(G.balls, +n).on) miniBallTable(+n, d.x, d.y, R * 0.8);
+  }
+}
+function drawSoloOverlay(S) {
+  const so = G.solo, px = 1 / L.s;
+  if (so.type !== 'levels') return;
+  const lv = LEVELS[so.idx];
+  for (const n of lv.bomb || []) {
+    const b = getBall(G.balls, n); if (!b.on) continue;
+    ctx.beginPath(); ctx.arc(b.x, b.y, R + 1.6, 0, TAU); ctx.strokeStyle = '#ff3b30'; ctx.lineWidth = 1.8 * px; ctx.stroke();
+    if (S && S.ev.touched.has(n) && CFG.lines !== 'off') {
+      ctx.strokeStyle = '#ff3b30'; ctx.lineWidth = 2.4 * px; const r = R + 3;
+      ctx.beginPath(); ctx.moveTo(b.x - r, b.y - r); ctx.lineTo(b.x + r, b.y + r); ctx.moveTo(b.x + r, b.y - r); ctx.lineTo(b.x - r, b.y + r); ctx.stroke();
+    }
+  }
+}
+function miniBallTable(n, x, y, r) { ctx.save(); ctx.translate(x, y); ctx.scale(r / R, r / R); drawBall(n, 0, 0); ctx.restore(); }
 
 // ===================== Computer =====================
 function pathClear(bs, x1, y1, x2, y2, ex1, ex2) {
@@ -833,7 +1057,19 @@ function drawHUD() {
   const fs = Math.max(10, Math.min(14, railH * 0.62));
   const midY = top + railH / 2 + 1;
   ctx.textBaseline = 'middle';
-  for (let i = 0; i < 2; i++) {
+  if (G.mode === 0) {
+    const so = G.solo, lv = LEVELS[so.idx];
+    const left = so.type === 'levels' ? 'Level ' + (so.idx + 1) + ': ' + lv.name : 'Punkte: ' + so.score;
+    const right = so.type === 'levels' ? 'Stöße: ' + so.shots + ' / ' + lv.shots + ' · Par ' + lv.par
+      : '❤'.repeat(so.lives) + '  · Serie ×' + Math.max(1, so.combo);
+    ctx.font = 'bold ' + fs + 'px system-ui,sans-serif';
+    [[left, L.ox + 4, 'left'], [right, L.ox + W * s - 4, 'right']].forEach(([t, x, al]) => {
+      const w = ctx.measureText(t).width;
+      ctx.fillStyle = 'rgba(40,20,8,.92)'; roundRect(al === 'left' ? x - 4 : x - w - 4, midY - fs * 0.7, w + 8, fs * 1.4, fs * 0.7); ctx.fill();
+      ctx.textAlign = al; ctx.fillStyle = '#ffd76a'; ctx.fillText(t, x, midY);
+    });
+  }
+  for (let i = 0; i < 2 && G.mode !== 0; i++) {
     const P = G.players[i], active = G.cur === i && G.state !== 'over';
     const x = i === 0 ? L.ox + 4 : L.ox + W * s - 4;
     ctx.font = (active ? 'bold ' : '') + fs + 'px system-ui,sans-serif';
@@ -890,6 +1126,12 @@ function statusText() {
   if (!G) return '';
   const P = G.players[G.cur];
   if (G.state === 'over') return 'Spiel beendet';
+  if (G.mode === 0) {
+    const so = G.solo;
+    let t = so.type === 'levels' ? LEVELS[so.idx].desc : 'Rekord: ' + SOLO.hi + ' · Linien-Bonus ×' + LINES_MULT[CFG.lines];
+    if (G.bih && G.state === 'aim') t += ' · Ball in Hand';
+    return t;
+  }
   let t = P.name;
   if (G.state === 'ai') t += ' überlegt …';
   else if (G.state === 'moving') t += ' hat gestoßen';
@@ -972,6 +1214,7 @@ function draw() {
       if (G.called === k) { ctx.fillStyle = '#f2b632'; ctx.font = 'bold 5px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('8', d.x, d.y); }
     }
   }
+  if (G.mode === 0) drawSoloTable();
   // Schatten
   ctx.fillStyle = 'rgba(0,0,0,.28)';
   for (const b of balls) if (b.on) { ctx.beginPath(); ctx.ellipse(b.x + 0.7, b.y + 0.9, R, R * 0.9, 0, 0, TAU); ctx.fill(); }
@@ -983,6 +1226,7 @@ function draw() {
     drawPrediction(S);
   }
   for (const b of balls) if (b.on) drawBall(b.n, b.x, b.y);
+  if (G.mode === 0) drawSoloOverlay(S);
   if (aiming && cue.on) {
     ctx.save(); ctx.beginPath(); ctx.rect(-BORDER, -BORDER, W + 2 * BORDER, H + 2 * BORDER); ctx.clip();
     if (G.bih) {
@@ -1064,21 +1308,32 @@ function syncMenu() {
     const k = seg.dataset.k;
     seg.querySelectorAll('button').forEach(b => b.classList.toggle('sel', String(CFG[k]) === b.dataset.v));
   });
-  $('rowDiff').style.display = CFG.opp === 'ai' ? '' : 'none';
+  const solo = CFG.mode === 0;
+  $('rowDiff').style.display = !solo && CFG.opp === 'ai' ? '' : 'none';
+  $('rowOpp').style.display = solo ? 'none' : '';
+  $('rowCall').style.display = solo || CFG.mode === 9 ? 'none' : '';
+  $('rowSolo').style.display = solo ? '' : 'none';
   $('bResume').classList.toggle('hidden', !G || G.state === 'over');
 }
 document.querySelectorAll('.seg').forEach(seg => seg.addEventListener('click', e => {
   const b = e.target.closest('button'); if (!b) return;
   const k = seg.dataset.k, v = b.dataset.v;
-  CFG[k] = (k === 'opp') ? v : +v;
+  CFG[k] = (k === 'opp' || k === 'solo') ? v : +v;
   saveCfg(); syncMenu();
 }));
-$('bStart').onclick = () => { initAudio(); newGame(); };
+$('bStart').onclick = () => {
+  initAudio();
+  if (CFG.mode !== 0) newGame();
+  else if (CFG.solo === 'levels') showLevels();
+  else newSolo('arcade');
+};
+$('bLevelsBack').onclick = () => { hide('levels'); syncMenu(); show('menu'); };
+$('bNext').onclick = () => newSolo('levels', G.solo.idx + 1);
 $('bResume').onclick = () => hide('menu');
 $('bMenu').onclick = () => { syncMenu(); show('menu'); };
 $('bRules').onclick = () => show('rules');
 $('bRulesClose').onclick = () => hide('rules');
-$('bAgain').onclick = () => newGame();
+$('bAgain').onclick = () => { if (G.mode === 0) newSolo(G.solo.type, G.solo.idx); else newGame(); };
 $('bOverMenu').onclick = () => { hide('over'); syncMenu(); show('menu'); };
 $('bShoot').onclick = () => shoot();
 $('bLines').onclick = () => { CFG.lines = CFG.lines === 'all' ? 'guide' : CFG.lines === 'guide' ? 'off' : 'all'; saveCfg(); updateUI(); };
@@ -1087,6 +1342,7 @@ $('bTake').onclick = () => { hide('pushDlg'); startTurn(); };
 $('bPass').onclick = () => { hide('pushDlg'); G.cur = 1 - G.cur; toast('Zurückgegeben – ' + G.players[G.cur].name + ' ist am Zug.'); startTurn(); };
 window.onAndroidBack = () => {
   if (!$('rules').classList.contains('hidden')) { hide('rules'); return true; }
+  if (!$('levels').classList.contains('hidden')) { hide('levels'); syncMenu(); show('menu'); return true; }
   if ($('menu').classList.contains('hidden')) { syncMenu(); show('menu'); return true; }
   if (G && G.state !== 'over') { hide('menu'); return true; }
   return false;

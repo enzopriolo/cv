@@ -79,7 +79,6 @@ h1 span{color:var(--accent)}
 .rules{text-align:left;font-size:13px;line-height:1.45;max-width:640px}
 .rules h2{font-size:15px;margin:10px 0 4px;color:var(--accent)}
 .rules ul{margin:0;padding-left:18px}
-#levelGrid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:6px}
 .lvl{display:flex;flex-direction:column;align-items:center;gap:1px;background:#1f3029;border:1px solid var(--line);border-radius:10px;color:var(--text);padding:4px 4px;min-width:96px;cursor:pointer}
 .lvl b{font-size:17px}
 .lvl span{font-size:11px;color:var(--muted);white-space:nowrap}
@@ -95,6 +94,31 @@ textarea{width:100%;box-sizing:border-box;height:62px;background:#0c1512;color:#
 input.name{background:#0c1512;color:var(--text);border:1px solid var(--line);border-radius:8px;padding:7px 10px;font-size:14px;width:150px}
 #chatDlg{position:fixed;z-index:16;right:110px;top:6px;background:rgba(22,35,30,.97);border:1px solid var(--line);border-radius:12px;padding:8px;display:grid;grid-template-columns:repeat(3,auto);gap:6px}
 #chatDlg button{background:#1f3029;border:1px solid var(--line);color:var(--text);border-radius:8px;padding:7px 9px;font-size:14px}
+#lessonBox{position:fixed;z-index:12;top:8px;bottom:8px;right:8px;width:260px;background:linear-gradient(#18302a,#0f1c18);border:1px solid var(--accent);border-radius:14px;padding:10px 12px;display:flex;flex-direction:column;box-sizing:border-box;box-shadow:0 8px 24px rgba(0,0,0,.6)}
+.lsHead{display:flex;justify-content:space-between;align-items:center;color:var(--accent);font-weight:800;font-size:13px}
+.lsHead button{background:transparent;border:0;color:var(--muted);font-size:18px}
+#lsStep{color:var(--muted);font-size:11px;margin-top:2px}
+#lsTitle{margin:4px 0;font-size:17px}
+#lsText{flex:1;overflow:auto;margin:0;font-size:13.5px;line-height:1.45;color:#dfe9e4}
+.lsBtns{display:flex;gap:6px;margin-top:8px}
+.lsBtns button{flex:1;border:1px solid var(--line);background:#1f3029;color:var(--text);border-radius:10px;padding:9px 4px;font-weight:700;font-size:13px}
+#lsBack{flex:0 0 44px}
+#lsDemo{background:#245a8a;border-color:#4a8fd0}
+#lsNext{background:var(--accent);color:#2a1a00;border-color:var(--accent)}
+#lsNext.done{background:#3fb68b;border-color:#3fb68b;color:#06150f}
+.lvpanel{width:min(900px,96vw)}
+.lvhint{text-align:center;margin:0 0 4px}
+#lvMsg{color:var(--accent);font-size:13px;min-height:16px;text-align:center}
+#topicList{display:grid;grid-template-columns:1fr 1fr;gap:8px;text-align:left}
+.topic{background:#17251f;border:1px solid var(--line);border-radius:12px;padding:8px}
+.topic.focus{border-color:var(--accent)}
+.thead{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.ticon{font-size:22px}
+.tname{flex:1}.tname b{display:block;font-size:14px}.tname small{color:var(--accent);font-size:11px}
+.lessonBtn{background:linear-gradient(#f2b632,#d58a10);color:#2a1a00;border:1px solid #ffd75a;border-radius:9px;padding:6px 10px;font-weight:800;font-size:12px}
+.lessonBtn.done{background:#24372f;color:#7dffb0;border-color:#3fb68b}
+.tlevels{display:flex;gap:5px;flex-wrap:wrap}
+.tlevels .lvl{min-width:0;flex:0 1 calc(25% - 4px)}
 #pushDlg{position:fixed;z-index:15;left:50%;top:50%;transform:translate(-50%,-50%);background:rgba(22,35,30,.96);border:1px solid var(--accent);border-radius:14px;padding:12px 16px;text-align:center;font-size:14px}
 #pushDlg .actions{margin-top:8px}
 </style>
@@ -257,11 +281,21 @@ input.name{background:#0c1512;color:var(--text);border:1px solid var(--line);bor
 </div>
 
 <div id="levels" class="overlay hidden">
-  <div class="panel">
+  <div class="panel lvpanel">
     <h1>Herausforderungen</h1>
-    <div id="levelGrid"></div>
+    <div class="muted lvhint">Jedes Thema beginnt mit einer Lektion. Sie zeigt dir am Tisch, wie und warum der Stoß funktioniert. Danach schaltest du die Herausforderungen frei und verdienst Münzen.</div>
+    <div id="lvMsg"></div>
+    <div id="topicList"></div>
     <div class="actions"><button id="bLevelsBack">Zurück</button></div>
   </div>
+</div>
+
+<div id="lessonBox" class="hidden">
+  <div class="lsHead"><span id="lsTopic"></span><button id="lsClose">✕</button></div>
+  <div id="lsStep"></div>
+  <h2 id="lsTitle"></h2>
+  <p id="lsText"></p>
+  <div class="lsBtns"><button id="lsBack">◀</button><button id="lsDemo">▶ Vorführen</button><button id="lsNext">Weiter ▶</button></div>
 </div>
 
 <div id="over" class="overlay hidden">
@@ -427,7 +461,7 @@ function stepSim(S) {
           b.vx += k * ny; b.vy += k * -nx; S.sx *= 0.6;
         }
         if (ev.first !== null) ev.railAfter = true;
-        else if (b.n === 0) ev.kick = true;
+        else if (b.n === 0) { ev.kick = true; if (!S.cueRail) S.cueRail = {x: b.x, y: b.y}; }
         if (b.n > 0) { ev.railBalls.add(b.n); ev.railCount[b.n] = (ev.railCount[b.n] || 0) + 1; }
         if (S.snd) S.snd.push({t: 'rail', v: -vn});
         recPath(S, b, true);
@@ -757,7 +791,7 @@ const LEVELS = (() => {
     {name: 'Großmeister', desc: 'Anstoß auf 15 Kugeln und alles abräumen.', cue: [W * 0.2, H / 2], balls: rack15, shots: 24, par: 16}
   ];
 })();
-const SOLO = {stars: [], hi: 0};
+const SOLO = {stars: [], hi: 0, lessons: []};
 try { Object.assign(SOLO, JSON.parse(localStorage.getItem('billard_solo') || '{}')); } catch (e) {}
 const saveSolo = () => { try { localStorage.setItem('billard_solo', JSON.stringify(SOLO)); } catch (e) {} };
 const LINES_MULT = {all: 1, guide: 1.5, off: 2};
@@ -765,7 +799,7 @@ const LINES_MULT = {all: 1, guide: 1.5, off: 2};
 function soloTargets(on) {
   const so = G.solo;
   let arr = [...on];
-  if (so.type === 'training') return [];
+  if (so.type === 'training' || so.type === 'lesson') return [];
   if (so.type === 'levels') {
     const lv = LEVELS[so.idx];
     if (lv.targets) arr = arr.filter(n => lv.targets.includes(n));
@@ -824,6 +858,7 @@ function soloFinish(ev) {
   const so = G.solo, cue = getBall(G.balls, 0);
   const scratch = ev.cuePotted;
   const placeCue = () => { G.bih = 'any'; if (!cue.on) { const p = findFree(G.balls, W * 0.25, H / 2, false); cue.x = p.x; cue.y = p.y; cue.on = true; cue.vx = cue.vy = 0; } };
+  if (so.type === 'lesson') { G.state = 'lessondone'; updateUI(); return; }
   G.bih = null;
   if (so.type === 'training') {
     so.shots++; so.pots = (so.pots || 0) + ev.potted.length;
@@ -911,23 +946,42 @@ function endSolo(win, text, stars) {
   } else title = 'Spiel vorbei';
   $('overTitle').textContent = title;
   $('overText').textContent = text;
-  $('bNext').classList.toggle('hidden', !(so.type === 'levels' && win && so.idx < LEVELS.length - 1));
+  const nx = so.type === 'levels' && win ? nextLevelInTopic(so.idx) : -1;
+  $('bNext').classList.toggle('hidden', !(nx >= 0 && levelUnlocked(nx)));
+  G.nextLevel = nx;
   setTimeout(() => show('over'), 600);
 }
 
-function showLevels() {
-  const box = $('levelGrid');
+function showLevels(focus) {
+  const box = $('topicList');
   box.innerHTML = '';
-  LEVELS.forEach((lv, i) => {
-    const b = document.createElement('button');
-    const unlocked = i === 0 || (SOLO.stars[i - 1] || 0) > 0;
-    const st = SOLO.stars[i] || 0;
-    b.className = 'lvl' + (unlocked ? '' : ' locked');
-    b.innerHTML = '<b>' + (i + 1) + '</b><span>' + (unlocked ? lv.name : 'Gesperrt') + '</span><i>' + (unlocked ? '★'.repeat(st) + '☆'.repeat(3 - st) : '🔒') + '</i><small>' + (st ? '✓ erledigt' : '🪙 ' + LEVEL_REWARDS[i]) + '</small>';
-    if (unlocked) b.onclick = () => { initAudio(); newSolo('levels', i); };
-    box.appendChild(b);
+  $('lvMsg').textContent = '';
+  TOPICS.forEach((tp, t) => {
+    const done = lessonDone(t);
+    const stars = tp.levels.reduce((a, i) => a + (SOLO.stars[i] || 0), 0);
+    const card = document.createElement('div');
+    card.className = 'topic' + (focus === t ? ' focus' : '');
+    const head = document.createElement('div'); head.className = 'thead';
+    head.innerHTML = '<span class="ticon">' + tp.icon + '</span><div class="tname"><b>' + tp.name + '</b><small>★ ' + stars + ' / ' + tp.levels.length * 3 + '</small></div>';
+    const lb = document.createElement('button');
+    lb.className = 'lessonBtn' + (done ? ' done' : '');
+    lb.textContent = done ? '✓ Lektion' : '📖 Lektion starten';
+    lb.onclick = () => { initAudio(); newLesson(t); };
+    head.appendChild(lb); card.appendChild(head);
+    const row = document.createElement('div'); row.className = 'tlevels';
+    for (const i of tp.levels) {
+      const b = document.createElement('button'), un = levelUnlocked(i), st = SOLO.stars[i] || 0;
+      b.className = 'lvl' + (un ? '' : ' locked');
+      b.innerHTML = '<b>' + (i + 1) + '</b><span>' + LEVELS[i].name + '</span><i>' + (un ? '★'.repeat(st) + '☆'.repeat(3 - st) : '🔒') + '</i><small>' +
+        (st ? '✓ erledigt' : !done ? 'erst Lektion' : '🪙 ' + LEVEL_REWARDS[i]) + '</small>';
+      if (un) b.onclick = () => { initAudio(); newSolo('levels', i); };
+      else b.onclick = () => { $('lvMsg').textContent = done ? 'Schaffe zuerst die Herausforderung davor in diesem Thema.' : 'Schau dir zuerst die Lektion „' + tp.name + '“ an – danach kannst du hier spielen.'; };
+      row.appendChild(b);
+    }
+    card.appendChild(row); box.appendChild(card);
   });
   hide('menu'); show('levels');
+  if (focus !== undefined) setTimeout(() => { const el = box.children[focus]; if (el) el.scrollIntoView({block: 'nearest'}); }, 50);
 }
 
 function drawSoloTable() {
@@ -962,6 +1016,264 @@ function miniBallTable(n, x, y, r) {
   const rpx = r * L.s * DPR, s = ballSprite('mt' + n + '_' + Math.round(rpx), n, IDENT3, 'm', rpx);
   const hs = s.size / 2 / (L.s * DPR);
   ctx.drawImage(s.cv, x - hs, y - hs, hs * 2, hs * 2);
+}
+
+// ===================== Lern-Modus =====================
+// Themen: erst die Lektion ansehen, dann werden die Herausforderungen freigeschaltet.
+const TOPICS = [
+  {icon: '🎯', name: 'Zielen & Geisterkugel', levels: [0, 1, 15, 16, 5]},
+  {icon: '🔗', name: 'Kombinationen', levels: [2, 14]},
+  {icon: '↗️', name: 'Banden', levels: [3, 12, 13]},
+  {icon: '⬆️', name: 'Effet: Stopp, Nachlauf, Rücklauf', levels: [10, 11, 6]},
+  {icon: '↪️', name: 'Seiteneffet', levels: [17]},
+  {icon: '🧠', name: 'Stellungsspiel & Abräumen', levels: [4, 7, 8, 9, 18, 19]}
+];
+const topicOf = i => TOPICS.findIndex(t => t.levels.includes(i));
+const lessonDone = t => !!(SOLO.lessons && SOLO.lessons[t]);
+function levelUnlocked(i) {
+  if ((SOLO.stars[i] || 0) > 0) return true;
+  const t = topicOf(i);
+  if (!lessonDone(t)) return false;
+  const pos = TOPICS[t].levels.indexOf(i);
+  return pos === 0 || (SOLO.stars[TOPICS[t].levels[pos - 1]] || 0) > 0;
+}
+function nextLevelInTopic(i) {
+  const t = TOPICS[topicOf(i)], pos = t.levels.indexOf(i);
+  return pos >= 0 && pos < t.levels.length - 1 ? t.levels[pos + 1] : -1;
+}
+// Stoß-Daten der Vorführungen (vorab mit der Physik geprüft)
+const DEMO = {
+  l1: {angle: 0.464121, power: 0.5, sx: 0, sy: 0},
+  l2: {angle: -0.203941, power: 0.45, sx: 0, sy: 0},
+  combo: {angle: 2.694753, power: 0.55, sx: 0, sy: 0},
+  bank4: {angle: 0.187623, power: 0.5, sx: 0, sy: 0},
+  kick: {angle: 0.687223, power: 0.6, sx: 0, sy: 0},
+  bank14: {angle: 0.602139, power: 0.6, sx: 0, sy: 0},
+  stop: {angle: 0.464121, power: 0.15, sx: 0, sy: -0.4},
+  follow: {angle: -0.509647, power: 0.35, sx: 0, sy: 0.6},
+  draw: {angle: 0.464121, power: 0.45, sx: 0, sy: -0.8},
+  effet: {angle: 0.457621, power: 0.8, sx: -0.7, sy: 0.3},
+  noeffet: {angle: 0.457621, power: 0.8, sx: 0, sy: 0.3},
+  position: {angle: -1.122127, power: 0.4, sx: 0, sy: -0.4},
+  brk: {angle: 0, power: 0.95, sx: 0, sy: -0.25}
+};
+const LESSONS = [
+  [ // Zielen
+    {level: 0, title: 'Die Geisterkugel', text: 'Jeder Stoß beginnt mit einer Frage: Wo muss die Weiße genau in dem Moment liegen, in dem sie die Objektkugel berührt? Diese gedachte Position heißt Geisterkugel. Sie liegt direkt hinter der Objektkugel, auf der Linie von der Tasche durch die Kugelmitte (gelb gestrichelt).',
+      marks: [{t: 'pocketLine', n: 1, k: 5}, {t: 'ghost', n: 1, k: 5}]},
+    {title: 'Ziele auf die Geisterkugel', text: 'Ziele nicht auf die Objektkugel selbst, sondern lass die Mitte der Weißen genau zur Geisterkugel rollen (weiße Linie). Beim Treffen schiebt die Weiße die Objektkugel entlang der Verbindungslinie der beiden Kugelmitten – und die zeigt genau zur Tasche. Der rote Punkt ist die Stelle, an der sich die Kugeln berühren.',
+      marks: [{t: 'pocketLine', n: 1, k: 5}, {t: 'ghost', n: 1, k: 5}, {t: 'aimLine', n: 1, k: 5}, {t: 'contact', n: 1, k: 5}]},
+    {title: 'Vorführung: gerader Stoß', text: 'So sieht der Stoß aus. Mittlere Kraft reicht: Zu viel Kraft verzeiht weniger, wenn die Kugel die Tasche nicht ganz mittig trifft.', demo: 'l1',
+      marks: [{t: 'ghost', n: 1, k: 5}]},
+    {level: 1, title: 'Der Schnitt', text: 'Liegt die Kugel nicht auf einer Linie mit Weißer und Tasche, wird sie „geschnitten“. Die Geisterkugel bleibt dein Ziel – sie liegt jetzt seitlich versetzt. Je dünner der Schnitt, desto kleiner ist der Teil der Objektkugel, den du triffst, und desto genauer musst du zielen. Nutze dafür das Feinrad und die 0,01°-Pfeile.',
+      marks: [{t: 'pocketLine', n: 3, k: 2}, {t: 'ghost', n: 3, k: 2}, {t: 'aimLine', n: 3, k: 2}, {t: 'contact', n: 3, k: 2}], demo: 'l2'},
+    {title: 'Ohne Hilfslinien zielen', text: 'Ohne Linien hilft ein Trick: Suche auf der Objektkugel den Punkt, der am weitesten von der Tasche entfernt ist (roter Punkt). Genau dort muss der Rand der Weißen auftreffen. Die Mitte der Weißen zielt dann eine halbe Kugelbreite daneben – auf die Geisterkugel.',
+      level: 0, marks: [{t: 'contact', n: 1, k: 5, label: 'Hier treffen'}, {t: 'ghost', n: 1, k: 5}]}
+  ],
+  [ // Kombinationen
+    {level: 2, title: 'Was ist eine Kombination?', text: 'Bei einer Kombination trifft die Weiße zuerst Kugel A (hier die 1). Kugel A trifft dann Kugel B (die 2), und B fällt. So erreichst du Kugeln, die du direkt nicht spielen darfst oder kannst.',
+      marks: [{t: 'pocketLine', n: 2, k: 3}]},
+    {title: 'Von hinten nach vorne denken', text: 'Plane rückwärts: Zuerst bestimmst du die Geisterkugel für die 2 (wohin die 1 rollen muss). Dann bestimmst du die Geisterkugel für die 1 – dorthin zielt die Weiße. Jeder Fehler vergrößert sich von Kugel zu Kugel, darum zielst du hier besonders genau.',
+      marks: [{t: 'pocketLine', n: 2, k: 3}, {t: 'ghost', n: 2, k: 3, label: 'Ziel für die 1'}, {t: 'comboGhost', a: 1, b: 2, k: 3}]},
+    {title: 'Vorführung', text: 'Die Weiße trifft die 1, die 1 schiebt die 2 in die Ecke. Liegen beide Kugeln dicht beieinander und zeigen zur Tasche, ist die Kombination fast sicher.', demo: 'combo',
+      marks: [{t: 'comboGhost', a: 1, b: 2, k: 3}]}
+  ],
+  [ // Banden
+    {level: 3, title: 'Einfallswinkel = Ausfallswinkel', text: 'Eine Kugel prallt von der Bande ungefähr im gleichen Winkel ab, in dem sie ankommt – wie Licht an einem Spiegel. Hier ist der direkte Weg zur 1 durch die gesperrte 8 versperrt, also nutzt du die Bande.',
+      marks: [{t: 'block', from: 0, to: 1, via: 8}]},
+    {title: 'Der Spiegel-Trick', text: 'Stell dir die Bande als Spiegel vor: Spiegele das Ziel an der Bande und ziele auf das Spiegelbild. Die Linie zum Spiegelbild schneidet die Bande genau am richtigen Punkt. Die Vorschau-Linie zeigt dir dann, ob es passt.', demo: 'bank4', marks: [{t: 'demoPath', label: 'gleicher Winkel'}]},
+    {level: 12, title: 'Kick-Shot', text: 'Beim Kick-Shot trifft die Weiße zuerst die Bande und erst danach die Kugel. Wichtig: Je fester du stößt, desto „flacher“ kommt die Kugel von der Bande zurück, weil das Gummi nachgibt. Mittlere Kraft ist am berechenbarsten.', demo: 'kick', marks: [{t: 'demoPath', label: 'erst Bande'}]},
+    {level: 13, title: 'Bandenstoß', text: 'Beim Bandenstoß geht die Objektkugel über die Bande in die Tasche. Hier: Die 4 läuft an die obere Bande und kommt schräg zurück in die untere Mitteltasche. Auch hier gilt der Spiegel-Trick – nur eben für die Objektkugel.', demo: 'bank14', marks: [{t: 'demoPath', n: 4, label: 'Bande'}]}
+  ],
+  [ // Effet
+    {level: 10, title: 'Wo du die Weiße triffst', text: 'Der Treffpunkt auf der Weißen bestimmt, was sie nach dem Zusammenstoß macht. Mitte oder knapp darunter: Die Weiße bleibt stehen (Stoppball). Oben: Sie läuft hinterher (Nachläufer). Unten: Sie kommt zurück (Rückläufer). Einstellen kannst du das mit der Effet-Kugel rechts oben.',
+      marks: [{t: 'spin', sx: 0, sy: -0.4, label: 'Stopp'}, {t: 'zone'}]},
+    {title: 'Stoppball', text: 'Mit wenig Kraft und etwas Effet unter der Mitte rutscht die Weiße ohne Drehung in die Objektkugel. Dann gibt sie ihre ganze Geschwindigkeit ab und bleibt genau an der Stelle der Geisterkugel liegen.', demo: 'stop', marks: [{t: 'zone'}, {t: 'spin', sx: 0, sy: -0.4, label: 'leicht unten'}]},
+    {level: 11, title: 'Nachläufer', text: 'Triffst du die Weiße oberhalb der Mitte, dreht sie sich vorwärts. Nach dem Treffer läuft sie der Objektkugel hinterher. So bringst du die Weiße nach vorne in Position – aber Vorsicht, dass sie nicht mit in die Tasche rollt.', demo: 'follow', marks: [{t: 'zone'}, {t: 'spin', sx: 0, sy: 0.6, label: 'oben'}]},
+    {level: 6, title: 'Rückläufer', text: 'Triffst du die Weiße weit unten, dreht sie sich rückwärts. Nach dem Treffer kommt sie zurück. Je weiter die Weiße vorher rollt, desto mehr Rückdrehung verliert sie – bei langen Stößen brauchst du deshalb mehr Kraft.', demo: 'draw', marks: [{t: 'zone'}, {t: 'spin', sx: 0, sy: -0.8, label: 'weit unten'}]}
+  ],
+  [ // Seiteneffet
+    {level: 17, title: 'Seiteneffet wirkt an der Bande', text: 'Seiteneffet verändert vor allem, wie die Weiße von der Bande abprallt. Auf dem Tisch siehst du zwei Bahnen desselben Stoßes: gestrichelt grau ohne Seiteneffet, blau mit Linkseffet. Mit Linkseffet springt die Weiße anders von der Bande ab und erreicht den goldenen Kreis.',
+      marks: [{t: 'zone'}, {t: 'comparePath', a: 'noeffet', b: 'effet'}, {t: 'spin', sx: -0.7, sy: 0.3, label: 'links + oben'}]},
+    {title: 'Vorführung', text: 'Merke dir: Rechtseffet schickt die Weiße nach der Bande weiter nach rechts (aus deiner Sicht), Linkseffet nach links. Starker Seiteneffet macht Stöße ungenauer – nutze ihn nur, wenn du ihn wirklich brauchst.', demo: 'effet', marks: [{t: 'zone'}]}
+  ],
+  [ // Stellungsspiel
+    {level: 8, title: 'Einen Stoß vorausdenken', text: 'Gute Spieler versenken nicht nur – sie legen sich die Weiße für den nächsten Stoß zurecht. Bevor du stößt, frag dich: Welche Kugel kommt als nächstes, und wo sollte die Weiße dafür liegen?',
+      marks: []},
+    {title: 'Die Endposition nutzen', text: 'Die gestrichelte Kugel in der Vorschau zeigt, wo die Weiße liegen bleibt. Hier wird die 3 mit leichtem Rückläufer versenkt – die Weiße bleibt so liegen, dass der nächste Stoß einfach ist. Probiere vor jedem Stoß verschiedene Kräfte und Effets aus und schau, wo die Weiße endet.', demo: 'position', marks: [{t: 'ghost', n: 3, k: 3}]},
+    {title: 'Reihenfolge planen', text: 'Spiele zuerst Kugeln, die später schwierig werden könnten (an Banden oder in Gruppen), solange noch Platz ist. Leichte Kugeln an den Taschen hebst du dir als „Sprungbrett“ auf. Bei Reihenfolge-Aufgaben musst du immer die niedrigste Nummer zuerst treffen – plane die Weiße deshalb immer zur nächsten Nummer.', marks: []},
+    {level: 9, title: 'Der Anstoß', text: 'Beim Anstoß triffst du die vordere Kugel voll und mit viel Kraft. Ein wenig Effet unter der Mitte sorgt dafür, dass die Weiße nach dem Treffer in der Tischmitte stehen bleibt statt wild herumzurollen.', demo: 'brk', marks: []}
+  ]
+];
+function lessonBalls(level) {
+  const lv = LEVELS[level];
+  return [{n: 0, x: lv.cue[0], y: lv.cue[1], vx: 0, vy: 0, on: true}].concat(lv.balls.map(b => ({n: b[0], x: b[1], y: b[2], vx: 0, vy: 0, on: true})));
+}
+function newLesson(t) {
+  G = {
+    mode: 0, solo: {type: 'lesson', topic: t, step: 0, level: LESSONS[t][0].level}, diff: 0,
+    players: [{name: 'Du', group: null, fouls: 0}, {name: '', group: null, fouls: 0}],
+    ai: [false, false], cur: 0, balls: lessonBalls(LESSONS[t][0].level), isBreak: false, bih: null,
+    state: 'lesson', aim: 0, power: 0.5, sx: 0, sy: 0, called: null, calledManual: false,
+    pushAvail: false, pushShot: false, ver: 0, pred: null, predKey: '', toast: null, live: null
+  };
+  initOrient();
+  ['over', 'menu', 'levels', 'stats', 'settings'].forEach(hide);
+  show('lessonBox');
+  layout();
+  lessonStep(0);
+}
+function lessonStep(i) {
+  const so = G.solo, steps = LESSONS[so.topic], st = steps[i];
+  so.step = i;
+  if (st.level !== undefined) so.level = st.level;
+  G.live = null; G.replay = null; SINKING = [];
+  G.balls = lessonBalls(so.level); G.ver++;
+  for (const b of G.balls) { const o = G.orient[b.n]; if (o) { o.lx = b.x; o.ly = b.y; o.ver++; } else G.orient[b.n] = {M: IDENT3.slice(), ver: 1, lx: b.x, ly: b.y, k: 0}; }
+  const d = st.demo && DEMO[st.demo];
+  if (st.demo === 'brk') { const c = getBall(G.balls, 0); G.aim = Math.atan2(FOOT.y - c.y, FOOT.x - c.x); G.power = d.power; G.sx = d.sx; G.sy = d.sy; }
+  else if (d) { G.aim = d.angle; G.power = d.power; G.sx = d.sx; G.sy = d.sy; }
+  G.state = d ? 'lessonaim' : 'lesson';
+  $('lsTopic').textContent = TOPICS[so.topic].icon + ' ' + TOPICS[so.topic].name;
+  $('lsStep').textContent = 'Schritt ' + (i + 1) + ' von ' + steps.length;
+  $('lsTitle').textContent = st.title;
+  $('lsText').textContent = st.text;
+  $('lsBack').disabled = i === 0;
+  $('lsDemo').classList.toggle('hidden', !d);
+  $('lsDemo').textContent = '▶ Vorführen';
+  const last = i === steps.length - 1;
+  $('lsNext').textContent = last ? '✓ Lektion abschließen' : 'Weiter ▶';
+  $('lsNext').classList.toggle('done', last);
+  updateUI();
+}
+function lessonDemo() {
+  const so = G.solo, st = LESSONS[so.topic][so.step];
+  if (!st.demo) return;
+  if (G.state !== 'lessonaim') lessonStep(so.step);
+  initAudio();
+  G.state = 'strike'; G.strikeT = performance.now();
+  $('lsDemo').textContent = '↻ Nochmal zeigen';
+}
+function lessonFinish() {
+  const t = G.solo.topic;
+  SOLO.lessons = SOLO.lessons || [];
+  const first = !SOLO.lessons[t];
+  SOLO.lessons[t] = true; saveSolo();
+  hide('lessonBox');
+  G = null; layout();
+  showLevels(t);
+  if (first) {
+    const c = gain(30, 20);
+    $('lvMsg').textContent = '🎓 Lektion abgeschlossen! +' + c + ' 🪙 · Die Herausforderungen zu „' + TOPICS[t].name + '“ sind jetzt freigeschaltet.';
+    confetti(); playSound('win', 0);
+  } else $('lvMsg').textContent = 'Lektion wiederholt. Viel Erfolg bei den Herausforderungen!';
+}
+function lessonExit() { hide('lessonBox'); G = null; layout(); showLevels(); }
+
+// Markierungen der Lektion auf dem Tisch
+function lessonLabel(text, x, y, col) {
+  const px = 1 / L.s;
+  ctx.font = 'bold ' + (11 * px).toFixed(2) + 'px system-ui,sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  const w = ctx.measureText(text).width + 8 * px;
+  ctx.fillStyle = 'rgba(8,14,12,.85)'; roundRect(x - w / 2, y - 7 * px, w, 14 * px, 7 * px); ctx.fill();
+  ctx.fillStyle = col || '#ffd75a'; ctx.fillText(text, x, y);
+}
+function ghostOf(n, k) {
+  const b = getBall(G.balls, n), ap = AIM_PTS[k];
+  let ux = ap.x - b.x, uy = ap.y - b.y; const d = Math.hypot(ux, uy); ux /= d; uy /= d;
+  return {b, ap, ux, uy, gx: b.x - ux * 2 * R, gy: b.y - uy * 2 * R};
+}
+function arrowLine(x1, y1, x2, y2, col, w, dash) {
+  const px = 1 / L.s;
+  ctx.strokeStyle = col; ctx.lineWidth = w * px; ctx.lineCap = 'round';
+  ctx.setLineDash(dash ? [5 * px, 4 * px] : []);
+  ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); ctx.setLineDash([]);
+  const a = Math.atan2(y2 - y1, x2 - x1), s = 3;
+  ctx.fillStyle = col; ctx.beginPath(); ctx.moveTo(x2, y2);
+  ctx.lineTo(x2 - Math.cos(a - 0.45) * s, y2 - Math.sin(a - 0.45) * s); ctx.lineTo(x2 - Math.cos(a + 0.45) * s, y2 - Math.sin(a + 0.45) * s); ctx.closePath(); ctx.fill();
+}
+let lessonPathCache = {};
+function demoPathOf(key, n) {
+  const id = key + ':' + G.solo.level + ':' + n;
+  if (!lessonPathCache[id]) {
+    const d = DEMO[key], c = getBall(G.balls, 0);
+    const shot = key === 'brk' ? {angle: Math.atan2(FOOT.y - c.y, FOOT.x - c.x), power: d.power, sx: d.sx, sy: d.sy} : d;
+    lessonPathCache[id] = runSim(lessonBalls(G.solo.level), shot, true).paths[n || 0];
+  }
+  return lessonPathCache[id];
+}
+function drawLesson(now) {
+  const so = G.solo, st = LESSONS[so.topic][so.step], px = 1 / L.s, pulse = 0.5 + 0.5 * Math.sin(now / 300);
+  if (G.state === 'moving' || G.state === 'strike') return;
+  const lv = LEVELS[so.level];
+  for (const m of st.marks || []) {
+    if (m.t === 'pocketLine') {
+      const g = ghostOf(m.n, m.k);
+      arrowLine(g.gx - g.ux * 6, g.gy - g.uy * 6, g.ap.x, g.ap.y, 'rgba(255,215,90,.9)', 1.6, true);
+      lessonLabel('Linie zur Tasche', (g.b.x + g.ap.x) / 2, (g.b.y + g.ap.y) / 2 - 6);
+    } else if (m.t === 'ghost') {
+      const g = ghostOf(m.n, m.k);
+      ctx.beginPath(); ctx.arc(g.gx, g.gy, R, 0, TAU); ctx.fillStyle = 'rgba(255,255,255,' + (0.15 + 0.2 * pulse) + ')'; ctx.fill();
+      ctx.setLineDash([2 * px, 2 * px]); ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5 * px; ctx.stroke(); ctx.setLineDash([]);
+      lessonLabel(m.label || 'Geisterkugel', g.gx - g.ux * 9, g.gy - g.uy * 9 + 7, '#fff');
+    } else if (m.t === 'aimLine') {
+      const g = ghostOf(m.n, m.k), c = getBall(G.balls, 0);
+      arrowLine(c.x, c.y, g.gx, g.gy, 'rgba(255,255,255,.95)', 1.8, false);
+      lessonLabel('Ziel der Weißen', (c.x + g.gx) / 2, (c.y + g.gy) / 2 - 6, '#fff');
+    } else if (m.t === 'contact') {
+      const g = ghostOf(m.n, m.k);
+      ctx.beginPath(); ctx.arc(g.b.x - g.ux * R, g.b.y - g.uy * R, 0.9 + 0.5 * pulse, 0, TAU); ctx.fillStyle = '#ff4d3d'; ctx.fill();
+      if (m.label) lessonLabel(m.label, g.b.x - g.ux * R, g.b.y - g.uy * R + 9, '#ff8a7a');
+    } else if (m.t === 'comboGhost') {
+      const g2 = ghostOf(m.b, m.k), a = getBall(G.balls, m.a), c = getBall(G.balls, 0);
+      let vx = g2.gx - a.x, vy = g2.gy - a.y; const d = Math.hypot(vx, vy); vx /= d; vy /= d;
+      const gx = a.x - vx * 2 * R, gy = a.y - vy * 2 * R;
+      arrowLine(a.x, a.y, g2.gx, g2.gy, 'rgba(255,215,90,.9)', 1.4, true);
+      ctx.beginPath(); ctx.arc(gx, gy, R, 0, TAU); ctx.fillStyle = 'rgba(255,255,255,' + (0.15 + 0.2 * pulse) + ')'; ctx.fill();
+      ctx.setLineDash([2 * px, 2 * px]); ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5 * px; ctx.stroke(); ctx.setLineDash([]);
+      arrowLine(c.x, c.y, gx, gy, 'rgba(255,255,255,.95)', 1.6, false);
+      lessonLabel('Ziel der Weißen', gx + 4, gy - 9, '#fff');
+    } else if (m.t === 'block') {
+      const a = getBall(G.balls, m.from), b = getBall(G.balls, m.to), v = getBall(G.balls, m.via);
+      arrowLine(a.x, a.y, b.x, b.y, 'rgba(255,77,61,.85)', 1.6, true);
+      ctx.strokeStyle = '#ff4d3d'; ctx.lineWidth = 2.4 * px; const r = R + 3;
+      ctx.beginPath(); ctx.moveTo(v.x - r, v.y - r); ctx.lineTo(v.x + r, v.y + r); ctx.moveTo(v.x + r, v.y - r); ctx.lineTo(v.x - r, v.y + r); ctx.stroke();
+      lessonLabel('direkter Weg versperrt', v.x, v.y - 10, '#ff8a7a');
+    } else if (m.t === 'demoPath' && G.state === 'lessonaim') {
+      const p = demoPathOf(st.demo, m.n || 0);
+      // stärkster Knick = Abprallpunkt an der Bande
+      let bi = -1, bang = 0;
+      for (let i = 2; i < p.length - 2; i++) {
+        const a1 = Math.atan2(p[i][1] - p[i - 2][1], p[i][0] - p[i - 2][0]), a2 = Math.atan2(p[i + 2][1] - p[i][1], p[i + 2][0] - p[i][0]);
+        let da = Math.abs(a2 - a1); if (da > Math.PI) da = TAU - da;
+        if (da > bang && (p[i][0] < R + 0.5 || p[i][0] > W - R - 0.5 || p[i][1] < R + 0.5 || p[i][1] > H - R - 0.5)) { bang = da; bi = i; }
+      }
+      if (bi > 0) {
+        ctx.beginPath(); ctx.arc(p[bi][0], p[bi][1], 2.5 + pulse, 0, TAU); ctx.strokeStyle = '#ffd75a'; ctx.lineWidth = 2 * px; ctx.stroke();
+        lessonLabel(m.label || 'Bande', p[bi][0] + (p[bi][0] < W / 2 ? 18 : -18), p[bi][1] + (p[bi][1] < H / 2 ? 8 : -8));
+      }
+    } else if (m.t === 'comparePath') {
+      const pa = demoPathOf(m.a, 0), pb = demoPathOf(m.b, 0);
+      ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+      ctx.setLineDash([4 * px, 4 * px]); polyline(pa); ctx.strokeStyle = 'rgba(200,200,200,.8)'; ctx.lineWidth = 2 * px; ctx.stroke(); ctx.setLineDash([]);
+      glowLine(pb, a => 'rgba(90,170,255,' + a + ')', 2.2 * px);
+      const ea = pa[pa.length - 1], eb = pb[pb.length - 1];
+      lessonLabel('ohne Effet', ea[0], ea[1] - 8, '#ddd'); lessonLabel('mit Linkseffet', eb[0], eb[1] - 8, '#8cc8ff');
+    } else if (m.t === 'zone' && lv.zone) {
+      ctx.setLineDash([2.5 * px, 2.5 * px]); ctx.strokeStyle = '#f2b632'; ctx.lineWidth = 2 * px;
+      ctx.fillStyle = 'rgba(242,182,50,' + (0.1 + 0.08 * pulse) + ')';
+      ctx.beginPath(); ctx.arc(lv.zone.x, lv.zone.y, lv.zone.r, 0, TAU); ctx.fill(); ctx.stroke(); ctx.setLineDash([]);
+      lessonLabel('Ziel der Weißen', lv.zone.x, lv.zone.y - lv.zone.r - 6);
+    } else if (m.t === 'spin') {
+      // kleine Effet-Kugel neben der Weißen
+      const c = getBall(G.balls, 0), r = 6, x = clamp(c.x - 24, 10, W - 10), y = clamp(c.y - 22, 9, H - 16);
+      miniBallTable(-1, x, y, r);
+      ctx.strokeStyle = 'rgba(0,0,0,.25)'; ctx.lineWidth = 0.8 * px;
+      ctx.beginPath(); ctx.moveTo(x - r, y); ctx.lineTo(x + r, y); ctx.moveTo(x, y - r); ctx.lineTo(x, y + r); ctx.stroke();
+      ctx.beginPath(); ctx.arc(x + m.sx * r, y - m.sy * r, 1.6, 0, TAU); ctx.fillStyle = 'rgba(40,90,175,.9)'; ctx.fill();
+      lessonLabel('Effet: ' + m.label, x, y + r + 6, '#8cc8ff');
+    }
+  }
 }
 
 // ===================== Computer =====================
@@ -1509,11 +1821,13 @@ let VW = 0, VH = 0, DPR = 1, L = null;
 function layout() {
   DPR = Math.min(window.devicePixelRatio || 1, 3); VW = innerWidth; VH = innerHeight;
   cv.width = Math.round(VW * DPR); cv.height = Math.round(VH * DPR);
-  const left = 58, right = 104, pad = 4;
+  const lesson = !!(G && G.mode === 0 && G.solo && G.solo.type === 'lesson');
+  const left = lesson ? 6 : 58, right = lesson ? Math.min(290, Math.round(VW * 0.33)) : 104, pad = 4;
+  $('lessonBox').style.width = (right - 14) + 'px';
   const aw = VW - left - right - pad * 2, ah = VH - pad * 2;
   const tw = W + 2 * BORDER, th = H + 2 * BORDER;
   const s = Math.max(0.5, Math.min(aw / tw, ah / th));
-  L = {s, left, rx: VW - right, right,
+  L = {s, left, rx: VW - right, right, lesson,
     ox: left + pad + (aw - tw * s) / 2 + BORDER * s, oy: pad + (ah - th * s) / 2 + BORDER * s};
   L.power = {x: 12, y: 30, w: 34, h: VH - 48};
   const bx = L.rx + 6, bw = right - 12;
@@ -1553,7 +1867,7 @@ const cloth = () => CLOTHS[CFG.cloth] || CLOTHS.blau;
 function applyCloth() { tableCacheKey = ''; CLOTH_RGB = cloth().rgb; for (const k in SPR) delete SPR[k]; }
 let tableCache = null, tableCacheKey = '';
 function drawTableBase() {
-  const key = VW + 'x' + VH + '@' + DPR + CFG.cloth;
+  const key = VW + 'x' + VH + '@' + DPR + CFG.cloth + (L.lesson ? 'L' : '');
   if (tableCacheKey !== key) {
     tableCacheKey = key;
     tableCache = document.createElement('canvas');
@@ -1783,7 +2097,8 @@ function updateOrient(balls) {
   if (!G.orient) return;
   for (const b of balls) {
     if (!b.on) continue;
-    const o = G.orient[b.n];
+    let o = G.orient[b.n];
+    if (!o) o = G.orient[b.n] = {M: IDENT3.slice(), ver: 1, lx: b.x, ly: b.y, k: 0};
     const dx = b.x - o.lx, dy = b.y - o.ly, dd = Math.hypot(dx, dy);
     if (dd < 1e-3) continue;
     if (dd < 25) { o.M = mul3(rotAxis(-dy / dd, dx / dd, 0, dd / R), o.M); if (++o.k % 24 === 0) o.M = orthonorm(o.M); }
@@ -1914,6 +2229,7 @@ function lineCol(n, a) {
 
 // Linienmodus (manche Herausforderungen schreiben ihn vor)
 function linesMode() {
+  if (G && G.mode === 0 && G.solo.type === 'lesson') return 'all';
   if (G && G.mode === 0 && G.solo.type === 'levels' && LEVELS[G.solo.idx].lines) return LEVELS[G.solo.idx].lines;
   return CFG.lines;
 }
@@ -2010,11 +2326,13 @@ function drawPrediction(S) {
   // Bahn der Weißen (laufende Striche)
   let cp = S.paths[0];
   if (mode === 'guide') {
-    if (C) {
-      let i = cp.findIndex(q => Math.abs(q[0] - C.x) < 0.01 && Math.abs(q[1] - C.y) < 0.01);
+    // bis zur getroffenen Kugel bzw. zur ersten Bande, danach ein kurzes Stück der neuen Richtung
+    const stop = C || S.cueRail;
+    if (stop) {
+      let i = cp.findIndex(q => Math.abs(q[0] - stop.x) < 0.01 && Math.abs(q[1] - stop.y) < 0.01);
       if (i < 0) i = cp.length - 1;
       cp = cp.slice(0, i + 1).concat(trimPath(cp.slice(i), 24).slice(1));
-    } else cp = trimPath(cp, 110);
+    }
   }
   if (cp.length > 1) {
     ctx.lineJoin = 'round'; ctx.lineCap = 'round';
@@ -2036,11 +2354,12 @@ function drawPrediction(S) {
     ctx.setLineDash([2 * px, 2 * px]); ctx.beginPath(); ctx.arc(cf.x, cf.y, R, 0, TAU);
     ctx.strokeStyle = 'rgba(255,255,255,.85)'; ctx.lineWidth = 1.3 * px; ctx.stroke(); ctx.setLineDash([]);
   }
+  if (mode !== 'all') return;
   // Taschen, in die etwas fällt
   for (const p of S.ev.potted) {
     const d = POCKET_DRAW[p.pocket], pulse = 0.5 + 0.5 * Math.sin(now / 180);
     ctx.beginPath(); ctx.arc(d.x, d.y, d.r - 0.6, 0, TAU); ctx.strokeStyle = lineCol(p.n, 1); ctx.lineWidth = (2.2 + pulse) * px; ctx.stroke();
-    if (mode === 'all') miniBallTable(p.n, d.x, d.y, R * 0.75);
+    miniBallTable(p.n, d.x, d.y, R * 0.75);
   }
   if (S.ev.cuePotted) {
     const p = S.paths[0][S.paths[0].length - 1];
@@ -2116,9 +2435,9 @@ function drawHUD() {
   const midY = top + railH / 2 + 1;
   ctx.textBaseline = 'middle';
   if (G.mode === 0) {
-    const so = G.solo, lv = LEVELS[so.idx];
-    const left = so.type === 'levels' ? 'Level ' + (so.idx + 1) + ': ' + lv.name : so.type === 'training' ? 'Training' : 'Punkte: ' + so.score;
-    const right = so.type === 'levels' ? 'Stöße: ' + so.shots + ' / ' + lv.shots + ' · Par ' + lv.par
+    const so = G.solo, lv = LEVELS[so.type === 'lesson' ? so.level : so.idx];
+    const left = so.type === 'lesson' ? '🎓 Lern-Modus' : so.type === 'levels' ? 'Level ' + (so.idx + 1) + ': ' + lv.name : so.type === 'training' ? 'Training' : 'Punkte: ' + so.score;
+    const right = so.type === 'lesson' ? TOPICS[so.topic].name : so.type === 'levels' ? 'Stöße: ' + so.shots + ' / ' + lv.shots + ' · Par ' + lv.par
       : so.type === 'training' ? 'Stöße: ' + so.shots + ' · Versenkt: ' + (so.pots || 0)
       : '❤'.repeat(so.lives) + '  · Serie ×' + Math.max(1, so.combo);
     ctx.font = 'bold ' + fs + 'px system-ui,sans-serif';
@@ -2160,6 +2479,7 @@ function drawHUD() {
     let label = 'Ziel:', list = tg;
     if (G.isBreak) { label = 'Anstoß'; list = []; }
     else if (G.mode === 0 && G.solo.type === 'training') { label = 'Freies Spiel'; list = []; }
+    else if (G.mode === 0 && G.solo.type === 'lesson') { label = 'Lektion ' + (G.solo.step + 1) + ' / ' + LESSONS[G.solo.topic].length; list = []; }
     else if (G.mode === 8 && !G.players[G.cur].group) { label = 'Ziel: Volle oder Halbe (nicht die 8)'; list = []; }
     else if (list.length > 7) list = list.slice(0, 7);
     ctx.font = 'bold ' + fs + 'px system-ui,sans-serif';
@@ -2173,7 +2493,7 @@ function drawHUD() {
   const by = L.oy + (H + CUSH) * s + railH / 2 + 1;
   ctx.textAlign = 'center'; ctx.font = fs + 'px system-ui,sans-serif';
   // Beim Zielen zeigt die Statuszeile, was der Stoß nach den Regeln bedeutet
-  const v = G.state === 'aim' && isHumanTurn() && !G.dragging && linesMode() !== 'off' ? G.predInfo : null;
+  const v = G.state === 'aim' && isHumanTurn() && !G.dragging && linesMode() === 'all' ? G.predInfo : null;
   const st = v ? v.t : statusText(), sw = ctx.measureText(st).width + 16;
   ctx.fillStyle = 'rgba(40,20,8,.92)'; roundRect(L.ox + W * s / 2 - sw / 2, by - fs * 0.7, sw, fs * 1.4, fs * 0.7); ctx.fill();
   if (v) { ctx.strokeStyle = v.c === 'good' ? '#3fd68b' : v.c === 'win' ? '#ffd75a' : '#ff6655'; ctx.lineWidth = 1.2; ctx.stroke(); }
@@ -2204,7 +2524,8 @@ function statusText() {
   if (G.state === 'replay') return 'Wiederholung in Zeitlupe – tippen zum Beenden';
   if (G.mode === 0) {
     const so = G.solo;
-    if (so.type === 'training') return 'Training · Kugeln ziehen zum Verschieben · ⟲ Replay · ↶ Zurück';
+    if (so.type === 'training') return 'Training · Kugel halten & ziehen · ⟲ Replay · ↶ Zurück';
+    if (so.type === 'lesson') return G.state === 'lessonaim' ? 'Die Linien zeigen den Lösungsstoß – tippe auf „Vorführen“' : 'Lektion – lies die Erklärung rechts';
     let t = so.type === 'levels' ? LEVELS[so.idx].desc : 'Rekord: ' + SOLO.hi + ' · Linien-Bonus ×' + LINES_MULT[CFG.lines];
     if (G.bih && G.state === 'aim') t += ' · Ball in Hand';
     return t;
@@ -2332,7 +2653,7 @@ function draw() {
   const px = 1 / L.s;
   const balls = G.replay ? G.replay.S.balls : G.live ? G.live.balls : G.balls;
   const cue = getBall(balls, 0);
-  const aiming = (G.state === 'aim' && !G.ai[G.cur]) || G.state === 'aipreview' || G.state === 'strike';
+  const aiming = (G.state === 'aim' && !G.ai[G.cur]) || G.state === 'aipreview' || G.state === 'strike' || G.state === 'lessonaim';
   const now = performance.now();
   updateOrient(balls);
   const humanAim = G.state === 'aim' && !G.ai[G.cur];
@@ -2358,7 +2679,8 @@ function draw() {
   }
   for (const b of balls) if (b.on) drawBall(b.n, b.x, b.y, G.dragging && b.n === G.dragN ? 1.14 : 1);
   if (humanAim) drawTargetGlow(now, false);
-  if (G.mode === 0) drawSoloOverlay(S);
+  if (G.mode === 0 && G.solo.type === 'lesson') drawLesson(now);
+  else if (G.mode === 0) drawSoloOverlay(S);
   if (aiming && cue.on) {
     ctx.save(); ctx.beginPath(); ctx.rect(-BORDER, -BORDER, W + 2 * BORDER, H + 2 * BORDER); ctx.clip();
     if (G.bih && humanAim) drawBallInHand(cue, now);
@@ -2367,7 +2689,7 @@ function draw() {
   }
   drawFloats(now);
   drawHUD();
-  drawControls();
+  if (!L.lesson) drawControls();
   if (G.state === 'replay') {
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
     const x = L.ox + 10, y = L.oy + 14, blink = Math.sin(now / 250) > 0;
@@ -2501,6 +2823,9 @@ const LINE_NAMES = {all: 'Alle', guide: 'Einfach', off: 'Aus'};
 function updateUI() {
   $('bLines').textContent = 'Linien: ' + LINE_NAMES[CFG.lines];
   if (!G) return;
+  const inLesson = G.mode === 0 && G.solo.type === 'lesson';
+  for (const id of ['bShoot', 'bLines', 'bReplay', 'bMenu']) $(id).classList.toggle('hidden', inLesson);
+  if (inLesson) { hide('bPush'); hide('bUndo'); hide('bChat'); return; }
   $('bShoot').disabled = !isHumanTurn();
   const canPush = G.mode === 9 && G.pushAvail && isHumanTurn();
   $('bPush').classList.toggle('hidden', !canPush);
@@ -2547,8 +2872,12 @@ $('bShop').onclick = () => showShop();
 $('bShopClose').onclick = () => { hide('shop'); syncMenu(); show('menu'); };
 document.querySelectorAll('#shopTabs button').forEach(b => b.onclick = () => { shopTab = b.dataset.tab; $('shopMsg').textContent = ''; renderShop(); });
 $('bLevelsBack').onclick = () => { hide('levels'); syncMenu(); show('menu'); };
+$('lsBack').onclick = () => { if (G && G.solo.step > 0) lessonStep(G.solo.step - 1); };
+$('lsNext').onclick = () => { if (!G) return; const n = LESSONS[G.solo.topic].length; if (G.solo.step < n - 1) lessonStep(G.solo.step + 1); else lessonFinish(); };
+$('lsDemo').onclick = () => lessonDemo();
+$('lsClose').onclick = () => lessonExit();
 $('bRulesClose').onclick = () => { hide('rules'); };
-$('bNext').onclick = () => newSolo('levels', G.solo.idx + 1);
+$('bNext').onclick = () => newSolo('levels', G.nextLevel);
 $('bResume').onclick = () => hide('menu');
 $('bMenu').onclick = () => { syncMenu(); show('menu'); };
 $('bRules').onclick = () => show('rules');
@@ -2569,7 +2898,7 @@ $('bReplay').onclick = () => startReplay();
 $('bUndo').onclick = () => {
   if (!isHumanTurn() || !G.beforeBalls) return;
   G.balls = cloneBalls(G.beforeBalls); G.ver++; G.bih = 'any';
-  for (const b of G.balls) { const o = G.orient[b.n]; o.lx = b.x; o.ly = b.y; o.ver++; }
+  for (const b of G.balls) { const o = G.orient[b.n]; if (o) { o.lx = b.x; o.ly = b.y; o.ver++; } }
   toast('Stoß rückgängig gemacht.');
 };
 $('bChat').onclick = () => $('chatDlg').classList.toggle('hidden');
@@ -2621,6 +2950,7 @@ window.onAndroidBack = () => {
   if (!$('shop').classList.contains('hidden')) { $('bShopClose').onclick(); return true; }
   if (!$('online').classList.contains('hidden')) { $('bOnlineBack').onclick(); return true; }
   if (G && G.state === 'replay') { endReplay(); return true; }
+  if (!$('lessonBox').classList.contains('hidden')) { lessonExit(); return true; }
   if (!$('rules').classList.contains('hidden')) { hide('rules'); return true; }
   if (!$('levels').classList.contains('hidden')) { hide('levels'); syncMenu(); show('menu'); return true; }
   if ($('menu').classList.contains('hidden')) { syncMenu(); show('menu'); return true; }

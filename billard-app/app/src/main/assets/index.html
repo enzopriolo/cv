@@ -1183,12 +1183,75 @@ function drawShadows(balls) {
   }
   for (const b of balls) {
     if (!b.on) continue;
+    if (b.n === 0 && G.dragging) { ctx.globalAlpha = 0.32; ctx.drawImage(shadowSpr, b.x + 1.3 * R - 1.7 * R, b.y + 1.8 * R - 1.7 * R, 3.4 * R, 3.4 * R); continue; }
     ctx.globalAlpha = 0.42; ctx.drawImage(shadowSpr, b.x + 0.55 * R - 1.5 * R, b.y + 0.8 * R - 1.5 * R, 3 * R, 3 * R);
     ctx.globalAlpha = 0.18; ctx.drawImage(shadowSpr, b.x - 0.6 * R - 1.4 * R, b.y + 0.4 * R - 1.4 * R, 2.8 * R, 2.8 * R);
     ctx.globalAlpha = 0.5; ctx.drawImage(shadowSpr, b.x - 0.95 * R, b.y - 0.85 * R, 1.9 * R, 1.9 * R);
   }
   ctx.globalAlpha = 1;
 }
+// Kugeln, die der Spieler am Zug treffen darf
+function currentTargets() {
+  if (!G || G.state === 'over') return [];
+  const on = onSet(G.balls);
+  if (G.mode === 0) return soloTargets(on);
+  if (G.isBreak) return [];
+  return legalTargets(G.mode, G.players[G.cur].group, on);
+}
+function drawTargetGlow(now, under) {
+  const px = 1 / L.s, pulse = 0.5 + 0.5 * Math.sin(now / 260);
+  for (const n of currentTargets()) {
+    const b = getBall(G.balls, n); if (!b || !b.on) continue;
+    if (under) {
+      const g = ctx.createRadialGradient(b.x, b.y, R * 0.8, b.x, b.y, R * 2.4);
+      g.addColorStop(0, 'rgba(255,215,90,' + (0.35 + 0.25 * pulse) + ')'); g.addColorStop(1, 'rgba(255,215,90,0)');
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(b.x, b.y, R * 2.4, 0, TAU); ctx.fill();
+    } else {
+      ctx.beginPath(); ctx.arc(b.x, b.y, R + 0.9 + pulse * 0.9, 0, TAU);
+      ctx.strokeStyle = 'rgba(255,215,90,' + (0.55 + 0.4 * pulse) + ')'; ctx.lineWidth = 1.6 * px; ctx.stroke();
+    }
+  }
+}
+// Animierte Markierung: die Weiße darf verschoben werden
+function drawBallInHand(cue, now) {
+  const px = 1 / L.s;
+  if (G.bih === 'kitchen') {
+    ctx.fillStyle = 'rgba(255,215,90,' + (0.05 + 0.04 * Math.sin(now / 300)) + ')'; ctx.fillRect(0, 0, HEAD_X, H);
+    ctx.setLineDash([3 * px, 3 * px]); ctx.lineDashOffset = -now / 40;
+    ctx.strokeStyle = 'rgba(255,215,90,.6)'; ctx.lineWidth = 1.5 * px;
+    ctx.beginPath(); ctx.moveTo(HEAD_X, 0); ctx.lineTo(HEAD_X, H); ctx.stroke();
+    ctx.setLineDash([]); ctx.lineDashOffset = 0;
+  }
+  if (G.dragging) {
+    if (now - (G.badPlaceT || 0) < 350) {
+      ctx.beginPath(); ctx.arc(cue.x, cue.y, R * 1.6, 0, TAU);
+      ctx.strokeStyle = 'rgba(255,60,50,' + (1 - (now - G.badPlaceT) / 350) + ')'; ctx.lineWidth = 2.5 * px; ctx.stroke();
+    }
+    return;
+  }
+  // drehender Ring
+  ctx.setLineDash([3.2 * px, 2.6 * px]); ctx.lineDashOffset = -now / 25;
+  ctx.strokeStyle = '#ffd75a'; ctx.lineWidth = 1.8 * px;
+  ctx.beginPath(); ctx.arc(cue.x, cue.y, R + 2.2, 0, TAU); ctx.stroke();
+  ctx.setLineDash([]); ctx.lineDashOffset = 0;
+  // vier Pfeile, die nach außen pulsieren
+  const d = R + 4 + 1.4 * (0.5 + 0.5 * Math.sin(now / 220));
+  ctx.fillStyle = 'rgba(255,215,90,.95)';
+  for (let k = 0; k < 4; k++) {
+    const a = k * Math.PI / 2, ca = Math.cos(a), sa = Math.sin(a);
+    const tx = cue.x + ca * (d + 1.8), ty = cue.y + sa * (d + 1.8);
+    ctx.beginPath(); ctx.moveTo(tx, ty);
+    ctx.lineTo(cue.x + ca * d - sa * 1.4, cue.y + sa * d + ca * 1.4);
+    ctx.lineTo(cue.x + ca * d + sa * 1.4, cue.y + sa * d - ca * 1.4); ctx.closePath(); ctx.fill();
+  }
+  ctx.font = 'bold ' + (11 * px).toFixed(2) + 'px system-ui,sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  const ty = cue.y + (cue.y > H - 16 ? -(R + 10) : R + 10);
+  const label = 'Ball in Hand – ziehen';
+  const w = ctx.measureText(label).width + 6 * px;
+  ctx.fillStyle = 'rgba(8,14,12,.8)'; ctx.fillRect(cue.x - w / 2, ty - 7 * px, w, 14 * px);
+  ctx.fillStyle = '#ffd75a'; ctx.fillText(label, cue.x, ty);
+}
+
 // Kugeln, die gerade in eine Tasche fallen
 let SINKING = [];
 function drawSinking(now) {
@@ -1344,6 +1407,21 @@ function drawHUD() {
       ctx.fillText('Fouls: ' + P.fouls, bxs - dir * br, midY);
     }
   }
+  // Zielkugeln mittig auf der oberen Bande
+  if (G.state !== 'over') {
+    const tg = currentTargets().sort((a, b) => a - b);
+    const br = Math.max(3.5, railH * 0.3), cxm = L.ox + W * s / 2;
+    let label = 'Ziel:', list = tg;
+    if (G.isBreak) { label = 'Anstoß'; list = []; }
+    else if (G.mode === 8 && !G.players[G.cur].group) { label = 'Ziel: Volle oder Halbe (nicht die 8)'; list = []; }
+    else if (list.length > 7) list = list.slice(0, 7);
+    ctx.font = 'bold ' + fs + 'px system-ui,sans-serif';
+    const lw = ctx.measureText(label).width, tw = lw + (list.length ? 6 + list.length * (br * 2 + 3) : 0) + 14;
+    ctx.fillStyle = 'rgba(40,20,8,.92)'; roundRect(cxm - tw / 2, midY - Math.max(fs * 0.7, br + 2), tw, Math.max(fs * 1.4, br * 2 + 4), Math.max(fs * 0.7, br + 2)); ctx.fill();
+    ctx.textAlign = 'left'; ctx.fillStyle = '#ffd76a'; ctx.fillText(label, cxm - tw / 2 + 7, midY);
+    let bx2 = cxm - tw / 2 + 7 + lw + 6 + br;
+    for (const n of list) { miniBall(n, bx2, midY, br); bx2 += br * 2 + 3; }
+  }
   // Statuszeile auf der unteren Holzbande
   const by = L.oy + (H + CUSH) * s + railH / 2 + 1;
   ctx.textAlign = 'center'; ctx.font = fs + 'px system-ui,sans-serif';
@@ -1498,8 +1576,8 @@ function draw() {
   const aiming = (G.state === 'aim' && !G.ai[G.cur]) || G.state === 'aipreview' || G.state === 'strike';
   const now = performance.now();
   updateOrient(balls);
-  // Kopffeld bei Ball in Hand
-  if (aiming && G.bih === 'kitchen') { ctx.fillStyle = 'rgba(255,255,255,.05)'; ctx.fillRect(0, 0, HEAD_X, H); }
+  const humanAim = G.state === 'aim' && !G.ai[G.cur];
+  if (humanAim) drawTargetGlow(now, true);
   // Taschenansage
   if (aiming && needCall()) {
     for (let k = 0; k < 6; k++) {
@@ -1519,15 +1597,13 @@ function draw() {
     if (!G.calledManual && needCall() && G.state === 'aim') { const e = S.ev.potted.find(p => p.n === 8); G.called = e ? e.pocket : null; }
     drawPrediction(S);
   }
-  for (const b of balls) if (b.on) drawBall(b.n, b.x, b.y);
+  for (const b of balls) if (b.on) drawBall(b.n, b.x, b.y, b.n === 0 && G.dragging ? 1.14 : 1);
+  if (humanAim) drawTargetGlow(now, false);
   if (G.mode === 0) drawSoloOverlay(S);
   if (aiming && cue.on) {
     ctx.save(); ctx.beginPath(); ctx.rect(-BORDER, -BORDER, W + 2 * BORDER, H + 2 * BORDER); ctx.clip();
-    if (G.bih) {
-      ctx.setLineDash([2 * px, 3 * px]); ctx.strokeStyle = '#f2b632'; ctx.lineWidth = 1.5 * px;
-      ctx.beginPath(); ctx.arc(cue.x, cue.y, R + 2.2, 0, TAU); ctx.stroke(); ctx.setLineDash([]);
-    }
-    drawCue(cue, G.state === 'strike' ? strikeOffset(now) : 0);
+    if (G.bih && humanAim) drawBallInHand(cue, now);
+    if (!G.dragging) drawCue(cue, G.state === 'strike' ? strikeOffset(now) : 0);
     ctx.restore();
   }
   drawHUD();
@@ -1562,7 +1638,7 @@ cv.addEventListener('pointerdown', e => {
   }
   if (kind === 'table') {
     const t = toTable(x, y), cue = getBall(G.balls, 0);
-    if (G.bih && Math.hypot(t.x - cue.x, t.y - cue.y) < R * 3.5) { st.drag = true; st.dx = cue.x - t.x; st.dy = cue.y - t.y; return; }
+    if (G.bih && Math.hypot(t.x - cue.x, t.y - cue.y) < R * 4) { st.drag = true; G.dragging = true; st.dx = cue.x - t.x; st.dy = cue.y - t.y; return; }
     if (needCall()) {
       for (let k = 0; k < 6; k++) { const d = POCKET_DRAW[k]; if (Math.hypot(t.x - d.x, t.y - d.y) < 9) { G.called = k; G.calledManual = true; st.kind = 'none'; return; } }
     }
@@ -1570,7 +1646,11 @@ cv.addEventListener('pointerdown', e => {
   handlePtr(st, x, y);
 });
 cv.addEventListener('pointermove', e => { const st = ptrs.get(e.pointerId); if (st && isHumanTurn()) handlePtr(st, e.clientX, e.clientY); });
-const endPtr = e => { const st = ptrs.get(e.pointerId); if (st && st.kind === 'spin' && G) G.spinUI = false; ptrs.delete(e.pointerId); };
+const endPtr = e => {
+  const st = ptrs.get(e.pointerId);
+  if (st && G) { if (st.kind === 'spin') G.spinUI = false; if (st.drag) G.dragging = false; }
+  ptrs.delete(e.pointerId);
+};
 cv.addEventListener('pointerup', endPtr); cv.addEventListener('pointercancel', endPtr);
 
 function handlePtr(st, x, y) {
@@ -1588,6 +1668,7 @@ function handlePtr(st, x, y) {
       const nx = t.x + st.dx, ny = t.y + st.dy, kitchen = G.bih === 'kitchen';
       let px = clamp(nx, R, kitchen ? HEAD_X : W - R), py = clamp(ny, R, H - R);
       if (placeOK(G.balls, px, py, kitchen)) { cue.x = px; cue.y = py; cue.on = true; G.ver++; }
+      else G.badPlaceT = performance.now();
     } else if (Math.hypot(t.x - cue.x, t.y - cue.y) > 1) G.aim = Math.atan2(t.y - cue.y, t.x - cue.x);
   }
 }

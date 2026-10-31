@@ -13,7 +13,12 @@
 html,body{margin:0;height:100%;background:var(--bg);overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;font-family:system-ui,-apple-system,Roboto,"Segoe UI",sans-serif;color:var(--text)}
 #c{display:block;position:fixed;inset:0;width:100%;height:100%}
 .card canvas{display:block}
-.b{position:fixed;z-index:5;border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:10px;font-size:13px;font-weight:600;padding:0;cursor:pointer}
+.b{position:fixed;z-index:5;border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:10px;font-size:calc(14px * var(--ui, 1));font-weight:700;padding:0;cursor:pointer;touch-action:manipulation}
+.b:hover{filter:brightness(1.2)}
+.shoot{font-size:calc(18px * var(--ui, 1))!important}
+.actions button,.lobbyBar button,.tile,.lvl,.lessonBtn,.card button,.seg button,.tabs button{cursor:pointer;touch-action:manipulation}
+.seg button,.tabs button{min-height:36px}
+.actions button{min-height:40px}
 .b:active{filter:brightness(1.3)}
 .b.on{background:#5a3d0b;border-color:var(--accent);color:var(--accent)}
 .shoot{background:linear-gradient(#e0412f,#a52418);border-color:#ff7a66;font-size:17px;letter-spacing:1px}
@@ -302,6 +307,7 @@ input.name{background:#0c1512;color:var(--text);border:1px solid var(--line);bor
     <h2>Extras</h2>
     <ul>
       <li><b>⟲ Replay</b> zeigt deinen letzten Stoß noch einmal in Zeitlupe. Tippen beendet die Wiederholung.</li>
+      <li><b>Am PC:</b> Das Mausrad dreht das Ziel fein, die Pfeiltasten in 0,01°-Schritten (mit Umschalt schneller). Die Leertaste stößt mit der zuletzt eingestellten Kraft.</li>
       <li><b>Online:</b> Einer erstellt einen Raum und bekommt einen Raumcode (zum Beispiel KQTR3), der andere gibt ihn unter „Raum beitreten“ ein. Mit „Freund einladen“ verschickst du auch einen Link, mit dem man im Browser direkt beitritt. Mit 💬 schickst du kurze Nachrichten.</li>
       <li><b>Münzen und Erfahrungspunkte</b> bekommst du für Siege, Herausforderungen, die Trefferserie und den Tagesbonus. Im <b>Shop</b> schaltest du damit Queues und Tücher frei. Mit Erfahrungspunkten steigst du im Level auf und bekommst Bonus-Münzen.</li>
       <li>In den <b>Einstellungen</b> änderst du deinen Namen, den Ton und die Vibration.</li>
@@ -435,9 +441,10 @@ const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
 const gauss = () => { let u = 0, v = 0; while (!u) u = Math.random(); while (!v) v = Math.random(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(TAU * v); };
 
 // ===================== Einstellungen =====================
-const CFG = {mode: 8, opp: 'ai', diff: 1, call: 1, sound: 1, lines: 'all', solo: 'levels', name: '', cloth: 'blau', vib: 1};
+const CFG = {mode: 8, opp: 'ai', diff: 1, call: 1, sound: 1, lines: 'guide', solo: 'levels', name: '', cloth: 'blau', vib: 1};
 try { Object.assign(CFG, JSON.parse(localStorage.getItem('billard_cfg') || '{}')); } catch (e) {}
 const saveCfg = () => { try { localStorage.setItem('billard_cfg', JSON.stringify(CFG)); } catch (e) {} };
+if (CFG.linesV !== 2) { CFG.lines = 'guide'; CFG.linesV = 2; saveCfg(); }
 let TIME_SCALE = 1;
 
 // ===================== Physik =====================
@@ -739,7 +746,7 @@ function aimDefault() {
 
 // Zeitlimit pro Stoß (nicht in Lektionen, Herausforderungen und Training)
 const timedGame = () => G && (G.mode !== 0 || G.solo.type === 'arcade');
-function turnTime() { return 25 + cueStats(G.cur).time; }
+function turnTime() { return 45 + cueStats(G.cur).time; }
 function timeoutFoul() {
   ptrs.clear(); G.dragging = false; G.spinUI = false;
   const P = G.players[G.cur];
@@ -2297,32 +2304,38 @@ function layout() {
   DPR = Math.min(window.devicePixelRatio || 1, 3); VW = innerWidth; VH = innerHeight;
   cv.width = Math.round(VW * DPR); cv.height = Math.round(VH * DPR);
   const lesson = !!(G && G.mode === 0 && G.solo && G.solo.type === 'lesson');
-  const left = lesson ? 6 : 58, right = lesson ? Math.min(290, Math.round(VW * 0.33)) : 104, pad = 4;
+  // Größere Bedienelemente auf größeren Bildschirmen (Browser, Tablet, PC)
+  const u = clamp(Math.min(VH / 393, VW / 873), 1, 1.6);
+  const left = lesson ? 6 : Math.round(62 * u), right = lesson ? Math.min(290, Math.round(VW * 0.33)) : Math.round(112 * u), pad = 4;
+  const bh = Math.round(36 * u), gap = Math.round(7 * u);
   $('lessonBox').style.width = (right - 14) + 'px';
+  document.documentElement.style.setProperty('--ui', u.toFixed(2));
   const aw = VW - left - right - pad * 2, ah = VH - pad * 2;
   const tw = W + 2 * BORDER, th = H + 2 * BORDER;
   const s = Math.max(0.5, Math.min(aw / tw, ah / th));
-  L = {s, left, rx: VW - right, right, lesson,
+  L = {s, left, rx: VW - right, right, lesson, u,
     ox: left + pad + (aw - tw * s) / 2 + BORDER * s, oy: pad + (ah - th * s) / 2 + BORDER * s};
-  L.power = {x: 12, y: 30, w: 34, h: VH - 48};
+  L.power = {x: Math.round(10 * u), y: Math.round(28 * u), w: left - Math.round(22 * u), h: VH - Math.round(48 * u)};
   const bx = L.rx + 6, bw = right - 12;
-  place('bMenu', bx, 6, bw, 32);
-  L.spin = {cx: L.rx + right / 2, cy: 6 + 32 + 14 + 32, r: 30};
-  const shootTop = VH - 6 - 58;
-  place('bShoot', bx, shootTop, bw, 58);
-  place('bLines', bx, shootTop - 8 - 32, bw, 32);
-  L.row = {x: bx, y: shootTop - 8 - 32 - 6 - 32, w: bw, half: (bw - 6) / 2};
+  place('bMenu', bx, 6, bw, bh);
+  L.spin = {cx: L.rx + right / 2, cy: 6 + bh + Math.round(16 * u) + Math.round(32 * u), r: Math.round(32 * u)};
+  const shootH = Math.round(58 * u), shootTop = VH - 6 - shootH;
+  place('bShoot', bx, shootTop, bw, shootH);
+  // ohne STOSS-Knopf rücken Linien und Replay nach unten
+  const base = $('bShoot').classList.contains('hidden') ? VH - 6 : shootTop - gap;
+  place('bLines', bx, base - bh, bw, bh);
+  L.row = {x: bx, y: base - bh - gap - bh, w: bw, half: (bw - gap) / 2};
   L.bx = bx; L.bw = bw;
-  place('bPush', bx + L.row.half + 6, L.row.y, L.row.half, 32);
-  place('bUndo', bx + L.row.half + 6, L.row.y, L.row.half, 32);
-  place('bReplay', bx, L.row.y, bw, 32);
+  place('bPush', bx + L.row.half + gap, L.row.y, L.row.half, bh);
+  place('bUndo', bx + L.row.half + gap, L.row.y, L.row.half, bh);
+  place('bReplay', bx, L.row.y, bw, bh);
   $('chatDlg').style.right = (right + 4) + 'px';
-  const wTop = L.spin.cy + L.spin.r + 22;
-  const wBot = shootTop - 8 - 32 - 6 - 32 - 8;
-  const wH = Math.max(90, wBot - wTop);
-  L.nudgeUp = {x: bx + 10, y: wTop, w: bw - 20, h: 26};
-  L.wheel = {x: bx + 18, y: wTop + 30, w: bw - 36, h: wH - 60};
-  L.nudgeDown = {x: bx + 10, y: wTop + wH - 26, w: bw - 20, h: 26};
+  const wTop = L.spin.cy + L.spin.r + Math.round(14 * u);
+  const wBot = L.row.y - gap;
+  const nh = Math.round(32 * u), wH = Math.max(nh * 2 + 30, wBot - wTop);
+  L.nudgeUp = {x: bx + 4, y: wTop, w: bw - 8, h: nh};
+  L.wheel = {x: bx + 16, y: wTop + nh + 4, w: bw - 32, h: wH - 2 * nh - 8};
+  L.nudgeDown = {x: bx + 4, y: wTop + wH - nh, w: bw - 8, h: nh};
   L.bigSpin = {cx: VW / 2, cy: VH / 2 + 4, r: Math.min(VH * 0.33, VW * 0.22)};
 }
 function place(id, x, y, w, h) { const e = document.getElementById(id).style; e.left = x + 'px'; e.top = y + 'px'; e.width = w + 'px'; e.height = h + 'px'; }
@@ -3612,7 +3625,7 @@ function drawControls() {
   ctx.strokeStyle = 'rgba(255,255,255,.18)';
   for (let i = 1; i < 10; i++) { const y = p.y + p.h * i / 10; ctx.beginPath(); ctx.moveTo(p.x + 4, y); ctx.lineTo(p.x + p.w - 4, y); ctx.stroke(); }
   ctx.fillStyle = '#fff'; ctx.fillRect(p.x - 3, p.y + p.h - fh - 1.5, p.w + 6, 3);
-  ctx.font = 'bold 12px system-ui,sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.font = 'bold ' + Math.round(12 * L.u) + 'px system-ui,sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   ctx.fillStyle = '#9fb5aa'; ctx.fillText('Kraft', p.x + p.w / 2, 13);
   ctx.fillStyle = '#fff'; ctx.fillText(Math.round(G.power * 100) + '%', p.x + p.w / 2, p.y + p.h + 12);
   }
@@ -3642,11 +3655,11 @@ function drawControls() {
   ctx.strokeStyle = '#2c4a3e'; roundRect(wh.x, wh.y, wh.w, wh.h, 8); ctx.stroke();
   for (const [r, sym] of [[L.nudgeUp, '▲  −0,01°'], [L.nudgeDown, '▼  +0,01°']]) {
     ctx.fillStyle = '#1f3029'; roundRect(r.x, r.y, r.w, r.h, 7); ctx.fill(); ctx.strokeStyle = '#2c4a3e'; ctx.stroke();
-    ctx.fillStyle = '#cfe'; ctx.font = 'bold 11px system-ui,sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#cfe'; ctx.font = 'bold ' + Math.round(11 * L.u) + 'px system-ui,sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.fillText(sym, r.x + r.w / 2, r.y + r.h / 2);
   }
   const deg = ((G.aim * 180 / Math.PI) % 360 + 360) % 360;
-  ctx.font = 'bold 11px system-ui,sans-serif';
+  ctx.font = 'bold ' + Math.round(11 * L.u) + 'px system-ui,sans-serif';
   const tw = ctx.measureText(deg.toFixed(2) + '°').width + 10;
   ctx.fillStyle = 'rgba(8,14,12,.85)'; roundRect(wh.x + wh.w / 2 - tw / 2, wh.y + wh.h / 2 - 9, tw, 18, 6); ctx.fill();
   ctx.fillStyle = '#ffd76a'; ctx.fillText(deg.toFixed(2) + '°', wh.x + wh.w / 2, wh.y + wh.h / 2);
@@ -3668,7 +3681,7 @@ function drawPullCue(p) {
   ctx.translate(cx, top); ctx.rotate(Math.PI / 2);
   paintCueShape(ctx, 0, p.h * 1.25, CUES[cueFor(G.cur)] || CUES.klassik, 3.2, 7.5);
   ctx.restore();
-  ctx.font = 'bold 12px system-ui,sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.font = 'bold ' + Math.round(12 * L.u) + 'px system-ui,sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   ctx.fillStyle = '#9fb5aa'; ctx.fillText('Stoß', p.x + p.w / 2, 13);
   ctx.fillStyle = pulling ? '#fff' : 'rgba(255,255,255,.6)';
   ctx.fillText(pulling ? Math.round(f * 100) + '%' : '↓ ziehen', p.x + p.w / 2, p.y + p.h + 12);
@@ -3805,9 +3818,9 @@ cv.addEventListener('pointerdown', e => {
   const x = e.clientX, y = e.clientY, sp = L.spin;
   let kind = null;
   if (x < L.left) kind = 'power';
-  else if (Math.hypot(x - sp.cx, y - sp.cy) < sp.r + 8) kind = 'spin';
-  else if (inRect(x, y, L.nudgeUp)) kind = 'nudge-';
-  else if (inRect(x, y, L.nudgeDown)) kind = 'nudge+';
+  else if (Math.hypot(x - sp.cx, y - sp.cy) < sp.r + 16 * L.u) kind = 'spin';
+  else if (inRect(x, y, {x: L.rx, y: L.nudgeUp.y - 4, w: L.right, h: L.nudgeUp.h + 6})) kind = 'nudge-';
+  else if (inRect(x, y, {x: L.rx, y: L.nudgeDown.y - 2, w: L.right, h: L.nudgeDown.h + 6})) kind = 'nudge+';
   else if (x > L.rx && y > L.wheel.y - 4 && y < L.wheel.y + L.wheel.h + 4) kind = 'wheel';
   else if (x >= L.left && x <= L.rx) kind = 'table';
   if (!kind || !isHumanTurn()) return;
@@ -3861,6 +3874,20 @@ const endPtr = e => {
   ptrs.delete(e.pointerId);
 };
 cv.addEventListener('pointerup', endPtr); cv.addEventListener('pointercancel', endPtr);
+// Am PC: Mausrad dreht fein, Pfeiltasten in 0,01°-Schritten (mit Umschalt schneller), Leertaste stößt
+cv.addEventListener('wheel', e => {
+  if (!G || !isHumanTurn()) return;
+  e.preventDefault();
+  G.aim += Math.sign(e.deltaY) * NUDGE * (e.shiftKey ? 30 : 6);
+}, {passive: false});
+window.addEventListener('keydown', e => {
+  if (!G || !isHumanTurn() || (e.target && e.target.tagName === 'INPUT')) return;
+  const ov = ['menu', 'shop', 'stats', 'settings', 'levels', 'rules', 'online', 'track', 'over'].some(id => !$(id).classList.contains('hidden'));
+  if (ov) return;
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { nudge(-1, e.shiftKey ? 20 : 1); e.preventDefault(); }
+  else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { nudge(1, e.shiftKey ? 20 : 1); e.preventDefault(); }
+  else if (e.key === ' ' || e.key === 'Enter') { shoot(); e.preventDefault(); }
+});
 // Gedrückthalten und Wiederholung der Feinpfeile
 function pointerTick(now) {
   for (const st of ptrs.values()) {
@@ -3914,7 +3941,9 @@ function updateUI() {
   if (!G) return;
   const inLesson = G.mode === 0 && G.solo.type === 'lesson';
   for (const id of ['bShoot', 'bLines', 'bReplay', 'bMenu']) $(id).classList.toggle('hidden', inLesson);
+  const wasHidden = $('bShoot').classList.contains('hidden');
   $('bShoot').classList.toggle('hidden', inLesson || pullMode());
+  if (wasHidden !== $('bShoot').classList.contains('hidden')) layout();
   if (inLesson) { hide('bPush'); hide('bUndo'); hide('bChat'); return; }
   $('bShoot').disabled = !isHumanTurn();
   const canPush = G.mode === 9 && G.pushAvail && isHumanTurn();
@@ -3930,8 +3959,9 @@ function updateUI() {
   $('bReplay').textContent = half ? '⟲' : '⟲ Replay';
   $('bReplay').disabled = !(isHumanTurn() && G.lastShot);
   $('bChat').classList.toggle('hidden', !G.online);
-  place('bMenu', L.bx, 6, G.online ? L.bw - 40 : L.bw, 32);
-  place('bChat', L.bx + L.bw - 34, 6, 34, 32);
+  const bh = Math.round(36 * L.u), cw = Math.round(38 * L.u);
+  place('bMenu', L.bx, 6, G.online ? L.bw - cw - 6 : L.bw, bh);
+  place('bChat', L.bx + L.bw - cw, 6, cw, bh);
 }
 function syncMenu() {
   if (CFG.mode !== 9) CFG.mode = 8;

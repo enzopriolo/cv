@@ -3,6 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#0d1512">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="description" content="Billard mit Linienvorschau: 8-Ball, 9-Ball, Lektionen, Herausforderungen und Online-Spiel ohne Server.">
 <title>Billard Linien</title>
 <style>
 :root{--bg:#0d1512;--panel:#16231e;--line:#2c4a3e;--text:#eef4f0;--muted:#9fb5aa;--accent:#f2b632;--accent2:#3fb68b}
@@ -16,13 +20,52 @@ html,body{margin:0;height:100%;background:var(--bg);overflow:hidden;touch-action
 .shoot:disabled,.b:disabled{opacity:.35}
 .hidden{display:none!important}
 #over{background:rgba(5,10,8,.6)}
-#menu.lobby{background:radial-gradient(ellipse at 50% 0%,rgba(29,74,60,.97) 0%,rgba(11,25,21,.96) 55%,rgba(5,10,8,.97) 100%);align-items:stretch}
+#menu.lobby{background:#050403;align-items:stretch;perspective:900px}
+#lobbyBg{position:absolute;inset:0;width:100%;height:100%;z-index:0}
+.lobbyWrap{position:relative;z-index:1}
+#heroBall{width:46px;height:46px;filter:drop-shadow(0 6px 10px rgba(0,0,0,.7));animation:bob 3s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+.logo b{background:linear-gradient(#fff,#cfd8d4);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:none;filter:drop-shadow(0 2px 0 #6b5212) drop-shadow(0 4px 6px rgba(0,0,0,.8))}
+.logo i{filter:drop-shadow(0 2px 4px rgba(0,0,0,.8))}
+.pcard,.coins,.daily,.lobbyOpts .seg,.lobbyBar button{backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.pcard{background:rgba(10,18,15,.55);box-shadow:0 8px 24px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.08)}
+.coins{background:rgba(20,14,2,.6);box-shadow:0 0 18px rgba(242,182,50,.25),inset 0 1px 0 rgba(255,255,255,.1)}
+.lobbyOpts .seg{background:rgba(10,18,15,.55)}
+.lobbyOpts span{text-shadow:0 1px 3px #000}
+.tiles{perspective:800px}
+.tile{transform-style:preserve-3d;transform:rotateX(8deg);transition:transform .18s,box-shadow .18s;box-shadow:0 14px 28px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.25),inset 0 -6px 14px rgba(0,0,0,.35);animation:tileIn .6s cubic-bezier(.2,.9,.3,1.2) backwards}
+.tile:nth-child(1){animation-delay:.05s}.tile:nth-child(2){animation-delay:.1s}.tile:nth-child(3){animation-delay:.15s}
+.tile:nth-child(4){animation-delay:.2s}.tile:nth-child(5){animation-delay:.25s}.tile:nth-child(6){animation-delay:.3s}
+@keyframes tileIn{from{opacity:0;transform:rotateX(50deg) translateY(30px) scale(.9)}}
+.tile:active{transform:rotateX(0) translateY(3px) scale(.97);box-shadow:0 4px 10px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.2)}
+.tile::before{content:'';position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.22) 45%,transparent 60%);transform:translateX(-120%);animation:shine 5s ease-in-out infinite}
+.tile:nth-child(2)::before{animation-delay:.8s}.tile:nth-child(3)::before{animation-delay:1.6s}.tile:nth-child(4)::before{animation-delay:2.4s}.tile:nth-child(5)::before{animation-delay:3.2s}.tile:nth-child(6)::before{animation-delay:4s}
+@keyframes shine{0%,70%{transform:translateX(-120%)}100%{transform:translateX(120%)}}
+.tile::after{content:'';position:absolute;left:0;right:0;top:0;height:45%;background:linear-gradient(rgba(255,255,255,.16),transparent);border-radius:16px 16px 0 0;pointer-events:none}
+.tile em{transform:translateZ(30px);animation:float 3.2s ease-in-out infinite}
+.tile:nth-child(even) em{animation-delay:1.2s}
+@keyframes float{0%,100%{translate:0 0}50%{translate:0 -5px}}
+.tile b,.tile small{transform:translateZ(18px);text-shadow:0 2px 4px rgba(0,0,0,.6);position:relative;z-index:1}
+.lobbyBar button{background:rgba(20,32,27,.7);box-shadow:0 6px 14px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.08)}
+#loader{position:fixed;inset:0;z-index:100;background:radial-gradient(ellipse at 50% 35%,#1d3a30 0%,#0a1411 55%,#030605 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;transition:opacity .6s}
+#loader.fade{opacity:0}
+.ldGlow{position:absolute;width:340px;height:340px;border-radius:50%;background:radial-gradient(circle,rgba(242,182,50,.18),transparent 65%);animation:glow 2.4s ease-in-out infinite}
+@keyframes glow{50%{transform:scale(1.15);opacity:.7}}
+#ldBall{width:min(34vh,150px);height:min(34vh,150px);position:relative;filter:drop-shadow(0 18px 22px rgba(0,0,0,.8))}
+.ldLogo{text-align:center;position:relative}
+.ldLogo b{display:block;font-size:30px;letter-spacing:8px;line-height:1;background:linear-gradient(#fff,#bfcac5);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 3px 0 #6b5212) drop-shadow(0 6px 8px #000)}
+.ldLogo i{display:block;font-style:normal;color:var(--accent);letter-spacing:12px;font-weight:800;font-size:15px;margin-top:2px}
+.ldBarWrap{width:min(70vw,360px);height:10px;border-radius:6px;background:rgba(0,0,0,.5);border:1px solid #2c4a3e;overflow:hidden;position:relative}
+#ldBar{height:100%;width:0;background:linear-gradient(90deg,#3fb68b,#f2b632,#e0412f);box-shadow:0 0 12px rgba(242,182,50,.6)}
+.ldRow{width:min(70vw,360px);display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
+#ldTip{position:absolute;bottom:14px;left:16px;right:16px;text-align:center;color:#cfe;font-size:13px;opacity:.85}
+#rotate{display:none;position:fixed;inset:0;z-index:200;background:#0a1411;color:#fff;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;padding:20px}
+#rotate div{font-size:56px;animation:float 2s ease-in-out infinite}
+#rotate small{color:var(--muted)}
+@media (orientation:portrait) and (max-width:820px){#rotate{display:flex}}
 .lobbyWrap{width:100%;max-width:980px;margin:auto;padding:10px 16px;box-sizing:border-box;display:flex;flex-direction:column;gap:8px;max-height:100%;overflow:auto}
 .lobbyHead{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .logo{display:flex;align-items:center;gap:8px;margin-right:auto}
-.logoBall{width:38px;height:38px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#555 0%,#111 45%,#000 100%);display:flex;align-items:center;justify-content:center;font-weight:900;color:#111;position:relative;box-shadow:0 4px 12px rgba(0,0,0,.6)}
-.logoBall::before{content:'';position:absolute;width:18px;height:18px;border-radius:50%;background:#f6f3ea}
-.logoBall{font-size:0}
 .logo b{display:block;font-size:20px;letter-spacing:3px;line-height:1}
 .logo i{display:block;font-style:normal;font-size:13px;letter-spacing:6px;color:var(--accent);font-weight:800}
 .pcard{display:flex;align-items:center;gap:8px;background:rgba(0,0,0,.35);border:1px solid var(--line);border-radius:14px;padding:5px 12px 5px 6px}
@@ -125,6 +168,15 @@ input.name{background:#0c1512;color:var(--text);border:1px solid var(--line);bor
 </head>
 <body>
 <canvas id="c"></canvas>
+<div id="loader">
+  <div class="ldGlow"></div>
+  <canvas id="ldBall"></canvas>
+  <div class="ldLogo"><b>BILLARD</b><i>LINIEN</i></div>
+  <div class="ldBarWrap"><div id="ldBar"></div></div>
+  <div class="ldRow"><span id="ldText">Lade …</span><span id="ldPct">0 %</span></div>
+  <div id="ldTip"></div>
+</div>
+<div id="rotate"><div>📱↻</div><b>Bitte dreh dein Handy quer</b><small>Billard spielt sich im Querformat am besten.</small></div>
 <button id="bMenu" class="b">☰ Menü</button>
 <button id="bChat" class="b hidden">💬</button>
 <button id="bPush" class="b hidden">Push-Out</button>
@@ -140,9 +192,10 @@ input.name{background:#0c1512;color:var(--text);border:1px solid var(--line);bor
 </div>
 
 <div id="menu" class="overlay lobby">
+  <canvas id="lobbyBg"></canvas>
   <div class="lobbyWrap">
     <div class="lobbyHead">
-      <div class="logo"><span class="logoBall">8</span><div><b>BILLARD</b><i>LINIEN</i></div></div>
+      <div class="logo"><canvas id="heroBall"></canvas><div><b>BILLARD</b><i>LINIEN</i></div></div>
       <div class="pcard"><div class="avatar" id="lbAvatar">S</div><div class="pinfo"><b id="lbName">Spieler 1</b><div class="xpbar"><div id="lbXp"></div></div><small id="lbLevel">Level 1</small></div></div>
       <div class="coins" id="lbCoins">🪙 0</div>
       <button id="bDaily" class="daily">🎁 Tagesbonus</button>
@@ -1776,6 +1829,197 @@ function shopAction(it) {
   saveProfile(); renderShop();
 }
 
+// ===================== 3D-Lobby =====================
+// Perspektivische Tischszene mit rollenden Kugeln hinter dem Lobby-Menü.
+const LB = {cv: null, ctx: null, balls: [], dust: [], t: 0, nextShot: 0, w: 0, h: 0, dpr: 1};
+const LB_TW = 1.27, LB_TL = 2.54, LB_R = 0.0286; // halbe Tischbreite, Tischlänge, Kugelradius (m)
+function lbProject(x, y, z) {
+  // Kamera über der vorderen Kante, leicht nach unten geneigt
+  const camY = 1.05, camZ = -0.55, pitch = 0.62, f = LB.h * 1.15;
+  const X = x, Y = y - camY, Z = z - camZ;
+  const c = Math.cos(pitch), s = Math.sin(pitch);
+  const y2 = Y * c + Z * s, z2 = -Y * s + Z * c;
+  return {x: LB.w / 2 + f * X / z2, y: LB.h * 0.42 - f * y2 / z2, k: f / z2};
+}
+function initLobbyBg() {
+  LB.cv = $('lobbyBg'); LB.ctx = LB.cv.getContext('2d');
+  const nums = [0, 1, 9, 8, 3, 11, 6, 14, 5];
+  LB.balls = nums.map((n, i) => ({n, x: (Math.random() - 0.5) * 1.8, z: 0.5 + Math.random() * 1.8, vx: 0, vz: 0,
+    M: mul3(rotAxis(1, 0, 0, Math.random() * 6), rotAxis(0, 1, 0, Math.random() * 6)), ver: i * 1000, sx: 0, sy: 0}));
+  LB.dust = Array.from({length: 46}, () => ({x: Math.random(), y: Math.random(), v: 0.004 + Math.random() * 0.012, a: Math.random() * TAU}));
+  LB.nextShot = performance.now() + 900;
+}
+function lobbyResize() {
+  if (!LB.cv) return;
+  LB.dpr = Math.min(window.devicePixelRatio || 1, 2);
+  LB.w = innerWidth; LB.h = innerHeight;
+  LB.cv.width = Math.round(LB.w * LB.dpr); LB.cv.height = Math.round(LB.h * LB.dpr);
+}
+function lobbyStep(dt, now) {
+  const bs = LB.balls;
+  // Regelmäßig wird eine Kugel angestoßen
+  if (now > LB.nextShot) {
+    const a = bs[Math.floor(Math.random() * bs.length)], b = bs[Math.floor(Math.random() * bs.length)];
+    let dx = b.x - a.x, dz = b.z - a.z; const d = Math.hypot(dx, dz) || 1;
+    if (a === b) { dx = Math.random() - 0.5; dz = Math.random() - 0.5; }
+    const sp = 1.1 + Math.random() * 1.4;
+    a.vx += dx / d * sp; a.vz += dz / d * sp;
+    LB.nextShot = now + 2200 + Math.random() * 2600;
+  }
+  const steps = 4, h = dt / steps;
+  for (let k = 0; k < steps; k++) {
+    for (const b of bs) {
+      const v = Math.hypot(b.vx, b.vz);
+      if (v > 0) { const nv = Math.max(0, v - (0.22 + 0.25 * v) * h); b.vx *= nv / v; b.vz *= nv / v; }
+      b.x += b.vx * h; b.z += b.vz * h;
+      const lim = LB_TW - LB_R;
+      if (b.x < -lim) { b.x = -lim; b.vx = Math.abs(b.vx) * 0.8; } if (b.x > lim) { b.x = lim; b.vx = -Math.abs(b.vx) * 0.8; }
+      if (b.z < LB_R + 0.05) { b.z = LB_R + 0.05; b.vz = Math.abs(b.vz) * 0.8; } if (b.z > LB_TL - LB_R) { b.z = LB_TL - LB_R; b.vz = -Math.abs(b.vz) * 0.8; }
+    }
+    for (let i = 0; i < bs.length; i++) for (let j = i + 1; j < bs.length; j++) {
+      const a = bs[i], b = bs[j], dx = b.x - a.x, dz = b.z - a.z, d = Math.hypot(dx, dz);
+      if (d >= 2 * LB_R || d === 0) continue;
+      const nx = dx / d, nz = dz / d, ov = (2 * LB_R - d) / 2;
+      a.x -= nx * ov; a.z -= nz * ov; b.x += nx * ov; b.z += nz * ov;
+      const rv = (a.vx - b.vx) * nx + (a.vz - b.vz) * nz;
+      if (rv > 0) { const j2 = rv * 0.97; a.vx -= j2 * nx; a.vz -= j2 * nz; b.vx += j2 * nx; b.vz += j2 * nz; }
+    }
+  }
+}
+function drawLobbyBg(now, dt) {
+  if (!LB.cv) return;
+  if (LB.w !== innerWidth || LB.h !== innerHeight) lobbyResize();
+  lobbyStep(Math.min(dt, 0.05), now);
+  const c = LB.ctx, d = LB.dpr, W2 = LB.w, H2 = LB.h;
+  c.setTransform(d, 0, 0, d, 0, 0);
+  // Raum
+  const bg = c.createRadialGradient(W2 / 2, H2 * 0.2, 10, W2 / 2, H2 * 0.5, Math.max(W2, H2));
+  bg.addColorStop(0, '#2a2118'); bg.addColorStop(0.5, '#120e0a'); bg.addColorStop(1, '#030202');
+  c.fillStyle = bg; c.fillRect(0, 0, W2, H2);
+  const P = (x, z, y) => lbProject(x, y || 0, z);
+  const poly = pts => { c.beginPath(); pts.forEach((p, i) => i ? c.lineTo(p.x, p.y) : c.moveTo(p.x, p.y)); c.closePath(); };
+  const rw = 0.17, rh = 0.05;
+  // Holzrahmen (Oberseite und vordere Kante)
+  const o = [P(-LB_TW - rw, -rw, rh), P(LB_TW + rw, -rw, rh), P(LB_TW + rw, LB_TL + rw, rh), P(-LB_TW - rw, LB_TL + rw, rh)];
+  const of = [P(-LB_TW - rw, -rw, rh), P(LB_TW + rw, -rw, rh), P(LB_TW + rw, -rw, -0.12), P(-LB_TW - rw, -rw, -0.12)];
+  c.save(); c.shadowColor = 'rgba(0,0,0,.8)'; c.shadowBlur = 40; c.shadowOffsetY = 20; poly(o); c.fillStyle = '#000'; c.fill(); c.restore();
+  let g = c.createLinearGradient(0, of[0].y, 0, of[2].y); g.addColorStop(0, '#5a2d12'); g.addColorStop(1, '#1d0d04');
+  poly(of); c.fillStyle = g; c.fill();
+  g = c.createLinearGradient(0, o[2].y, 0, o[0].y); g.addColorStop(0, '#3a1c09'); g.addColorStop(1, '#7a421c');
+  poly(o); c.fillStyle = g; c.fill();
+  // Tuch mit Lampenlicht
+  const cl = cloth();
+  const t = [P(-LB_TW, 0, 0.001), P(LB_TW, 0, 0.001), P(LB_TW, LB_TL, 0.001), P(-LB_TW, LB_TL, 0.001)];
+  poly(t); c.fillStyle = cl.band; c.fill();
+  const tc = P(0, LB_TL * 0.45), lr = (t[1].x - t[0].x) * 0.8;
+  g = c.createRadialGradient(tc.x, tc.y, 5, tc.x, tc.y, lr);
+  g.addColorStop(0, cl.cush[0]); g.addColorStop(0.45, cl.main); g.addColorStop(1, cl.band);
+  c.save(); poly(t); c.clip(); c.fillStyle = g; c.fillRect(0, 0, W2, H2);
+  // Banden-Schatten
+  c.globalAlpha = 0.35; c.strokeStyle = '#000'; c.lineWidth = 6; poly(t); c.stroke(); c.globalAlpha = 1;
+  c.restore();
+  // Taschen
+  for (const [px, pz] of [[-LB_TW, 0], [LB_TW, 0], [-LB_TW, LB_TL / 2], [LB_TW, LB_TL / 2], [-LB_TW, LB_TL], [LB_TW, LB_TL]]) {
+    const p = P(px, pz, 0.002), r = 0.065 * p.k;
+    c.beginPath(); c.ellipse(p.x, p.y, r, r * 0.62, 0, 0, TAU); c.fillStyle = '#050403'; c.fill();
+    c.strokeStyle = 'rgba(160,140,110,.35)'; c.lineWidth = 1.5; c.stroke();
+  }
+  // Kugeln (hinten zuerst), mit Schatten und Rollen
+  const order = LB.balls.slice().sort((a, b) => b.z - a.z);
+  for (const b of order) {
+    const p = P(b.x, b.z, LB_R), r = LB_R * p.k;
+    const sp = P(b.x + 0.012, b.z + 0.02, 0.001);
+    c.beginPath(); c.ellipse(sp.x, sp.y, r * 1.05, r * 0.55, 0, 0, TAU); c.fillStyle = 'rgba(0,0,0,.45)'; c.fill();
+    const dxs = p.x - (b.sx || p.x), dys = p.y - (b.sy || p.y), dd = Math.hypot(dxs, dys);
+    if (dd > 0.01 && b.sx) { b.M = mul3(rotAxis(-dys / dd, dxs / dd, 0, dd / r), b.M); b.ver++; if (b.ver % 40 === 0) b.M = orthonorm(b.M); }
+    b.sx = p.x; b.sy = p.y;
+    const rpx = Math.max(3, r * d), s = ballSprite('lb' + b.n, b.n, b.M, b.ver + '@' + Math.round(rpx), rpx);
+    const hs = s.size / 2 / d;
+    c.drawImage(s.cv, p.x - hs, p.y - hs, hs * 2, hs * 2);
+  }
+  // Lampe und Lichtkegel mit Staub
+  const lx = W2 / 2, ly = -10;
+  g = c.createLinearGradient(0, 0, 0, H2 * 0.8);
+  g.addColorStop(0, 'rgba(255,236,190,.16)'); g.addColorStop(1, 'rgba(255,236,190,0)');
+  c.beginPath(); c.moveTo(lx - W2 * 0.12, ly); c.lineTo(lx + W2 * 0.12, ly); c.lineTo(lx + W2 * 0.42, H2 * 0.8); c.lineTo(lx - W2 * 0.42, H2 * 0.8); c.closePath();
+  c.fillStyle = g; c.fill();
+  for (const q of LB.dust) {
+    q.y -= q.v * dt * 0.6; q.a += dt; if (q.y < 0) { q.y = 1; q.x = Math.random(); }
+    const x = lx + (q.x - 0.5) * W2 * 0.5 * (0.4 + q.y) + Math.sin(q.a) * 6, y = q.y * H2 * 0.8;
+    c.fillStyle = 'rgba(255,240,200,' + (0.25 * (1 - q.y)) + ')'; c.fillRect(x, y, 1.6, 1.6);
+  }
+  // Vignette
+  g = c.createRadialGradient(W2 / 2, H2 / 2, Math.min(W2, H2) * 0.35, W2 / 2, H2 / 2, Math.max(W2, H2) * 0.75);
+  g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,.7)');
+  c.fillStyle = g; c.fillRect(0, 0, W2, H2);
+}
+
+// ===================== 3D-Kugel als Symbol (Logo, Ladebildschirm) =====================
+const HERO = {M: mul3(rotAxis(1, 0, 0, 0.35), rotAxis(0, 1, 0, -0.5)), ver: 0};
+function drawHeroBall(canvas, n, dt, speed) {
+  const w = canvas.clientWidth, d = Math.min(window.devicePixelRatio || 1, 2);
+  if (!w) return;
+  if (canvas.width !== Math.round(w * d)) { canvas.width = canvas.height = Math.round(w * d); }
+  HERO.M = mul3(rotAxis(0.25, 1, 0.1, dt * (speed || 0.8)), HERO.M); HERO.ver++;
+  if (HERO.ver % 50 === 0) HERO.M = orthonorm(HERO.M);
+  const rpx = canvas.width / 2 - 2, s = ballSprite('hero' + canvas.id, n, HERO.M, HERO.ver, rpx);
+  const c = canvas.getContext('2d');
+  c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, canvas.width, canvas.height);
+  c.drawImage(s.cv, (canvas.width - s.size) / 2, (canvas.height - s.size) / 2);
+}
+
+// ===================== Ladebildschirm =====================
+const TIPS = [
+  'Tipp: Ziele immer auf die Geisterkugel – nicht auf die Kugel selbst.',
+  'Tipp: Mit ▲ und ▼ drehst du das Ziel in 0,01°-Schritten.',
+  'Tipp: Effet unten bringt die Weiße zurück, oben läuft sie nach.',
+  'Tipp: In den Lektionen lernst du jeden Stoß Schritt für Schritt.',
+  'Tipp: Hol dir jeden Tag deinen Tagesbonus in der Lobby.',
+  'Tipp: Mit „Linien: Aus“ gibt es in der Trefferserie doppelte Punkte.',
+  'Tipp: Online spielst du direkt von Handy zu Handy – ohne Server.'
+];
+function startLoading() {
+  const tasks = [
+    ['Kugeln werden poliert …', () => { for (let n = 1; n <= 15; n++) glyph(n); }],
+    ['Tisch wird aufgebaut …', () => { layout(); drawTableBase(); }],
+    ['Licht wird eingestellt …', () => { for (let n = 0; n <= 15; n++) ballSprite('ti' + n, n, IDENT3, 'i' + R * L.s * DPR, R * L.s * DPR); }],
+    ['Queue wird gekreidet …', () => { initLobbyBg(); lobbyResize(); }],
+    ['Fertig!', () => {}]
+  ];
+  let i = 0, shown = 0;
+  const t0 = performance.now();
+  $('ldTip').textContent = TIPS[Math.floor(Math.random() * TIPS.length)];
+  const tick = now => {
+    const target = (i / tasks.length) * 100;
+    shown += (target - shown) * 0.18 + 0.4;
+    shown = Math.min(shown, target);
+    $('ldBar').style.width = shown.toFixed(1) + '%';
+    $('ldPct').textContent = Math.round(shown) + ' %';
+    drawHeroBall($('ldBall'), 8, 1 / 60, 2.2);
+    if (i < tasks.length && shown >= target - 1) {
+      $('ldText').textContent = tasks[i][0];
+      try { tasks[i][1](); } catch (e) {}
+      i++;
+    }
+    if (i >= tasks.length && shown >= 99 && now - t0 > 1800) {
+      $('loader').classList.add('fade');
+      setTimeout(() => hide('loader'), 600);
+      return;
+    }
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}
+
+// Im Browser: Querformat und Vollbild anbieten
+function tryFullscreen() {
+  if (window.AndroidBridge) return;
+  const el = document.documentElement;
+  try {
+    if (!document.fullscreenElement && el.requestFullscreen) el.requestFullscreen().then(() => { try { screen.orientation.lock('landscape').catch(() => {}); } catch (e) {} }).catch(() => {});
+  } catch (e) {}
+}
+
 // ===================== Wiederholung =====================
 function copyOrient(src) {
   const o = {}; src = src || G.orient;
@@ -2860,7 +3104,7 @@ document.querySelectorAll('.seg[data-k]').forEach(seg => seg.addEventListener('c
   saveCfg(); syncMenu();
 }));
 document.querySelectorAll('.tile').forEach(t => t.onclick = () => {
-  initAudio();
+  initAudio(); tryFullscreen();
   const go = t.dataset.go;
   if (go === 'ai' || go === 'human') { CFG.opp = go; saveCfg(); if (G && G.online) netReset(); newGame(); }
   else if (go === 'online') { CFG.opp = 'online'; saveCfg(); openOnline(); }
@@ -2987,12 +3231,14 @@ function frame(now) {
       shoot();
     }
   }
-  draw();
+  if (!$('menu').classList.contains('hidden')) { drawLobbyBg(now, dt); drawHeroBall($('heroBall'), 8, dt, 0.7); }
+  else draw();
   applyShake();
   requestAnimationFrame(frame);
 }
 window.addEventListener('resize', () => { layout(); });
 layout(); syncMenu(); updateUI(); show('menu');
+startLoading();
 requestAnimationFrame(frame);
 </script>
 </body>

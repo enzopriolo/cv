@@ -1075,6 +1075,7 @@ function launchShot() {
   vibrate(10 + Math.round(G.power * 30));
   G.shotCalled = G.called;
   G.shotLines = CFG.lines;
+  G.shotPred = linesMode() === 'all' && !G.ai[G.cur] ? getPrediction() : null;
   const S = newSim(G.balls, shotParams());
   S.snd = []; S.sunk = 0; S.cueSunk = false;
   G.live = S; G.state = 'moving'; G.pred = null;
@@ -1293,8 +1294,8 @@ function soloFinish(ev) {
     track('lucky');
     const p = ev.potted.find(q => q.n === 1);
     if (p && !scratch) { so.prize = so.prizes[p.pocket]; return endSolo(true, 'Treffer! Die 1 fiel in die Tasche mit ' + so.prize + ' Münzen.'); }
-    so.prize = 10;
-    return endSolo(false, scratch ? 'Die Weiße ist gefallen – 10 Trostmünzen.' : 'Leider daneben – 10 Trostmünzen.');
+    so.prize = 0;
+    return endSolo(false, scratch ? 'Die Weiße ist gefallen – leider kein Gewinn.' : 'Leider daneben – kein Gewinn.');
   }
   if (so.type === 'target') {
     so.shots++;
@@ -1388,7 +1389,7 @@ function endSolo(win, text, stars) {
   let title;
   showReward(0, 0);
   if (so.type === 'arcade') { track('arcade', so.score); const c = Math.min(400, Math.floor(so.score / 40)), xp = Math.floor(so.score / 120); showReward(gain(c, xp), xp); }
-  if (so.type === 'lucky') { showReward(gain(so.prize || 10, 10), 10); if (win) { confetti(); playSound('win', 0); } title = win ? '🍀 Glückstreffer!' : 'Kein Glück'; }
+  if (so.type === 'lucky') { if (win) showReward(gain(so.prize, 10), 10); if (win) { confetti(); playSound('win', 0); } title = win ? '🍀 Glückstreffer!' : 'Kein Glück'; }
   if (so.type === 'target') { const c = Math.floor(so.score / 10), xp = Math.floor(so.score / 20); showReward(gain(c, xp), xp); if (so.score >= 200) confetti(); title = '🎯 ' + so.score + ' Punkte'; }
   if (so.type === 'levels') {
     if (win) {
@@ -2293,9 +2294,11 @@ function renderLobby() {
 // Belohnung für eine beendete Partie (8-Ball / 9-Ball)
 function rewardGame(winner) {
   const li = localIdx(), won = winner === li;
+  // Nur ein Sieg wird belohnt
+  if (!won) { showReward(0, 0); return; }
   let c, x;
-  if (G.online) { c = won ? 80 : 10; x = won ? 60 : 20; }
-  else if (G.ai[1]) { c = won ? [30, 60, 120][G.diff] : 5; x = won ? [30, 45, 70][G.diff] : 15; }
+  if (G.online) { c = 80; x = 60; }
+  else if (G.ai[1]) { c = [30, 60, 120][G.diff]; x = [30, 45, 70][G.diff]; }
   else { c = 10; x = 15; }
   showReward(gain(c, x), x);
 }
@@ -4703,6 +4706,9 @@ function draw() {
     S = getPrediction();
     if (!G.calledManual && needCall() && G.state === 'aim') { const e = S.ev.potted.find(p => p.n === 8); G.called = e ? e.pocket : null; }
     drawPrediction(S);
+  } else if (G.state === 'moving' && G.shotPred && linesMode() === 'all') {
+    // Bei „Alle“ bleiben die Bahnen während des Stoßes sichtbar – die Kugeln laufen genau darauf
+    ctx.save(); ctx.globalAlpha = 0.55; drawPrediction(G.shotPred); ctx.restore();
   }
   for (const b of balls) if (b.on) drawBall(b.n, b.x, b.y, G.dragging && b.n === G.dragN ? 1.14 : 1);
   if (humanAim) drawTargetGlow(now, false);

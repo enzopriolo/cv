@@ -33,19 +33,19 @@ html,body{margin:0;height:100%;background:var(--bg);overflow:hidden;touch-action
 .lobbyOpts .seg{background:rgba(10,18,15,.55)}
 .lobbyOpts span{text-shadow:0 1px 3px #000}
 .tiles{perspective:800px}
-.tile{transform-style:preserve-3d;transform:rotateX(8deg);transition:transform .18s,box-shadow .18s;box-shadow:0 14px 28px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.25),inset 0 -6px 14px rgba(0,0,0,.35);animation:tileIn .6s cubic-bezier(.2,.9,.3,1.2) backwards}
+.tile{transform-style:preserve-3d;box-shadow:0 22px 40px rgba(0,0,0,.65),inset 0 1px 0 rgba(255,255,255,.3),inset 0 -10px 22px rgba(0,0,0,.35)}
 .tile:nth-child(1){animation-delay:.05s}.tile:nth-child(2){animation-delay:.1s}.tile:nth-child(3){animation-delay:.15s}
 .tile:nth-child(4){animation-delay:.2s}.tile:nth-child(5){animation-delay:.25s}.tile:nth-child(6){animation-delay:.3s}
 @keyframes tileIn{from{opacity:0;transform:rotateX(50deg) translateY(30px) scale(.9)}}
-.tile:active{transform:rotateX(0) translateY(3px) scale(.97);box-shadow:0 4px 10px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.2)}
+.tile:active{filter:brightness(1.15)}
 .tile::before{content:'';position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.22) 45%,transparent 60%);transform:translateX(-120%);animation:shine 5s ease-in-out infinite}
 .tile:nth-child(2)::before{animation-delay:.8s}.tile:nth-child(3)::before{animation-delay:1.6s}.tile:nth-child(4)::before{animation-delay:2.4s}.tile:nth-child(5)::before{animation-delay:3.2s}.tile:nth-child(6)::before{animation-delay:4s}
 @keyframes shine{0%,70%{transform:translateX(-120%)}100%{transform:translateX(120%)}}
 .tile::after{content:'';position:absolute;left:0;right:0;top:0;height:45%;background:linear-gradient(rgba(255,255,255,.16),transparent);border-radius:16px 16px 0 0;pointer-events:none}
-.tile em{transform:translateZ(30px);animation:float 3.2s ease-in-out infinite}
+.tile em{transform:translateZ(60px);animation:float 3.2s ease-in-out infinite}
 .tile:nth-child(even) em{animation-delay:1.2s}
 @keyframes float{0%,100%{translate:0 0}50%{translate:0 -5px}}
-.tile b,.tile small{transform:translateZ(18px);text-shadow:0 2px 4px rgba(0,0,0,.6);position:relative;z-index:1}
+.tile b,.tile small{transform:translateZ(30px);text-shadow:0 2px 4px rgba(0,0,0,.6);position:relative;z-index:1}
 .lobbyBar button{background:rgba(20,32,27,.7);box-shadow:0 6px 14px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.08)}
 #loader{position:fixed;inset:0;z-index:100;background:radial-gradient(ellipse at 50% 35%,#1d3a30 0%,#0a1411 55%,#030605 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;transition:opacity .6s}
 #loader.fade{opacity:0}
@@ -78,11 +78,18 @@ html,body{margin:0;height:100%;background:var(--bg);overflow:hidden;touch-action
 .daily.ready{background:linear-gradient(#f2b632,#d58a10);color:#2a1a00;border-color:#ffd75a;animation:pulse 1.2s infinite}
 @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
 .lobbyOpts{display:flex;align-items:center;gap:10px;flex-wrap:wrap;color:var(--muted);font-size:13px}
-.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.tile{position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:12px 14px;min-height:min(19vh,110px);text-align:left;color:#fff;cursor:pointer;display:flex;flex-direction:column;justify-content:flex-end;box-shadow:0 6px 18px rgba(0,0,0,.45)}
+#menu .lobbyWrap{height:100%;max-height:none}
+.carWrap{position:relative;flex:1;min-height:150px;display:flex}
+#carousel{flex:1;display:flex;gap:14px;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;padding:8px calc(50% - 150px);align-items:center;scrollbar-width:none;perspective:1100px;-webkit-overflow-scrolling:touch}
+#carousel::-webkit-scrollbar{display:none}
+.carArrow{position:absolute;top:50%;transform:translateY(-50%);z-index:3;width:38px;height:54px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:rgba(10,18,15,.6);color:#fff;font-size:30px;line-height:1;backdrop-filter:blur(6px)}
+.carArrow.l{left:4px}.carArrow.r{right:4px}
+.tile{position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.18);border-radius:22px;padding:16px 18px;flex:0 0 300px;height:min(100%,250px);scroll-snap-align:center;text-align:left;color:#fff;cursor:pointer;display:flex;flex-direction:column;justify-content:flex-end;gap:2px;box-shadow:0 6px 18px rgba(0,0,0,.45);will-change:transform}
+.tile p{margin:4px 0 6px;font-size:12.5px;opacity:.85;line-height:1.3;transform:translateZ(14px)}
+.tile .play{align-self:flex-start;background:rgba(255,255,255,.92);color:#122;border-radius:20px;padding:6px 14px;font-weight:800;font-size:13px;box-shadow:0 4px 10px rgba(0,0,0,.4);transform:translateZ(26px)}
 .tile:active{transform:scale(.97)}
-.tile em{position:absolute;right:10px;top:4px;font-style:normal;font-size:42px;opacity:.9;filter:drop-shadow(0 3px 6px rgba(0,0,0,.5))}
-.tile b{font-size:17px}.tile small{font-size:12px;opacity:.85}
+.tile em{position:absolute;right:12px;top:6px;font-style:normal;font-size:60px;opacity:.95;filter:drop-shadow(0 10px 14px rgba(0,0,0,.6))}
+.tile b{font-size:24px;letter-spacing:.3px}.tile small{font-size:13px;opacity:.9;color:#ffe28a}
 .t1{background:linear-gradient(135deg,#1f6f8f,#0d3447)}.t2{background:linear-gradient(135deg,#2f7d4f,#123a24)}.t3{background:linear-gradient(135deg,#6a3fa8,#2a1450)}
 .t4{background:linear-gradient(135deg,#c58a12,#5e3b05)}.t5{background:linear-gradient(135deg,#c23a2a,#5a120a)}.t6{background:linear-gradient(135deg,#3a6f7a,#122e33)}
 #lbMsg{color:var(--accent);font-size:13px;text-align:center;min-height:16px}
@@ -105,6 +112,9 @@ html,body{margin:0;height:100%;background:var(--bg);overflow:hidden;touch-action
 .card.active{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
 .card .prev{width:100%;height:24px}
 .g-tables .card .prev{height:64px}.g-balls .card .prev{height:40px}
+.stats4{display:grid;grid-template-columns:auto 1fr;gap:1px 5px;align-items:center;font-size:9px;color:var(--muted)}
+.stats4 i{height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden}
+.stats4 b{display:block;height:100%;background:linear-gradient(90deg,#3fb68b,#f2b632)}
 .tierBadge{align-self:center;font-size:9px;font-weight:800;border:1px solid;border-radius:6px;padding:0 6px;background:rgba(0,0,0,.45);letter-spacing:.5px;text-transform:uppercase}
 .card.tier1{background:linear-gradient(160deg,#173049,#14221e)}
 .card.tier2{background:linear-gradient(160deg,#30184a,#14221e);border-color:#6a3fa8}
@@ -216,13 +226,17 @@ input.name{background:#0c1512;color:var(--text);border:1px solid var(--line);bor
       <span>Spiel</span><div class="seg" data-k="mode"><button data-v="8">8-Ball</button><button data-v="9">9-Ball</button></div>
       <span>Computer</span><div class="seg" data-k="diff"><button data-v="0">Leicht</button><button data-v="1">Mittel</button><button data-v="2">Schwer</button></div>
     </div>
-    <div class="tiles">
-      <button class="tile t1" data-go="ai"><em>🤖</em><b>Gegen Computer</b><small id="tAi"></small></button>
-      <button class="tile t2" data-go="human"><em>👥</em><b>2 Spieler</b><small>An einem Handy</small></button>
-      <button class="tile t3" data-go="online"><em>🌐</em><b>Online</b><small>Mit Freunden, ohne Server</small></button>
-      <button class="tile t4" data-go="levels"><em>🏆</em><b>Herausforderungen</b><small id="tLv"></small></button>
-      <button class="tile t5" data-go="arcade"><em>⚡</em><b>Trefferserie</b><small id="tArc"></small></button>
-      <button class="tile t6" data-go="training"><em>🎯</em><b>Training</b><small>Kugeln frei setzen</small></button>
+    <div class="carWrap">
+      <button class="carArrow l" id="carL">‹</button>
+      <div id="carousel">
+        <button class="tile t1" data-go="ai"><em>🤖</em><b>Gegen Computer</b><small id="tAi"></small><p>Spiele 8-Ball oder 9-Ball gegen drei Stärken.</p><span class="play">Spielen ▶</span></button>
+        <button class="tile t4" data-go="levels"><em>🏆</em><b>Herausforderungen</b><small id="tLv"></small><p>Lektionen und 20 Aufgaben mit Belohnungen.</p><span class="play">Spielen ▶</span></button>
+        <button class="tile t3" data-go="online"><em>🌐</em><b>Online</b><small>Mit Freunden, ohne Server</small><p>Direkt von Handy zu Handy per Code.</p><span class="play">Spielen ▶</span></button>
+        <button class="tile t5" data-go="arcade"><em>⚡</em><b>Trefferserie</b><small id="tArc"></small><p>Endlos versenken, Serie aufbauen, Rekord jagen.</p><span class="play">Spielen ▶</span></button>
+        <button class="tile t2" data-go="human"><em>👥</em><b>2 Spieler</b><small>An einem Handy</small><p>Abwechselnd stoßen, ohne Internet.</p><span class="play">Spielen ▶</span></button>
+        <button class="tile t6" data-go="training"><em>🎯</em><b>Training</b><small>Kugeln frei setzen</small><p>Jeden Stoß in Ruhe üben – mit allen Linien.</p><span class="play">Spielen ▶</span></button>
+      </div>
+      <button class="carArrow r" id="carR">›</button>
     </div>
     <div id="lbMsg"></div>
     <div class="lobbyBar">
@@ -413,7 +427,7 @@ function onSet(bs) { const s = new Set(); for (const b of bs) if (b.on && b.n > 
 function newSim(balls, shot) {
   const bs = cloneBalls(balls);
   const cue = getBall(bs, 0);
-  const v = Math.max(0.02, shot.power) * MAXV;
+  const v = Math.max(0.02, shot.power) * MAXV * (shot.force || 1);
   cue.vx = Math.cos(shot.angle) * v; cue.vy = Math.sin(shot.angle) * v;
   return {balls: bs, t: 0, sx: shot.sx || 0, sy: shot.sy || 0, spinUsed: false, cueTravel: 0, contact: null,
     ev: {first: null, cueOut: false, railAfter: false, railBalls: new Set(), railCount: {}, touched: new Set(), potted: [], cuePotted: false}, paths: null, snd: null};
@@ -503,9 +517,10 @@ function stepSim(S) {
     if (!b.on) continue;
     const pk = pocketCheck(b);
     if (pk >= 0) {
+      b.pvx = b.vx; b.pvy = b.vy;
       b.on = false; b.vx = b.vy = 0;
       if (S.paths) S.paths[b.n].push([POCKETS[pk].x, POCKETS[pk].y]);
-      if (b.n === 0) ev.cuePotted = true; else ev.potted.push({n: b.n, pocket: pk});
+      if (b.n === 0) { ev.cuePotted = true; ev.cueV = {vx: b.pvx || 0, vy: b.pvy || 0}; } else ev.potted.push({n: b.n, pocket: pk, vx: b.pvx || 0, vy: b.pvy || 0});
       if (S.snd) S.snd.push({t: 'pocket', v: 1});
       continue;
     }
@@ -520,7 +535,8 @@ function stepSim(S) {
       b.x = cx + nx * R; b.y = cy + ny * R;
       if (vn < 0) {
         const tvx = b.vx - vn * nx, tvy = b.vy - vn * ny;
-        b.vx = tvx * CUSH_T - E_CUSH * vn * nx; b.vy = tvy * CUSH_T - E_CUSH * vn * ny;
+        const e = clamp(0.86 - 0.00042 * -vn, 0.62, 0.86);
+        b.vx = tvx * CUSH_T - e * vn * nx; b.vy = tvy * CUSH_T - e * vn * ny;
         if (b.n === 0 && S.sx !== 0) {
           // Seiteneffet verändert den Abprallwinkel an der Bande
           const k = -0.42 * S.sx * (-vn);
@@ -529,7 +545,7 @@ function stepSim(S) {
         if (ev.first !== null) ev.railAfter = true;
         else if (b.n === 0) { ev.kick = true; if (!S.cueRail) S.cueRail = {x: b.x, y: b.y}; }
         if (b.n > 0) { ev.railBalls.add(b.n); ev.railCount[b.n] = (ev.railCount[b.n] || 0) + 1; }
-        if (S.snd) S.snd.push({t: 'rail', v: -vn});
+        if (S.snd) S.snd.push({t: 'rail', v: -vn, x: cx, y: cy});
         recPath(S, b, true);
       }
     }
@@ -700,10 +716,40 @@ function aimDefault() {
   G.aim = Math.atan2(ty - cue.y, tx - cue.x);
 }
 
+// Zeitlimit pro Stoß (nicht in Lektionen, Herausforderungen und Training)
+const timedGame = () => G && (G.mode !== 0 || G.solo.type === 'arcade');
+function turnTime() { return 25 + cueStats(G.cur).time; }
+function timeoutFoul() {
+  ptrs.clear(); G.dragging = false; G.spinUI = false;
+  const P = G.players[G.cur];
+  playSound('foul', 0); vibrate(80);
+  if (G.mode === 0) {
+    const so = G.solo; so.lives--; so.combo = 0;
+    if (so.lives <= 0) { const rec = so.score > SOLO.hi; if (rec) { SOLO.hi = so.score; saveSolo(); } endSolo(false, 'Zeit abgelaufen. ' + so.score + ' Punkte'); return; }
+    toast('⏱ Zeit abgelaufen – ein Leben weniger.'); startTurn(); return;
+  }
+  STATS.fouls++; saveStats();
+  if (G.mode === 9) { P.fouls++; if (P.fouls >= 3) { endGame(1 - G.cur, 'Drei Fouls in Folge (' + P.name + ').'); if (G.online) netSend({t: 'state', g: snapshot()}); return; } }
+  G.cur = 1 - G.cur;
+  if (!G.isBreak) G.bih = 'any';
+  toast('⏱ Zeit abgelaufen – Foul! Ball in Hand für ' + G.players[G.cur].name + '.', 3500);
+  G.pushAvail = false;
+  startTurn();
+  if (G.online) netSend({t: 'state', g: snapshot()});
+}
+function tickTimer(dt) {
+  if (!timedGame() || G.state !== 'aim' || G.turnT === undefined) return;
+  // Bei Online-Partien zählt nur das Gerät des Spielers am Zug verbindlich
+  G.turnT -= dt;
+  const sec = Math.ceil(G.turnT);
+  if (sec <= 5 && sec > 0 && sec !== G.lastBeep && isHumanTurn()) { G.lastBeep = sec; playSound('tick', 0); }
+  if (G.turnT <= 0) { G.turnT = 0; if (isHumanTurn()) timeoutFoul(); }
+}
 function startTurn() {
   G.state = 'aim'; G.sx = 0; G.sy = 0; G.called = null; G.calledManual = false; G.pushShot = false;
   aimDefault();
-  if (G.isBreak) G.power = 0.9; else if (G.power > 0.7 || G.power < 0.05) G.power = 0.5;
+  if (G.isBreak) G.power = 0.9; else if (G.power < 0.05) G.power = 0.5;
+  G.turnT = timedGame() ? turnTime() : undefined; G.lastBeep = 0;
   if (G.ai[G.cur]) startAI();
   updateUI();
 }
@@ -733,11 +779,11 @@ function strikeOffset(now) {
 function launchShot() {
   G.before = onSet(G.balls);
   G.beforeBalls = cloneBalls(G.balls);
-  G.lastShot = {balls: G.beforeBalls, shot: {angle: G.aim, power: G.power, sx: G.sx, sy: G.sy}, orient: copyOrient()};
+  G.lastShot = {balls: G.beforeBalls, shot: shotParams(), orient: copyOrient()};
   vibrate(10 + Math.round(G.power * 30));
   G.shotCalled = G.called;
   G.shotLines = CFG.lines;
-  const S = newSim(G.balls, {angle: G.aim, power: G.power, sx: G.sx, sy: G.sy});
+  const S = newSim(G.balls, shotParams());
   S.snd = []; S.sunk = 0; S.cueSunk = false;
   G.live = S; G.state = 'moving'; G.pred = null;
   playSound('cue', G.power);
@@ -1112,14 +1158,14 @@ const DEMO = {
   l1: {angle: 0.464121, power: 0.5, sx: 0, sy: 0},
   l2: {angle: -0.203941, power: 0.45, sx: 0, sy: 0},
   combo: {angle: 2.694753, power: 0.55, sx: 0, sy: 0},
-  bank4: {angle: 0.187623, power: 0.5, sx: 0, sy: 0},
-  kick: {angle: 0.687223, power: 0.6, sx: 0, sy: 0},
-  bank14: {angle: 0.602139, power: 0.6, sx: 0, sy: 0},
+  bank4: {angle: 0.154898, power: 0.5, sx: 0, sy: 0},
+  kick: {angle: 0.667588, power: 0.6, sx: 0, sy: 0},
+  bank14: {angle: 0.584685, power: 0.6, sx: 0, sy: 0},
   stop: {angle: 0.464121, power: 0.15, sx: 0, sy: -0.4},
-  follow: {angle: -0.509647, power: 0.35, sx: 0, sy: 0.6},
+  follow: {angle: -0.503647, power: 0.4, sx: 0, sy: 0.4},
   draw: {angle: 0.464121, power: 0.45, sx: 0, sy: -0.8},
-  effet: {angle: 0.457621, power: 0.8, sx: -0.7, sy: 0.3},
-  noeffet: {angle: 0.457621, power: 0.8, sx: 0, sy: 0.3},
+  effet: {angle: 0.471121, power: 0.9, sx: -0.7, sy: 0.6},
+  noeffet: {angle: 0.471121, power: 0.9, sx: 0, sy: 0.6},
   position: {angle: -1.122127, power: 0.4, sx: 0, sy: -0.4},
   brk: {angle: 0, power: 0.95, sx: 0, sy: -0.25}
 };
@@ -1155,12 +1201,12 @@ const LESSONS = [
     {level: 10, title: 'Wo du die Weiße triffst', text: 'Der Treffpunkt auf der Weißen bestimmt, was sie nach dem Zusammenstoß macht. Mitte oder knapp darunter: Die Weiße bleibt stehen (Stoppball). Oben: Sie läuft hinterher (Nachläufer). Unten: Sie kommt zurück (Rückläufer). Einstellen kannst du das mit der Effet-Kugel rechts oben.',
       marks: [{t: 'spin', sx: 0, sy: -0.4, label: 'Stopp'}, {t: 'zone'}]},
     {title: 'Stoppball', text: 'Mit wenig Kraft und etwas Effet unter der Mitte rutscht die Weiße ohne Drehung in die Objektkugel. Dann gibt sie ihre ganze Geschwindigkeit ab und bleibt genau an der Stelle der Geisterkugel liegen.', demo: 'stop', marks: [{t: 'zone'}, {t: 'spin', sx: 0, sy: -0.4, label: 'leicht unten'}]},
-    {level: 11, title: 'Nachläufer', text: 'Triffst du die Weiße oberhalb der Mitte, dreht sie sich vorwärts. Nach dem Treffer läuft sie der Objektkugel hinterher. So bringst du die Weiße nach vorne in Position – aber Vorsicht, dass sie nicht mit in die Tasche rollt.', demo: 'follow', marks: [{t: 'zone'}, {t: 'spin', sx: 0, sy: 0.6, label: 'oben'}]},
+    {level: 11, title: 'Nachläufer', text: 'Triffst du die Weiße oberhalb der Mitte, dreht sie sich vorwärts. Nach dem Treffer läuft sie der Objektkugel hinterher. So bringst du die Weiße nach vorne in Position – aber Vorsicht, dass sie nicht mit in die Tasche rollt.', demo: 'follow', marks: [{t: 'zone'}, {t: 'spin', sx: 0, sy: 0.4, label: 'oben'}]},
     {level: 6, title: 'Rückläufer', text: 'Triffst du die Weiße weit unten, dreht sie sich rückwärts. Nach dem Treffer kommt sie zurück. Je weiter die Weiße vorher rollt, desto mehr Rückdrehung verliert sie – bei langen Stößen brauchst du deshalb mehr Kraft.', demo: 'draw', marks: [{t: 'zone'}, {t: 'spin', sx: 0, sy: -0.8, label: 'weit unten'}]}
   ],
   [ // Seiteneffet
     {level: 17, title: 'Seiteneffet wirkt an der Bande', text: 'Seiteneffet verändert vor allem, wie die Weiße von der Bande abprallt. Auf dem Tisch siehst du zwei Bahnen desselben Stoßes: gestrichelt grau ohne Seiteneffet, blau mit Linkseffet. Mit Linkseffet springt die Weiße anders von der Bande ab und erreicht den goldenen Kreis.',
-      marks: [{t: 'zone'}, {t: 'comparePath', a: 'noeffet', b: 'effet'}, {t: 'spin', sx: -0.7, sy: 0.3, label: 'links + oben'}]},
+      marks: [{t: 'zone'}, {t: 'comparePath', a: 'noeffet', b: 'effet'}, {t: 'spin', sx: -0.7, sy: 0.6, label: 'links + oben'}]},
     {title: 'Vorführung', text: 'Merke dir: Rechtseffet schickt die Weiße nach der Bande weiter nach rechts (aus deiner Sicht), Linkseffet nach links. Starker Seiteneffet macht Stöße ungenauer – nutze ihn nur, wenn du ihn wirklich brauchst.', demo: 'effet', marks: [{t: 'zone'}]}
   ],
   [ // Stellungsspiel
@@ -1502,6 +1548,8 @@ function playSound(type, v) {
       [523, 659, 784, 1047].forEach((f, i) => tone(f, t + i * 0.12, 0.4, 0.16, 'triangle'));
     } else if (type === 'foul') {
       tone(240, t, 0.32, 0.16, 'sawtooth', 140);
+    } else if (type === 'tick') {
+      tone(1200, t, 0.05, 0.12, 'square');
     } else if (type === 'chat') {
       tone(880, t, 0.09, 0.12, 'sine'); tone(1320, t + 0.08, 0.12, 0.1, 'sine');
     }
@@ -1816,6 +1864,11 @@ function renderShop() {
     badge.style.color = TIERS[tier].col; badge.style.borderColor = TIERS[tier].col; card.appendChild(badge);
     const prev = document.createElement('canvas'); prev.className = 'prev'; card.appendChild(prev);
     const t = document.createElement('div'); t.className = 'cname'; t.textContent = it.name; card.appendChild(t);
+    if (shopTab === 'cues') {
+      const st = CUE_STATS[id] || [1, 1, 1, 1], box = document.createElement('div'); box.className = 'stats4';
+      ['Kraft', 'Zielen', 'Effet', 'Zeit'].forEach((nm, k) => { box.innerHTML += '<span>' + nm + '</span><i><b style="width:' + st[k] * 10 + '%"></b></i>'; });
+      card.appendChild(box);
+    }
     const btn = document.createElement('button');
     if (it.active) { btn.textContent = '✓ Ausgerüstet'; btn.disabled = true; }
     else if (it.owned) { btn.textContent = 'Ausrüsten'; btn.className = 'eq'; }
@@ -2090,15 +2143,19 @@ function endReplay() {
 function trackSinking(S, now) {
   while (S.sunk < S.ev.potted.length) {
     const q = S.ev.potted[S.sunk++], b = getBall(S.balls, q.n);
-    SINKING.push({n: q.n, x: b.x, y: b.y, k: q.pocket, t0: now}); vibrate(18);
+    SINKING.push({n: q.n, x: b.x, y: b.y, k: q.pocket, t0: now, vx: q.vx, vy: q.vy}); vibrate(18);
   }
   if (S.ev.cuePotted && !S.cueSunk) {
-    S.cueSunk = true; const b = getBall(S.balls, 0), k = pocketCheck(b);
-    SINKING.push({n: 0, x: b.x, y: b.y, k: k < 0 ? 0 : k, t0: now});
+    S.cueSunk = true; const b = getBall(S.balls, 0), k = pocketCheck(b), v = S.ev.cueV || {vx: 0, vy: 0};
+    SINKING.push({n: 0, x: b.x, y: b.y, k: k < 0 ? 0 : k, t0: now, vx: v.vx, vy: v.vy});
   }
   if (S.snd.length) {
     let n = 0;
-    for (const e of S.snd) { if (e.t === 'ball' && e.v > 420) SHAKE = Math.max(SHAKE, Math.min(7, e.v / 110)); if (n++ < 5) playSound(e.t, e.v); }
+    for (const e of S.snd) {
+      if (e.t === 'ball' && e.v > 420) SHAKE = Math.max(SHAKE, Math.min(7, e.v / 110));
+      if (e.t === 'rail' && e.v > 60 && RAILHITS.length < 12) RAILHITS.push({x: e.x, y: e.y, v: e.v, t0: now});
+      if (n++ < 5) playSound(e.t, e.v);
+    }
     S.snd.length = 0;
   }
 }
@@ -2615,6 +2672,20 @@ function paintTable(c, o) {
   cush(SEGS[0][0], 0, SEGS[0][2], 0, 0, -1); cush(SEGS[1][0], 0, SEGS[1][2], 0, 0, -1);
   cush(SEGS[2][0], H, SEGS[2][2], H, 0, 1); cush(SEGS[3][0], H, SEGS[3][2], H, 0, 1);
   cush(0, SEGS[4][1], 0, SEGS[4][3], -1, 0); cush(W, SEGS[5][1], W, SEGS[5][3], 1, 0);
+  // Gummi-Nase mit Glanzlinie und abgerundete Ecken an den Taschen
+  for (const sg of SEGS) {
+    const dx = sg[2] - sg[0], dy = sg[3] - sg[1], l = Math.hypot(dx, dy), nx = -dy / l, ny = dx / l;
+    const out = (sg[1] === 0 && sg[3] === 0) || (sg[0] === 0 && sg[2] === 0) ? -1 : 1;
+    c.strokeStyle = 'rgba(255,255,255,.22)'; c.lineWidth = 0.35;
+    c.beginPath(); c.moveTo(sg[0] + nx * out * 0.45, sg[1] + ny * out * 0.45); c.lineTo(sg[2] + nx * out * 0.45, sg[3] + ny * out * 0.45); c.stroke();
+    c.strokeStyle = 'rgba(0,0,0,.25)'; c.lineWidth = 0.25;
+    c.beginPath(); c.moveTo(sg[0] + nx * out * 1.8, sg[1] + ny * out * 1.8); c.lineTo(sg[2] + nx * out * 1.8, sg[3] + ny * out * 1.8); c.stroke();
+    for (const [ex, ey] of [[sg[0], sg[1]], [sg[2], sg[3]]]) {
+      const g = c.createRadialGradient(ex - 0.3, ey - 0.3, 0.1, ex, ey, 1.2);
+      g.addColorStop(0, CL.cush[0]); g.addColorStop(1, CL.cush[3]);
+      c.fillStyle = g; c.beginPath(); c.arc(ex + nx * out * 0.6, ey + ny * out * 0.6, 1.0, 0, TAU); c.fill();
+    }
+  }
   c.strokeStyle = 'rgba(255,255,255,.07)'; c.lineWidth = 0.3;
   c.beginPath(); c.moveTo(HEAD_X, 0); c.lineTo(HEAD_X, H); c.stroke();
   c.fillStyle = 'rgba(255,255,255,.3)';
@@ -2857,14 +2928,40 @@ function drawBallInHand(cue, now) {
 
 // Kugeln, die gerade in eine Tasche fallen
 let SINKING = [];
+let RAILHITS = [];
+// Kugeln rollen mit ihrem Schwung in die Tasche, kreisen kurz und fallen hinein
 function drawSinking(now) {
-  const dur = 420 / TIME_SCALE;
+  const dur = 650 / TIME_SCALE;
   SINKING = SINKING.filter(s => now - s.t0 < dur);
   for (const s of SINKING) {
-    const t = (now - s.t0) / dur, e = t * t * (3 - 2 * t), d = POCKET_DRAW[s.k];
+    const t = (now - s.t0) / dur, d = POCKET_DRAW[s.k];
+    // Phase 1: weiterrollen Richtung Taschenmitte
+    const sp = Math.hypot(s.vx || 0, s.vy || 0), roll = Math.min(1, t / 0.35);
+    let x = s.x + (s.vx || 0) * 0.05 * roll, y = s.y + (s.vy || 0) * 0.05 * roll;
+    const pull = roll * roll;
+    x += (d.x - x) * pull * 0.85; y += (d.y - y) * pull * 0.85;
+    let scale = 1, alpha = 1;
+    if (t > 0.35) {
+      // Phase 2: im Loch kreisen und absinken
+      const q = (t - 0.35) / 0.65, ang = q * (6 + Math.min(6, sp / 60)) + s.k, rr = (1 - q) * Math.min(2.4, d.r - R);
+      x = d.x + Math.cos(ang) * rr; y = d.y + Math.sin(ang) * rr;
+      scale = 1 - 0.45 * q; alpha = 1 - 0.85 * q * q;
+    }
     ctx.beginPath(); ctx.arc(d.x, d.y, d.r + 0.6 + t * 2.5, 0, TAU);
-    ctx.strokeStyle = 'rgba(255,215,90,' + (0.8 * (1 - t)) + ')'; ctx.lineWidth = 1.6 / L.s; ctx.stroke();
-    drawBall(s.n, s.x + (d.x - s.x) * e * 0.85, s.y + (d.y - s.y) * e * 0.85, 1 - 0.4 * e, 1 - e * 0.9);
+    ctx.strokeStyle = 'rgba(255,215,90,' + (0.7 * (1 - t)) + ')'; ctx.lineWidth = 1.6 / L.s; ctx.stroke();
+    ctx.save();
+    if (t > 0.3) { ctx.beginPath(); ctx.arc(d.x, d.y, d.r, 0, TAU); ctx.clip(); }
+    drawBall(s.n, x, y, scale, alpha);
+    if (t > 0.35) { ctx.beginPath(); ctx.arc(x, y, R * scale, 0, TAU); ctx.fillStyle = 'rgba(0,0,0,' + (0.6 * (t - 0.35) / 0.65) + ')'; ctx.fill(); }
+    ctx.restore();
+  }
+  // Aufblitzen der Bande bei Treffern
+  RAILHITS = RAILHITS.filter(h => now - h.t0 < 380);
+  for (const h of RAILHITS) {
+    const t = (now - h.t0) / 380, a = Math.min(0.75, h.v / 500) * (1 - t);
+    const g = ctx.createRadialGradient(h.x, h.y, 0.2, h.x, h.y, 3 + t * 7);
+    g.addColorStop(0, 'rgba(255,255,255,' + a + ')'); g.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(h.x, h.y, 3 + t * 7, 0, TAU); ctx.fill();
   }
 }
 
@@ -2887,7 +2984,7 @@ function getPrediction() {
   const key = [G.aim, G.power, G.sx, G.sy, cue.x, cue.y, G.ver, G.called].join('|');
   if (key !== G.predKey) {
     G.predKey = key;
-    G.pred = runSim(G.balls, {angle: G.aim, power: G.power, sx: G.sx, sy: G.sy}, true);
+    G.pred = runSim(G.balls, shotParams(), true);
     G.predInfo = predictVerdict(G.pred);
   }
   return G.pred;
@@ -2952,6 +3049,13 @@ function pathArrows(p, color, px, step) {
   }
   void px;
 }
+function pathLen(p) { let l = 0; for (let i = 1; i < p.length; i++) l += Math.hypot(p[i][0] - p[i - 1][0], p[i][1] - p[i - 1][1]); return l; }
+// Wie lang die Linien sein dürfen (abhängig vom Queue); Training und Lektionen zeigen alles
+function lineLimit(mode) {
+  if (G.mode === 0 && (G.solo.type === 'lesson' || G.solo.type === 'training')) return Infinity;
+  const base = cueStats(G.cur).line;
+  return mode === 'all' ? base * 1.6 : base;
+}
 function movedPath(S, n) {
   const p = S.paths[n];
   if (!p || p.length < 2) return false;
@@ -2962,13 +3066,14 @@ function drawPrediction(S) {
   const mode = linesMode();
   if (mode === 'off') return;
   const px = 1 / L.s, C = S.contact, now = performance.now();
-  // Endpositionen aller bewegten Kugeln als Geisterkugeln
-  if (mode === 'all') for (const b of S.balls) if (b.on && b.n !== 0 && movedPath(S, b.n)) drawBall(b.n, b.x, b.y, 1, 0.42);
+  const lim = lineLimit(mode), full = n => pathLen(S.paths[n]) <= lim;
+  // Endpositionen als Geisterkugeln – nur wenn die ganze Bahn sichtbar ist
+  if (mode === 'all') for (const b of S.balls) if (b.on && b.n !== 0 && movedPath(S, b.n) && full(b.n)) drawBall(b.n, b.x, b.y, 1, 0.42);
   // Bahnen der Objektkugeln
   const objs = mode === 'all' ? Object.keys(S.paths).map(Number).filter(n => n !== 0 && movedPath(S, n)) : C ? [C.n] : [];
   for (const n of objs) {
     let p = S.paths[n];
-    if (mode === 'guide') p = trimPath(p, 55);
+    p = trimPath(p, mode === 'guide' ? Math.min(55, lim * 0.6) : lim * 0.6);
     glowLine(p, a => lineCol(n, a), 2.1 * px);
     pathArrows(p, 'rgba(255,255,255,.85)', px, 22);
   }
@@ -2980,9 +3085,10 @@ function drawPrediction(S) {
     if (stop) {
       let i = cp.findIndex(q => Math.abs(q[0] - stop.x) < 0.01 && Math.abs(q[1] - stop.y) < 0.01);
       if (i < 0) i = cp.length - 1;
-      cp = cp.slice(0, i + 1).concat(trimPath(cp.slice(i), 24).slice(1));
+      cp = cp.slice(0, i + 1).concat(trimPath(cp.slice(i), 20).slice(1));
     }
   }
+  cp = trimPath(cp, lim);
   if (cp.length > 1) {
     ctx.lineJoin = 'round'; ctx.lineCap = 'round';
     polyline(cp); ctx.strokeStyle = 'rgba(255,255,255,.18)'; ctx.lineWidth = 6 * px; ctx.stroke();
@@ -2999,18 +3105,19 @@ function drawPrediction(S) {
   }
   // Endposition der Weißen
   const cf = getBall(S.balls, 0);
-  if (cf.on && mode === 'all') {
+  if (cf.on && mode === 'all' && full(0)) {
     ctx.setLineDash([2 * px, 2 * px]); ctx.beginPath(); ctx.arc(cf.x, cf.y, R, 0, TAU);
     ctx.strokeStyle = 'rgba(255,255,255,.85)'; ctx.lineWidth = 1.3 * px; ctx.stroke(); ctx.setLineDash([]);
   }
   if (mode !== 'all') return;
-  // Taschen, in die etwas fällt
+  // Taschen, in die etwas fällt (nur wenn die Bahn bis dorthin sichtbar ist)
   for (const p of S.ev.potted) {
+    if (!full(p.n)) continue;
     const d = POCKET_DRAW[p.pocket], pulse = 0.5 + 0.5 * Math.sin(now / 180);
     ctx.beginPath(); ctx.arc(d.x, d.y, d.r - 0.6, 0, TAU); ctx.strokeStyle = lineCol(p.n, 1); ctx.lineWidth = (2.2 + pulse) * px; ctx.stroke();
     miniBallTable(p.n, d.x, d.y, R * 0.75);
   }
-  if (S.ev.cuePotted) {
+  if (S.ev.cuePotted && full(0)) {
     const p = S.paths[0][S.paths[0].length - 1];
     ctx.strokeStyle = '#ff4d3d'; ctx.lineWidth = 2.6 * px; ctx.lineCap = 'round';
     ctx.beginPath(); ctx.moveTo(p[0] - 3, p[1] - 3); ctx.lineTo(p[0] + 3, p[1] + 3); ctx.moveTo(p[0] + 3, p[1] - 3); ctx.lineTo(p[0] - 3, p[1] + 3); ctx.stroke();
@@ -3098,6 +3205,26 @@ function drawCue(cue, extra) {
   paintCueShape(ctx, x0, len, design, 0.62, 1.5);
   ctx.restore();
 }
+// Werte der Queues: Kraft, Zielen (Linienlänge), Effet, Zeit (0–10)
+const CUE_STATS = {klassik: [1, 1, 1, 1], ebenholz: [2, 2, 1, 2], kirsch: [2, 2, 2, 2], carbon: [3, 3, 3, 2], chrom: [3, 4, 3, 3],
+  eis: [4, 3, 4, 3], jade: [4, 4, 4, 4], neon: [5, 5, 4, 5], gold: [5, 5, 5, 5], lava: [6, 5, 6, 5], schlange: [6, 6, 6, 6],
+  royal: [7, 6, 6, 7], phoenix: [8, 7, 7, 7], kosmos: [8, 8, 8, 8], blitz: [10, 9, 9, 10]};
+// Gelten in Partien und der Trefferserie – Lektionen, Herausforderungen und Training bleiben neutral
+const statsActive = () => G && (G.mode !== 0 || G.solo.type === 'arcade');
+function cueStats(i) {
+  const id = cueFor(i), st = CUE_STATS[id] || CUE_STATS.klassik, on = statsActive() && !(G.ai && G.ai[i]);
+  return {
+    force: on ? 0.95 + st[0] * 0.02 : 1,
+    line: 38 + st[1] * 9,
+    spin: on ? 0.9 + st[2] * 0.035 : 1,
+    time: st[3]
+  };
+}
+// Der tatsächliche Stoß des Spielers am Zug (mit den Werten seines Queues)
+function shotParams() {
+  const c = cueStats(G.cur);
+  return {angle: G.aim, power: G.power, sx: G.sx * c.spin, sy: G.sy * c.spin, force: c.force};
+}
 // Welcher Queue gehört zum Spieler am Zug?
 function cueFor(i) {
   if (!G || G.mode === 0) return PROFILE.cue;
@@ -3150,6 +3277,15 @@ function drawHUD() {
       ctx.fillStyle = '#ff6655'; ctx.font = 'bold ' + (fs - 1) + 'px system-ui,sans-serif';
       ctx.fillText('Fouls: ' + P.fouls, bxs - dir * br, midY);
     }
+  }
+  // Zeitbalken unter dem Spieler am Zug
+  if (G.turnT !== undefined && G.state === 'aim') {
+    const tot = turnTime(), f = clamp(G.turnT / tot, 0, 1), warn = G.turnT <= 5;
+    const bw = W * s * 0.32, bx = G.cur === 0 || G.mode === 0 ? L.ox + 4 : L.ox + W * s - 4 - bw, by = top + railH - 3;
+    ctx.fillStyle = 'rgba(0,0,0,.55)'; roundRect(bx, by, bw, 4, 2); ctx.fill();
+    ctx.fillStyle = warn ? (Math.sin(performance.now() / 90) > 0 ? '#ff3b30' : '#ff8a7a') : f > 0.5 ? '#3fd68b' : '#f2b632';
+    roundRect(bx, by, Math.max(2, bw * f), 4, 2); ctx.fill();
+    if (warn) { ctx.font = 'bold 12px system-ui,sans-serif'; ctx.textAlign = 'center'; ctx.fillStyle = '#ff6655'; ctx.fillText('⏱ ' + Math.ceil(G.turnT), bx + bw / 2, by + 12); }
   }
   // Zielkugeln mittig auf der oberen Bande
   if (G.state !== 'over') {
@@ -3235,8 +3371,8 @@ function drawControls() {
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
   const active = isHumanTurn();
   ctx.globalAlpha = active ? 1 : 0.45;
-  // Kraft
   const p = L.power;
+  if (pullMode()) { drawPullCue(p); } else {
   ctx.fillStyle = '#16231e'; roundRect(p.x - 4, p.y - 4, p.w + 8, p.h + 8, 10); ctx.fill();
   ctx.strokeStyle = '#2c4a3e'; ctx.lineWidth = 1; ctx.stroke();
   const fh = p.h * G.power;
@@ -3252,6 +3388,7 @@ function drawControls() {
   ctx.font = 'bold 12px system-ui,sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   ctx.fillStyle = '#9fb5aa'; ctx.fillText('Kraft', p.x + p.w / 2, 13);
   ctx.fillStyle = '#fff'; ctx.fillText(Math.round(G.power * 100) + '%', p.x + p.w / 2, p.y + p.h + 12);
+  }
   // Effet (kleine Anzeige – gedrückt halten öffnet die große Kugel)
   const sp = L.spin;
   ctx.fillStyle = '#9fb5aa'; ctx.fillText('Effet', sp.cx, sp.cy - sp.r - 10);
@@ -3287,6 +3424,32 @@ function drawControls() {
   ctx.fillStyle = 'rgba(8,14,12,.85)'; roundRect(wh.x + wh.w / 2 - tw / 2, wh.y + wh.h / 2 - 9, tw, 18, 6); ctx.fill();
   ctx.fillStyle = '#ffd76a'; ctx.fillText(deg.toFixed(2) + '°', wh.x + wh.w / 2, wh.y + wh.h / 2);
   ctx.globalAlpha = 1;
+}
+
+// Senkrechter Queue zum Ziehen: je weiter nach unten, desto fester der Stoß
+function drawPullCue(p) {
+  const now = performance.now(), pulling = !!G.pulling, f = pulling ? G.power : 0;
+  ctx.fillStyle = 'rgba(12,20,17,.9)'; roundRect(p.x - 4, p.y - 4, p.w + 8, p.h + 8, 10); ctx.fill();
+  ctx.strokeStyle = '#2c4a3e'; ctx.lineWidth = 1; ctx.stroke();
+  // Kraftskala
+  const g = ctx.createLinearGradient(0, p.y, 0, p.y + p.h);
+  g.addColorStop(0, '#3fb68b'); g.addColorStop(0.55, '#f2b632'); g.addColorStop(1, '#e0412f');
+  ctx.fillStyle = 'rgba(255,255,255,.06)'; roundRect(p.x + p.w - 7, p.y, 5, p.h, 3); ctx.fill();
+  ctx.fillStyle = g; roundRect(p.x + p.w - 7, p.y, 5, Math.max(3, p.h * f), 3); ctx.fill();
+  ctx.save(); roundRect(p.x - 2, p.y - 2, p.w + 4, p.h + 4, 8); ctx.clip();
+  const cx = p.x + (p.w - 8) / 2, top = p.y + 8 + f * p.h * 0.78;
+  ctx.translate(cx, top); ctx.rotate(Math.PI / 2);
+  paintCueShape(ctx, 0, p.h * 1.25, CUES[cueFor(G.cur)] || CUES.klassik, 3.2, 7.5);
+  ctx.restore();
+  ctx.font = 'bold 12px system-ui,sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillStyle = '#9fb5aa'; ctx.fillText('Stoß', p.x + p.w / 2, 13);
+  ctx.fillStyle = pulling ? '#fff' : 'rgba(255,255,255,.6)';
+  ctx.fillText(pulling ? Math.round(f * 100) + '%' : '↓ ziehen', p.x + p.w / 2, p.y + p.h + 12);
+  if (!pulling && isHumanTurn()) {
+    const a = 0.4 + 0.4 * Math.sin(now / 250), y = p.y + 30 + ((now / 12) % 30);
+    ctx.fillStyle = 'rgba(255,215,90,' + a + ')';
+    ctx.beginPath(); ctx.moveTo(cx - 6, y); ctx.lineTo(cx + 6, y); ctx.lineTo(cx, y + 7); ctx.closePath(); ctx.fill();
+  }
 }
 
 // Große Kugel zum genauen Einstellen des Effets
@@ -3387,6 +3550,8 @@ const ptrs = new Map();
 const WHEEL_RAD_PER_PX = 0.00006; // ca. 0,0034° pro Pixel
 let lastSpinTap = 0;
 function toTable(x, y) { return {x: (x - L.ox) / L.s, y: (y - L.oy) / L.s}; }
+// Im Training mit allen Linien bleibt der STOSS-Knopf, sonst wird mit dem Queue links gestoßen
+const pullMode = () => !(G && G.mode === 0 && G.solo.type === 'training' && linesMode() === 'all');
 const inRect = (x, y, r) => x >= r.x && x <= r.x + r.w && y >= r.y && y <= r.y + r.h;
 // Kugel, die man an dieser Stelle aufnehmen darf (Ball in Hand / Training)
 function movableBallAt(t) {
@@ -3428,6 +3593,7 @@ cv.addEventListener('pointerdown', e => {
     G.spinUI = true; st.lx = x; st.ly = y; return;
   }
   if (kind === 'nudge-' || kind === 'nudge+') { st.dir = kind === 'nudge+' ? 1 : -1; st.next = now + 380; nudge(st.dir); return; }
+  if (kind === 'power' && pullMode()) { st.kind = 'pull'; st.y0 = y; st.p0 = G.power; st.pull = 0; G.pulling = true; return; }
   if (kind === 'table') {
     const t = toTable(x, y);
     // Taschenansage nur durch Antippen einer Tasche
@@ -3455,6 +3621,11 @@ const endPtr = e => {
   if (st && G) {
     if (st.kind === 'spin') G.spinUI = false;
     if (st.drag) G.dragging = false;
+    if (st.kind === 'pull') {
+      G.pulling = false;
+      // loslassen = stoßen; kaum gezogen = abbrechen
+      if (st.pull >= 0.04 && isHumanTurn()) shoot(); else G.power = st.p0;
+    }
     // kurzes Antippen einer Kugel: auf sie zielen
     if (st.kind === 'hold' && isHumanTurn() && st.n !== 0) { const b = getBall(G.balls, st.n), c = getBall(G.balls, 0); G.aim = Math.atan2(b.y - c.y, b.x - c.x); }
   }
@@ -3474,6 +3645,7 @@ function pointerTick(now) {
 
 function handlePtr(st, x, y) {
   if (st.kind === 'power') G.power = clamp((L.power.y + L.power.h - y) / L.power.h, 0.02, 1);
+  else if (st.kind === 'pull') { st.pull = clamp((y - st.y0) / (L.power.h * 0.78), 0, 1); G.power = Math.max(0.02, st.pull); }
   else if (st.kind === 'spin') {
     // Relativ zur großen Kugel: der Finger verdeckt den Treffpunkt nicht
     let sx = G.sx + (x - st.lx) / L.bigSpin.r, sy = G.sy - (y - st.ly) / L.bigSpin.r;
@@ -3505,6 +3677,7 @@ function updateUI() {
   if (!G) return;
   const inLesson = G.mode === 0 && G.solo.type === 'lesson';
   for (const id of ['bShoot', 'bLines', 'bReplay', 'bMenu']) $(id).classList.toggle('hidden', inLesson);
+  $('bShoot').classList.toggle('hidden', inLesson || pullMode());
   if (inLesson) { hide('bPush'); hide('bUndo'); hide('bChat'); return; }
   $('bShoot').disabled = !isHumanTurn();
   const canPush = G.mode === 9 && G.pushAvail && isHumanTurn();
@@ -3548,6 +3721,20 @@ document.querySelectorAll('.tile').forEach(t => t.onclick = () => {
   else newSolo(go);
 });
 $('bDaily').onclick = () => claimDaily();
+// 3D-Karussell: die Karte in der Mitte steht vorne, die anderen drehen sich in die Tiefe
+function updateCarousel() {
+  const car = $('carousel'); if (!car || !car.clientWidth) return;
+  const mid = car.scrollLeft + car.clientWidth / 2;
+  for (const t of car.children) {
+    const c = t.offsetLeft + t.offsetWidth / 2, d = clamp((c - mid) / (t.offsetWidth + 14), -2.5, 2.5), a = Math.abs(d);
+    t.style.transform = 'rotateY(' + (-d * 32).toFixed(1) + 'deg) translateZ(' + (-a * 110).toFixed(0) + 'px) scale(' + (1 - a * 0.06).toFixed(3) + ')';
+    t.style.opacity = (1 - Math.min(0.55, a * 0.3)).toFixed(2);
+    t.style.zIndex = String(10 - Math.round(a * 3));
+  }
+}
+$('carousel').addEventListener('scroll', updateCarousel, {passive: true});
+const carStep = dir => { const car = $('carousel'); car.scrollBy({left: dir * (car.children[0].offsetWidth + 14), behavior: 'smooth'}); };
+$('carL').onclick = () => carStep(-1); $('carR').onclick = () => carStep(1);
 $('bShop').onclick = () => showShop();
 $('bShopClose').onclick = () => { hide('shop'); syncMenu(); show('menu'); };
 document.querySelectorAll('#shopTabs button').forEach(b => b.onclick = () => { shopTab = b.dataset.tab; $('shopMsg').textContent = ''; renderShop(); });
@@ -3619,6 +3806,7 @@ $('bOnlineBack').onclick = () => { if (!NET.on) netReset(); hide('online'); sync
 $('bOverMenu').onclick = () => { hide('over'); syncMenu(); show('menu'); };
 $('bShoot').onclick = () => shoot();
 $('bLines').onclick = () => { CFG.lines = CFG.lines === 'all' ? 'guide' : CFG.lines === 'guide' ? 'off' : 'all'; saveCfg(); updateUI(); };
+$('bLines').addEventListener('click', () => updateUI());
 $('bPush').onclick = () => { if (!isHumanTurn()) return; G.pushShot = !G.pushShot; if (G.pushShot) toast('Push-Out angesagt: Nur die Regeln zur Weißen gelten.'); updateUI(); };
 $('bTake').onclick = () => { hide('pushDlg'); if (G.online) netSend({t: 'push', take: true}); startTurn(); };
 $('bPass').onclick = () => {
@@ -3646,6 +3834,7 @@ function frame(now) {
   if (G && !paused) {
     netTick(now);
     pointerTick(now);
+    tickTimer(dt);
     if (G.state === 'moving' && G.live) {
       const S = G.live, target = S.t + dt * TIME_SCALE;
       let moving = true;
@@ -3667,7 +3856,7 @@ function frame(now) {
       shoot();
     }
   }
-  if (!$('menu').classList.contains('hidden')) { drawLobbyBg(now, dt); drawHeroBall($('heroBall'), 8, dt, 0.7); }
+  if (!$('menu').classList.contains('hidden')) { drawLobbyBg(now, dt); drawHeroBall($('heroBall'), 8, dt, 0.7); updateCarousel(); }
   else draw();
   applyShake();
   requestAnimationFrame(frame);

@@ -8,6 +8,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="description" content="Billard mit Linienvorschau: 8-Ball, 9-Ball, Lektionen, Herausforderungen und Online-Spiel ohne Server.">
 <title>Billard Linien</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,600;0,700;0,800;1,800;1,900&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#0d1512;--panel:#16231e;--line:#2c4a3e;--text:#eef4f0;--muted:#9fb5aa;--accent:#f2b632;--accent2:#3fb68b}
 html,body{margin:0;height:100%;background:var(--bg);overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;font-family:system-ui,-apple-system,Roboto,"Segoe UI",sans-serif;color:var(--text)}
@@ -260,6 +262,155 @@ input.name{background:#0c1512;color:var(--text);border:1px solid var(--line);bor
 .card.more .plus{font-size:30px;color:var(--accent)}
 #pushDlg{position:fixed;z-index:15;left:50%;top:50%;transform:translate(-50%,-50%);background:rgba(22,35,30,.96);border:1px solid var(--accent);border-radius:14px;padding:12px 16px;text-align:center;font-size:14px}
 #pushDlg .actions{margin-top:8px}
+/* ===================== Lobby 2.0 ===================== */
+:root{--disp:"Exo 2",system-ui,-apple-system,Roboto,"Segoe UI",sans-serif;--gold1:#ffe9a3;--gold2:#ffc23a;--gold3:#d9890b}
+#menu.lobby{background:#04070a}
+#menu svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
+#menu svg .f{fill:currentColor;stroke:none}
+#menu .lbShade{position:absolute;inset:0;z-index:0;pointer-events:none;background:
+  radial-gradient(ellipse 70% 55% at 50% 52%,rgba(4,8,12,0) 0%,rgba(4,8,12,.55) 70%,rgba(3,5,8,.92) 100%),
+  linear-gradient(180deg,rgba(3,6,9,.88) 0%,rgba(3,6,9,.25) 18%,rgba(3,6,9,0) 40%,rgba(3,6,9,.2) 72%,rgba(3,6,9,.92) 100%)}
+#menu .lbShade::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.012) 0 1px,transparent 1px 3px);mix-blend-mode:overlay}
+#menu .lobbyWrap{max-width:1180px;padding:max(8px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left));gap:6px;overflow:hidden}
+#menu button{font-family:var(--disp)}
+/* Kopfzeile */
+#menu .lobbyHead{gap:10px;flex-wrap:nowrap;animation:lbDrop .6s cubic-bezier(.2,.9,.3,1.2) both}
+@keyframes lbDrop{from{opacity:0;transform:translateY(-18px)}}
+#menu .logo{gap:10px}
+#menu #heroBall{width:42px;height:42px}
+#menu .wm b{font-family:var(--disp);font-style:italic;font-weight:900;font-size:24px;letter-spacing:1.5px;line-height:.95;background:linear-gradient(180deg,#fff 0%,var(--gold1) 38%,var(--gold2) 62%,var(--gold3) 100%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 1px 0 #6b3d00) drop-shadow(0 3px 6px rgba(0,0,0,.9));padding-right:4px}
+#menu .wm i{display:flex;align-items:center;gap:6px;font-family:var(--disp);font-style:normal;font-weight:700;font-size:10.5px;letter-spacing:7px;color:#e8f1ff;opacity:.92;margin-top:3px}
+#menu .wm i::before{content:'';width:16px;height:2px;border-radius:2px;background:linear-gradient(90deg,transparent,var(--gold2))}
+#menu .pcard{position:relative;gap:10px;padding:5px 14px 5px 5px;border-radius:999px;border:1px solid rgba(255,255,255,.1);background:linear-gradient(180deg,rgba(28,36,48,.78),rgba(10,14,20,.78));box-shadow:0 10px 30px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.12);cursor:pointer;transition:transform .15s}
+#menu .pcard:hover{transform:translateY(-1px)}
+#menu .avRing{--p:0;position:relative;width:44px;height:44px;border-radius:50%;padding:3px;box-sizing:border-box;background:conic-gradient(var(--gold2) calc(var(--p)*1%),rgba(255,255,255,.12) 0)}
+#menu .avatar{width:100%;height:100%;font-family:var(--disp);font-size:18px;font-weight:800;background:radial-gradient(circle at 35% 30%,#ffd58a,#f08a24 55%,#a8380e);box-shadow:inset 0 -3px 6px rgba(0,0,0,.35),inset 0 2px 3px rgba(255,255,255,.4)}
+#menu .lvBadge{position:absolute;right:-5px;bottom:-4px;min-width:18px;height:18px;padding:0 4px;box-sizing:border-box;border-radius:9px;background:linear-gradient(#5ec8ff,#1677d6);border:2px solid #0b1118;color:#fff;font:800 10px/14px var(--disp);text-align:center}
+#menu .pinfo b{font-family:var(--disp);font-weight:800;font-size:14px;letter-spacing:.3px}
+#menu .pinfo small{font-size:10.5px;color:#9fb0c4}
+#menu .xpbar{width:120px;height:6px;background:rgba(0,0,0,.55);border-radius:4px;box-shadow:inset 0 1px 2px rgba(0,0,0,.6)}
+#menu .xpbar div{background:linear-gradient(90deg,#4fd1ff,#7cffc4);box-shadow:0 0 8px rgba(80,210,255,.7);border-radius:4px}
+#menu .trkBtn{display:flex;color:var(--gold2);filter:drop-shadow(0 0 6px rgba(255,190,60,.6));animation:float 2.6s ease-in-out infinite}
+#menu .hdrRight{display:flex;align-items:center;gap:8px}
+#menu .coins{display:flex;align-items:center;gap:7px;padding:4px 4px 4px 6px;border-radius:999px;border:1px solid rgba(255,200,80,.35);background:linear-gradient(180deg,rgba(40,30,10,.85),rgba(16,11,3,.85));color:#ffe6a0;font:800 15px var(--disp);box-shadow:0 8px 24px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.12);cursor:pointer}
+#menu .coin{display:block;width:22px;height:22px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff6c8 0 12%,#ffd34d 30%,#e09a10 70%,#9a5a00);box-shadow:inset 0 0 0 2px rgba(255,240,180,.55),0 0 10px rgba(255,190,40,.5)}
+#menu .coin::after{content:'';display:block;margin:6px;height:10px;border-radius:50%;border:1.5px solid rgba(120,60,0,.55)}
+#menu .plus{display:flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:linear-gradient(#5be38f,#1f9d55);color:#fff;font-size:16px;line-height:1;box-shadow:inset 0 1px 0 rgba(255,255,255,.4)}
+#menu .daily{display:flex;align-items:center;gap:6px;padding:7px 14px 7px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:linear-gradient(180deg,rgba(36,44,58,.85),rgba(14,18,26,.85));color:#9fb0c4;font:700 13px var(--disp);box-shadow:0 8px 24px rgba(0,0,0,.5)}
+#menu .daily.ready{background:linear-gradient(180deg,#ffe07a,#f7a51c 60%,#d7780a);color:#3a1d00;border-color:#fff1b8;box-shadow:0 0 0 0 rgba(255,200,60,.7),0 8px 24px rgba(0,0,0,.5);animation:dailyGlow 1.6s infinite}
+@keyframes dailyGlow{0%{box-shadow:0 0 0 0 rgba(255,200,60,.65),0 8px 24px rgba(0,0,0,.5)}70%{box-shadow:0 0 0 12px rgba(255,200,60,0),0 8px 24px rgba(0,0,0,.5)}100%{box-shadow:0 0 0 0 rgba(255,200,60,0),0 8px 24px rgba(0,0,0,.5)}}
+/* Modus-Auswahl */
+#menu .lobbyOpts{justify-content:center;gap:8px;font:700 10.5px var(--disp);letter-spacing:1.6px;text-transform:uppercase;color:#8ea1b6;animation:lbFade .7s .1s both}
+@keyframes lbFade{from{opacity:0}}
+#menu .lobbyOpts .seg{border:1px solid rgba(255,255,255,.1);border-radius:999px;padding:3px;background:rgba(8,12,18,.72);box-shadow:inset 0 1px 3px rgba(0,0,0,.6),0 6px 18px rgba(0,0,0,.4);overflow:visible}
+#menu .lobbyOpts .seg button{min-height:28px;border:0;border-radius:999px;background:transparent;color:#c6d2df;font:700 13px var(--disp);padding:3px 14px;transition:background .2s,color .2s}
+#menu .lobbyOpts .seg button.sel{background:linear-gradient(180deg,#6fe0ff,#1e8fe0);color:#04121f;box-shadow:0 2px 10px rgba(40,160,255,.55),inset 0 1px 0 rgba(255,255,255,.5)}
+/* Bühne mit Karussell */
+#menu .stage{flex:1;min-height:0;display:flex;gap:6px;position:relative}
+#menu .rail{display:flex;flex-direction:column;justify-content:center;gap:12px;z-index:4;animation:lbSlide .7s .15s both}
+@keyframes lbSlide{from{opacity:0;transform:translateX(-20px)}}
+#menu .ev{display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:0;padding:0;color:#e8eef6;cursor:pointer}
+#menu .evI{position:relative;display:flex;align-items:center;justify-content:center;width:50px;height:50px;border-radius:16px;color:#fff;box-shadow:0 8px 20px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.35),inset 0 -3px 0 rgba(0,0,0,.25);transition:transform .15s}
+#menu .ev:hover .evI{transform:translateY(-2px) scale(1.04)}
+#menu .ev:active .evI{transform:scale(.94)}
+#menu .evI svg{width:26px;height:26px;filter:drop-shadow(0 1px 1px rgba(0,0,0,.4))}
+#menu .evQ .evI{background:linear-gradient(160deg,#4fb5ff,#2054c8)}
+#menu .evW .evI{background:linear-gradient(160deg,#ff8fd0,#a02bd6)}
+#menu .evW .evI svg{animation:spinSlow 9s linear infinite}
+@keyframes spinSlow{to{transform:rotate(360deg)}}
+#menu .ev small{font:700 10px var(--disp);letter-spacing:.4px;text-shadow:0 1px 3px #000}
+#menu .badge{top:-6px!important;right:-6px!important;border:2px solid #0b1118;box-shadow:none;font-family:var(--disp);font-weight:800}
+#menu .carWrap{flex:1;min-width:0;min-height:0}
+#menu #carousel{gap:14px;padding:10px calc(50% - 140px) 22px;perspective:1200px}
+#menu .carArrow{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;padding:0;background:rgba(10,14,20,.7);border:1px solid rgba(255,255,255,.16);box-shadow:0 6px 16px rgba(0,0,0,.5);color:#fff}
+#menu .carArrow svg{width:20px;height:20px;stroke-width:2.6}
+#menu .dots{position:absolute;left:0;right:0;bottom:4px;display:flex;justify-content:center;gap:6px;pointer-events:none}
+#menu .dots i{width:6px;height:6px;border-radius:3px;background:rgba(255,255,255,.25);transition:width .25s,background .25s}
+#menu .dots i.on{width:18px;background:linear-gradient(90deg,var(--gold1),var(--gold2))}
+/* Karten */
+#menu .tile{--c1:#38b6ff;--c2:#06244a;flex:0 0 280px;height:min(100%,300px);padding:0;border-radius:22px;border:1px solid rgba(255,255,255,.14);background:linear-gradient(165deg,var(--c2) 0%,#0a0f16 62%,#06090d 100%);box-shadow:0 24px 50px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.18);display:block;font-family:var(--disp);transition:box-shadow .3s,border-color .3s;animation:none}
+#menu .tile::after{content:'';position:absolute;inset:0;height:auto;border-radius:inherit;background:radial-gradient(90% 55% at 50% 18%,var(--c1),transparent 70%);opacity:.38;pointer-events:none;mix-blend-mode:screen}
+#menu .tile::before{z-index:3;background:linear-gradient(110deg,transparent 35%,rgba(255,255,255,.16) 48%,transparent 60%);animation:shine 6s ease-in-out infinite}
+#menu .tile.act{border-color:var(--c1);box-shadow:0 0 0 1px var(--c1),0 0 34px -4px var(--c1),0 26px 60px rgba(0,0,0,.75),inset 0 1px 0 rgba(255,255,255,.25)}
+#menu .tile .art{position:absolute;left:0;top:0;width:100%;height:62%;z-index:1;pointer-events:none}
+#menu .tile .tag{position:absolute;left:12px;top:12px;z-index:2;font:800 9.5px var(--disp);letter-spacing:1.4px;color:#fff;padding:4px 8px;border-radius:6px;background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.18);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+#menu .tile .tbody{position:absolute;left:0;right:0;bottom:0;z-index:2;display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding:40px 16px 56px;background:linear-gradient(180deg,transparent,rgba(5,8,12,.82) 38%,rgba(5,8,12,.96))}
+#menu .tile b{font-family:var(--disp);font-style:italic;font-weight:900;font-size:23px;line-height:1;letter-spacing:.2px;text-transform:uppercase;color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.35),0 0 18px var(--c2);transform:none}
+#menu .tile small{display:inline-flex;align-items:center;gap:4px;font:700 11px var(--disp);color:#ffe08a;background:rgba(255,200,60,.1);border:1px solid rgba(255,200,60,.28);padding:2px 8px;border-radius:999px;transform:none;opacity:1}
+#menu .tile small:empty{display:none}
+#menu .tile p{margin:0;font:600 12px/1.35 var(--disp);color:rgba(225,234,244,.72);transform:none;opacity:1}
+#menu .tile em{display:none}
+#menu .tile .play{padding:0;box-sizing:border-box;position:absolute;left:16px;right:16px;bottom:14px;z-index:2;display:flex;align-items:center;justify-content:center;gap:6px;height:34px;border-radius:12px;background:linear-gradient(180deg,#ffe58a,#ffb21f 55%,#e48a06);color:#3a1d00;font:900 13px var(--disp);letter-spacing:1.6px;text-transform:uppercase;box-shadow:0 6px 16px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.7),inset 0 -2px 0 rgba(120,60,0,.35);transform:none}
+#menu .tile .play svg{width:14px;height:14px}
+#menu .tile:not(.act) .play{background:rgba(255,255,255,.1);color:#dfe8f2;box-shadow:inset 0 1px 0 rgba(255,255,255,.12)}
+#menu .tile:active{transform:scale(.97)}
+/* Dock */
+#menu #lbMsg{min-height:0;font:700 12px var(--disp)}
+#menu .lobbyBar{align-self:center;justify-content:center;gap:2px;padding:5px;border-radius:20px;background:linear-gradient(180deg,rgba(26,33,44,.86),rgba(9,12,18,.9));border:1px solid rgba(255,255,255,.1);box-shadow:0 14px 40px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.1);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);animation:lbRise .6s .1s cubic-bezier(.2,.9,.3,1.2) both;max-width:100%}
+@keyframes lbRise{from{opacity:0;transform:translateY(20px)}}
+#menu .lobbyBar button{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:68px;padding:6px 10px 5px;border:0;border-radius:14px;background:transparent;box-shadow:none;color:#c9d6e4;backdrop-filter:none;-webkit-backdrop-filter:none;transition:background .15s,color .15s}
+#menu .lobbyBar button:hover{background:rgba(255,255,255,.07);color:#fff}
+#menu .lobbyBar button:active{transform:scale(.95)}
+#menu .lobbyBar small{font:700 10.5px var(--disp);letter-spacing:.4px}
+#menu .lobbyBar #bResume{background:linear-gradient(180deg,#7dffb4,#22b866);color:#03240f;box-shadow:0 0 18px rgba(60,230,140,.45),inset 0 1px 0 rgba(255,255,255,.6)}
+html.dev-pc #menu .tile{flex-basis:340px;height:min(100%,430px)}
+html.dev-pc #menu #carousel{padding:12px calc(50% - 170px) 24px}
+html.dev-pc #menu .tile b{font-size:28px}
+html.dev-pc #menu .tile p{font-size:13.5px}
+html.dev-pc #menu .wm b{font-size:28px}
+html.dev-pc #menu .evI{width:58px;height:58px;border-radius:18px}
+html.dev-pc #menu .lobbyBar button{min-width:84px;padding:8px 14px 6px}
+html.dev-pc #menu .lobbyBar svg{width:24px;height:24px}
+html.dev-pc #menu .tile .tbody{padding-bottom:64px}
+@media (min-height:600px){html.dev-tablet #menu .tile{flex-basis:320px;height:min(100%,420px)}html.dev-tablet #menu #carousel{padding:12px calc(50% - 160px) 24px}html.dev-tablet #menu .tile b{font-size:26px}html.dev-tablet #menu .tile .tbody{padding-bottom:62px}}
+@media (max-height:460px){
+#menu .lobbyWrap{gap:3px}
+#menu .lobbyHead{gap:8px}
+#menu .avRing{width:34px;height:34px;padding:2.5px}
+#menu .avatar{font-size:14px}
+#menu .pcard{padding:3px 12px 3px 3px;gap:8px}
+#menu .pinfo b{font-size:12.5px}
+#menu .xpbar{height:5px;margin:1px 0}
+#menu .trkBtn svg{width:18px;height:18px}
+#menu .coins{font-size:13px;padding:3px 3px 3px 4px;gap:5px}
+#menu .coin,#menu .plus{width:18px;height:18px}
+#menu .coin::after{margin:4px;height:8px}
+#menu .daily{font-size:12px;padding:5px 11px 5px 8px}
+#menu .daily svg{width:18px;height:18px}
+#menu .lobbyOpts{font-size:9.5px;gap:6px}
+#menu .lobbyOpts .seg{padding:2px}
+#menu .lobbyOpts .seg button{min-height:22px;padding:1px 10px;font-size:11.5px}
+#menu #carousel{padding:6px calc(50% - 115px) 16px}
+#menu .tile{flex-basis:230px}
+#menu .tile .art{height:72%}
+#menu .tile .tag{left:9px;top:9px;font-size:8.5px;padding:3px 6px}
+#menu .tile .tbody{padding:16px 11px 40px;gap:3px;background:linear-gradient(180deg,transparent,rgba(5,8,12,.85) 30%,rgba(5,8,12,.97))}
+#menu .tile b{font-size:17px}
+#menu .tile p{display:none}
+#menu .tile small{font-size:10px;padding:1px 7px}
+#menu .tile .play{height:26px;bottom:9px;left:11px;right:11px;font-size:11.5px;border-radius:9px}
+#menu .lobbyBar{padding:3px;border-radius:16px}
+#menu .lobbyBar button{padding:3px 6px 2px;min-width:56px;gap:1px}
+#menu .lobbyBar svg{width:18px;height:18px}
+#menu .lobbyBar small{font-size:9px}
+#menu .evI{width:40px;height:40px;border-radius:12px}
+#menu .evI svg{width:21px;height:21px}
+#menu .ev small{font-size:9px}
+#menu .rail{gap:8px}
+#menu .wm b{font-size:18px}
+#menu #heroBall{width:32px;height:32px}
+#menu .dots{bottom:2px}
+}
+@media (max-width:640px){#menu .pinfo small,#menu .trkBtn{display:none}}
+
+#loader{background:radial-gradient(ellipse at 50% 38%,#15314a 0%,#081422 50%,#020509 100%)}
+.ldGlow{background:radial-gradient(circle,rgba(80,170,255,.22),transparent 65%)}
+.ldLogo b{font-family:var(--disp);font-style:italic;font-weight:900;font-size:38px;letter-spacing:2px;background:linear-gradient(180deg,#fff 0%,var(--gold1) 38%,var(--gold2) 62%,var(--gold3) 100%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 2px 0 #6b3d00) drop-shadow(0 6px 10px #000);padding-right:6px}
+.ldLogo i{font-family:var(--disp);color:#e8f1ff;letter-spacing:10px;font-weight:700;font-size:13px}
+.ldBarWrap{height:8px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.55)}
+#ldBar{border-radius:999px;background:linear-gradient(90deg,#4fd1ff,#7cffc4 50%,#ffc23a);box-shadow:0 0 14px rgba(80,210,255,.7)}
+.ldRow{font-family:var(--disp);font-weight:700;letter-spacing:.5px;color:#9fb0c4}
+#ldTip{font-family:var(--disp);color:#c9d6e4}
 </style>
 </head>
 <body>
@@ -290,36 +441,46 @@ input.name{background:#0c1512;color:var(--text);border:1px solid var(--line);bor
 
 <div id="menu" class="overlay lobby">
   <canvas id="lobbyBg"></canvas>
+  <div class="lbShade"></div>
   <div class="lobbyWrap">
     <div class="lobbyHead">
-      <div class="logo"><canvas id="heroBall"></canvas><div><b>BILLARD</b><i>LINIEN</i></div></div>
-      <div class="pcard" id="pcard" title="Level-Belohnungen"><div class="avatar" id="lbAvatar">S</div><div class="pinfo"><b id="lbName">Spieler 1</b><div class="xpbar"><div id="lbXp"></div></div><small id="lbLevel">Level 1</small></div><span class="trkBtn">🎁</span></div>
-      <div class="coins" id="lbCoins">🪙 0</div>
-      <button id="bDaily" class="daily">🎁 Tagesbonus</button>
+      <div class="logo"><canvas id="heroBall"></canvas><div class="wm"><b>BILLARD</b><i>LINIEN</i></div></div>
+      <div class="pcard" id="pcard" title="Level-Belohnungen"><div class="avRing" id="lbRing"><div class="avatar" id="lbAvatar">S</div><span class="lvBadge" id="lbLvNum">1</span></div><div class="pinfo"><b id="lbName">Spieler 1</b><div class="xpbar"><div id="lbXp"></div></div><small id="lbLevel">Level 1</small></div><span class="trkBtn"><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M5 12v9h14v-9M12 8v13M12 8c-1.5-4-6-4.5-6-1.5S12 8 12 8zM12 8c1.5-4 6-4.5 6-1.5S12 8 12 8z"/></svg></span></div>
+      <div class="hdrRight">
+        <button class="coins" id="lbCoinsBtn" title="Shop"><i class="coin"></i><span id="lbCoins">0</span><b class="plus">+</b></button>
+        <button id="bDaily" class="daily"><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M5 12v9h14v-9M12 8v13M12 8c-1.5-4-6-4.5-6-1.5S12 8 12 8zM12 8c1.5-4 6-4.5 6-1.5S12 8 12 8z"/></svg><span id="bDailyTxt">Tagesbonus</span></button>
+      </div>
     </div>
     <div class="lobbyOpts">
       <span>Spiel</span><div class="seg" data-k="mode"><button data-v="8">8-Ball</button><button data-v="9">9-Ball</button></div>
-      <span>Computer</span><div class="seg" data-k="diff"><button data-v="0">Leicht</button><button data-v="1">Mittel</button><button data-v="2">Schwer</button></div>
+      <span>Gegner</span><div class="seg" data-k="diff"><button data-v="0">Leicht</button><button data-v="1">Mittel</button><button data-v="2">Schwer</button></div>
     </div>
-    <div class="carWrap">
-      <button class="carArrow l" id="carL">‹</button>
-      <div id="carousel">
-        <button class="tile t1" data-go="ai"><em>🤖</em><b>Gegen Computer</b><small id="tAi"></small><p>Spiele 8-Ball oder 9-Ball gegen drei Stärken.</p><span class="play">Spielen ▶</span></button>
-        <button class="tile t4" data-go="levels"><em>🏆</em><b>Herausforderungen</b><small id="tLv"></small><p>6 Lektionen und 90 Aufgaben mit Belohnungen.</p><span class="play">Spielen ▶</span></button>
-        <button class="tile t3" data-go="online"><em>🌐</em><b>Online</b><small>Mit Freunden, ohne Server</small><p>Direkt von Handy zu Handy per Code.</p><span class="play">Spielen ▶</span></button>
-        <button class="tile t5" data-go="arcade"><em>⚡</em><b>Trefferserie</b><small id="tArc"></small><p>Endlos versenken, Serie aufbauen, Rekord jagen.</p><span class="play">Spielen ▶</span></button>
-        <button class="tile t2" data-go="human"><em>👥</em><b>2 Spieler</b><small>An einem Handy</small><p>Abwechselnd stoßen, ohne Internet.</p><span class="play">Spielen ▶</span></button>
-        <button class="tile t6" data-go="training"><em>🎯</em><b>Training</b><small>Kugeln frei setzen</small><p>Jeden Stoß in Ruhe üben – mit allen Linien.</p><span class="play">Spielen ▶</span></button>
-        <button class="tile t7" data-go="tourn"><em>🏟</em><b>Turnier</b><small>Startgeld 100 🪙 · Sieg 1.200 🪙</small><p>Viertelfinale, Halbfinale, Finale – drei Siege in Folge.</p><span class="play">Spielen ▶</span></button>
-        <button class="tile t8" data-go="target"><em>🎯</em><b>Zielscheibe</b><small id="tTgt"></small><p>Weiße genau ins Zentrum legen. 5 Stöße.</p><span class="play">Spielen ▶</span></button>
-        <button class="tile t9" data-go="lucky"><em>🍀</em><b>Glücksstoß</b><small id="tLucky"></small><p>Jede Tasche ein Preis – bis 800 🪙!</p><span class="play">Spielen ▶</span></button>
+    <div class="stage">
+      <div class="rail">
+        <button id="bQuests" class="ev evQ"><span class="evI"><svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2.5"/><path d="M9 3h6v3.5H9zM9 13.5l2.2 2.2L15.5 11"/></svg><i class="badge hidden" id="qBadge"></i></span><small>Aufgaben</small></button>
+        <button id="bWheel" class="ev evW"><span class="evI"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18M5.6 5.6l12.8 12.8M18.4 5.6L5.6 18.4"/><circle cx="12" cy="12" r="2.2" class="f"/></svg><i class="badge hidden" id="wBadge">!</i></span><small>Glücksrad</small></button>
       </div>
-      <button class="carArrow r" id="carR">›</button>
+      <div class="carWrap">
+        <button class="carArrow l" id="carL"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+        <div id="carousel">
+        <button class="tile" data-go="ai" style="--c1:#38b6ff;--c2:#06244a"><canvas class="art" data-art="ai"></canvas><span class="tag">8 & 9-BALL</span><span class="tbody"><b>Gegen Computer</b><small id="tAi"></small><p>Drei Stärken – vom Anfänger bis zum Profi.</p></span><span class="play">Spielen <svg viewBox="0 0 24 24"><path d="M8 4.5l12 7.5-12 7.5z" class="f"/></svg></span></button>
+        <button class="tile" data-go="levels" style="--c1:#ffc23a;--c2:#4a2c00"><canvas class="art" data-art="levels"></canvas><span class="tag">90 LEVEL</span><span class="tbody"><b>Herausforderungen</b><small id="tLv"></small><p>6 Lektionen und 90 Aufgaben mit Belohnungen.</p></span><span class="play">Spielen <svg viewBox="0 0 24 24"><path d="M8 4.5l12 7.5-12 7.5z" class="f"/></svg></span></button>
+        <button class="tile" data-go="online" style="--c1:#a879ff;--c2:#21104f"><canvas class="art" data-art="online"></canvas><span class="tag">MULTIPLAYER</span><span class="tbody"><b>Online</b><small>Mit Freunden, ohne Server</small><p>Raumcode oder Link teilen und los.</p></span><span class="play">Spielen <svg viewBox="0 0 24 24"><path d="M8 4.5l12 7.5-12 7.5z" class="f"/></svg></span></button>
+        <button class="tile" data-go="arcade" style="--c1:#ff6a3d;--c2:#4a0e02"><canvas class="art" data-art="arcade"></canvas><span class="tag">ENDLOS</span><span class="tbody"><b>Trefferserie</b><small id="tArc"></small><p>Serie aufbauen, Multiplikator jagen.</p></span><span class="play">Spielen <svg viewBox="0 0 24 24"><path d="M8 4.5l12 7.5-12 7.5z" class="f"/></svg></span></button>
+        <button class="tile" data-go="tourn" style="--c1:#d08cff;--c2:#33105e"><canvas class="art" data-art="tourn"></canvas><span class="tag">NEU</span><span class="tbody"><b>Turnier</b><small>100 → 1.200 Münzen</small><p>Viertelfinale, Halbfinale, Finale.</p></span><span class="play">Spielen <svg viewBox="0 0 24 24"><path d="M8 4.5l12 7.5-12 7.5z" class="f"/></svg></span></button>
+        <button class="tile" data-go="target" style="--c1:#ff5d6c;--c2:#450a14"><canvas class="art" data-art="target"></canvas><span class="tag">NEU · MINISPIEL</span><span class="tbody"><b>Zielscheibe</b><small id="tTgt"></small><p>Weiße genau ins Zentrum legen.</p></span><span class="play">Spielen <svg viewBox="0 0 24 24"><path d="M8 4.5l12 7.5-12 7.5z" class="f"/></svg></span></button>
+        <button class="tile" data-go="lucky" style="--c1:#46e38f;--c2:#06361b"><canvas class="art" data-art="lucky"></canvas><span class="tag">TÄGLICH GRATIS</span><span class="tbody"><b>Glücksstoß</b><small id="tLucky"></small><p>Jede Tasche ein Preis – bis 800 Münzen.</p></span><span class="play">Spielen <svg viewBox="0 0 24 24"><path d="M8 4.5l12 7.5-12 7.5z" class="f"/></svg></span></button>
+        <button class="tile" data-go="human" style="--c1:#43d9a0;--c2:#073a2a"><canvas class="art" data-art="human"></canvas><span class="tag">LOKAL</span><span class="tbody"><b>2 Spieler</b><small>An einem Gerät</small><p>Abwechselnd stoßen, ohne Internet.</p></span><span class="play">Spielen <svg viewBox="0 0 24 24"><path d="M8 4.5l12 7.5-12 7.5z" class="f"/></svg></span></button>
+        <button class="tile" data-go="training" style="--c1:#3fd6e0;--c2:#063940"><canvas class="art" data-art="training"></canvas><span class="tag">ÜBEN</span><span class="tbody"><b>Training</b><small>Kugeln frei setzen</small><p>Jeden Stoß in Ruhe üben.</p></span><span class="play">Spielen <svg viewBox="0 0 24 24"><path d="M8 4.5l12 7.5-12 7.5z" class="f"/></svg></span></button>
+        </div>
+        <button class="carArrow r" id="carR"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+        <div class="dots" id="carDots"></div>
+      </div>
     </div>
     <div id="lbMsg"></div>
     <div class="lobbyBar">
-      <button id="bResume" class="hidden">▶ Weiterspielen</button>
-      <button id="bQuests">📋 Aufgaben<i class="badge hidden" id="qBadge"></i></button><button id="bWheel">🎡 Glücksrad<i class="badge hidden" id="wBadge">!</i></button><button id="bInv">🎒 Inventar</button><button id="bShop">🛒 Shop</button><button id="bStats">📊 Statistik</button><button id="bSettings">⚙ Einstellungen</button><button id="bRules">📖 Regeln</button>
+      <button id="bResume" class="hidden"><svg viewBox="0 0 24 24"><path d="M8 4.5l12 7.5-12 7.5z" class="f"/></svg><small>Weiterspielen</small></button>
+      <button id="bInv"><svg viewBox="0 0 24 24"><path d="M5 9h14l-1.2 11.5H6.2L5 9z"/><path d="M9 9V6.5a3 3 0 0 1 6 0V9"/></svg><small>Inventar</small></button><button id="bShop"><svg viewBox="0 0 24 24"><path d="M2.5 4h2.6l2.3 11h10.9l2.2-7.6H6.2"/><circle cx="9" cy="19.2" r="1.5"/><circle cx="17" cy="19.2" r="1.5"/></svg><small>Shop</small></button><button id="bStats"><svg viewBox="0 0 24 24"><path d="M3 20.5h18M6 20.5v-7M11 20.5V5M16 20.5v-10M21 20.5"/></svg><small>Statistik</small></button><button id="bSettings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg><small>Optionen</small></button><button id="bRules"><svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5v-15z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5M8.5 7.5h7M8.5 11h7"/></svg><small>Regeln</small></button>
     </div>
   </div>
 </div>
@@ -2112,9 +2273,11 @@ function renderLobby() {
   $('lbAvatar').textContent = name.trim().charAt(0).toUpperCase() || 'S';
   $('lbLevel').textContent = 'Level ' + lvl + ' · ' + (PROFILE.xp - a) + ' / ' + (b - a) + ' EP';
   $('lbXp').style.width = Math.round((PROFILE.xp - a) / (b - a) * 100) + '%';
-  $('lbCoins').textContent = '🪙 ' + fmt(PROFILE.coins);
+  $('lbCoins').textContent = fmt(PROFILE.coins);
+  $('lbLvNum').textContent = lvl;
+  $('lbRing').style.setProperty('--p', Math.round((PROFILE.xp - a) / (b - a) * 100));
   const d = dailyAvail();
-  $('bDaily').textContent = d ? '🎁 Tagesbonus abholen' : '🎁 Morgen wieder';
+  $('bDailyTxt').textContent = d ? 'Tagesbonus abholen' : 'Morgen wieder';
   $('bDaily').classList.toggle('ready', d); $('bDaily').disabled = !d;
   $('tAi').textContent = 'Sieg: ' + [30, 60, 120][+CFG.diff] + ' 🪙';
   const stars = SOLO.stars.reduce((x, y) => x + (y || 0), 0);
@@ -2423,6 +2586,165 @@ function drawHeroBall(canvas, n, dt, speed) {
   const c = canvas.getContext('2d');
   c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, canvas.width, canvas.height);
   c.drawImage(s.cv, (canvas.width - s.size) / 2, (canvas.height - s.size) / 2);
+}
+
+// ===================== Lobby-Kartenbilder (prozedural gezeichnet) =====================
+const ART = {key: {}};
+function artBall(c, n, x, y, r, rx, ry, d) {
+  // Kontaktschatten
+  const sg = c.createRadialGradient(x + r * 0.25, y + r * 0.95, 0, x + r * 0.25, y + r * 0.95, r * 1.2);
+  sg.addColorStop(0, 'rgba(0,0,0,.6)'); sg.addColorStop(1, 'rgba(0,0,0,0)');
+  c.fillStyle = sg; c.beginPath(); c.ellipse(x + r * 0.25, y + r * 0.95, r * 1.25, r * 0.38, 0, 0, TAU); c.fill();
+  const M = mul3(rotAxis(1, 0, 0, rx || 0), rotAxis(0, 1, 0, ry || 0));
+  const s = ballSprite('art' + n + '_' + Math.round(r * d) + '_' + (rx || 0) + (ry || 0), n, M, 0, r * d);
+  c.drawImage(s.cv, x - s.size / 2 / d, y - s.size / 2 / d, s.size / d, s.size / d);
+}
+function artGlow(c, x, y, r, col, a) {
+  const g = c.createRadialGradient(x, y, 0, x, y, r);
+  g.addColorStop(0, col); g.addColorStop(1, 'rgba(0,0,0,0)');
+  c.globalAlpha = a || 1; c.fillStyle = g; c.beginPath(); c.arc(x, y, r, 0, TAU); c.fill(); c.globalAlpha = 1;
+}
+function artGold(c, y0, y1) { const g = c.createLinearGradient(0, y0, 0, y1); g.addColorStop(0, '#fff3c0'); g.addColorStop(0.35, '#ffd047'); g.addColorStop(0.7, '#e59a10'); g.addColorStop(1, '#8a4c00'); return g; }
+function artStar(c, x, y, r, rot) {
+  c.beginPath();
+  for (let i = 0; i < 10; i++) { const a = rot - Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? r * 0.45 : r; c.lineTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr); }
+  c.closePath(); c.fillStyle = artGold(c, y - r, y + r); c.fill();
+  c.strokeStyle = 'rgba(120,60,0,.7)'; c.lineWidth = Math.max(1, r * 0.08); c.stroke();
+}
+function artCoin(c, x, y, r, tilt) {
+  const ry = r * (tilt || 0.42);
+  c.fillStyle = '#9a5a00'; c.beginPath(); c.ellipse(x, y + ry * 0.35, r, ry, 0, 0, TAU); c.fill();
+  const g = c.createLinearGradient(x - r, y - ry, x + r, y + ry); g.addColorStop(0, '#fff2b0'); g.addColorStop(0.45, '#ffcc33'); g.addColorStop(1, '#c47a00');
+  c.fillStyle = g; c.beginPath(); c.ellipse(x, y, r, ry, 0, 0, TAU); c.fill();
+  c.strokeStyle = 'rgba(140,80,0,.7)'; c.lineWidth = r * 0.08; c.beginPath(); c.ellipse(x, y, r * 0.7, ry * 0.7, 0, 0, TAU); c.stroke();
+}
+function artCue(c, x0, y0, x1, y1, w) {
+  const a = Math.atan2(y1 - y0, x1 - x0), L = Math.hypot(x1 - x0, y1 - y0);
+  c.save(); c.translate(x0, y0); c.rotate(a);
+  c.shadowColor = 'rgba(0,0,0,.6)'; c.shadowBlur = 10; c.shadowOffsetY = 6;
+  c.beginPath(); c.moveTo(0, -w * 0.28); c.lineTo(L, -w * 0.55); c.lineTo(L, w * 0.55); c.lineTo(0, w * 0.28); c.closePath();
+  const g = c.createLinearGradient(0, 0, L, 0); g.addColorStop(0, '#3a6fd0'); g.addColorStop(0.012, '#3a6fd0'); g.addColorStop(0.013, '#f4efe2'); g.addColorStop(0.05, '#f4efe2');
+  g.addColorStop(0.051, '#e8c98a'); g.addColorStop(0.55, '#c8924a'); g.addColorStop(0.551, '#d9d9d9'); g.addColorStop(0.56, '#d9d9d9'); g.addColorStop(0.561, '#4a1c08'); g.addColorStop(0.78, '#2a0e04');
+  g.addColorStop(0.781, '#111'); g.addColorStop(1, '#222');
+  c.fillStyle = g; c.fill(); c.shadowColor = 'transparent';
+  const h = c.createLinearGradient(0, -w * 0.55, 0, w * 0.55); h.addColorStop(0, 'rgba(255,255,255,.45)'); h.addColorStop(0.4, 'rgba(255,255,255,0)'); h.addColorStop(1, 'rgba(0,0,0,.35)');
+  c.fillStyle = h; c.fill(); c.restore();
+}
+function artSpark(c, x, y, r) {
+  c.fillStyle = '#fff'; c.beginPath();
+  c.moveTo(x, y - r); c.quadraticCurveTo(x, y, x + r, y); c.quadraticCurveTo(x, y, x, y + r); c.quadraticCurveTo(x, y, x - r, y); c.quadraticCurveTo(x, y, x, y - r); c.fill();
+  artGlow(c, x, y, r * 1.6, 'rgba(255,255,255,.5)');
+}
+const ART_DRAW = {
+  ai(c, w, h, d) {
+    artGlow(c, w * 0.36, h * 0.52, h * 0.5, 'rgba(80,180,255,.45)'); artGlow(c, w * 0.66, h * 0.52, h * 0.45, 'rgba(255,200,60,.35)');
+    artBall(c, 9, w * 0.68, h * 0.5, h * 0.2, 0.3, -0.4, d);
+    artBall(c, 8, w * 0.36, h * 0.54, h * 0.25, 0.25, 0.35, d);
+    c.save(); c.translate(w * 0.53, h * 0.3); c.rotate(-0.12);
+    c.font = '900 italic ' + Math.round(h * 0.2) + 'px ' + getComputedStyle(document.body).getPropertyValue('--disp');
+    c.textAlign = 'center'; c.textBaseline = 'middle'; c.lineWidth = h * 0.035; c.strokeStyle = '#0a1a33'; c.strokeText('VS', 0, 0);
+    c.fillStyle = artGold(c, -h * 0.1, h * 0.1); c.fillText('VS', 0, 0); c.restore();
+  },
+  levels(c, w, h, d) {
+    artGlow(c, w / 2, h * 0.45, h * 0.55, 'rgba(255,200,60,.5)');
+    for (let i = 0; i < 12; i++) { const a = -Math.PI / 2 + (i - 5.5) * 0.2; c.strokeStyle = 'rgba(255,220,120,.12)'; c.lineWidth = 6; c.beginPath(); c.moveTo(w / 2, h * 0.62); c.lineTo(w / 2 + Math.cos(a) * h, h * 0.62 + Math.sin(a) * h); c.stroke(); }
+    artBall(c, 3, w / 2, h * 0.62, h * 0.17, 0.4, 0.2, d);
+    artStar(c, w / 2 - h * 0.3, h * 0.36, h * 0.1, -0.2); artStar(c, w / 2 + h * 0.3, h * 0.36, h * 0.1, 0.2); artStar(c, w / 2, h * 0.24, h * 0.14, 0);
+  },
+  online(c, w, h, d) {
+    const cx = w / 2, cy = h * 0.5, R = h * 0.3;
+    artGlow(c, cx, cy, R * 1.6, 'rgba(160,110,255,.55)');
+    c.strokeStyle = 'rgba(200,180,255,.5)'; c.lineWidth = 1.2;
+    c.beginPath(); c.arc(cx, cy, R, 0, TAU); c.stroke();
+    for (const k of [0.35, 0.7]) { c.beginPath(); c.ellipse(cx, cy, R * k, R, 0, 0, TAU); c.stroke(); c.beginPath(); c.ellipse(cx, cy, R, R * k, 0, 0, TAU); c.stroke(); }
+    c.setLineDash([4, 5]); c.strokeStyle = 'rgba(255,255,255,.7)'; c.lineWidth = 2;
+    c.beginPath(); c.moveTo(w * 0.17, h * 0.62); c.quadraticCurveTo(cx, h * 0.02, w * 0.83, h * 0.62); c.stroke(); c.setLineDash([]);
+    artBall(c, 0, w * 0.17, h * 0.62, h * 0.12, 0, 0, d); artBall(c, 8, w * 0.83, h * 0.62, h * 0.12, 0.2, -0.3, d);
+    for (const [x, y] of [[0.36, 0.3], [0.5, 0.24], [0.64, 0.3]]) artGlow(c, w * x, h * y, 6, 'rgba(255,255,255,.9)');
+  },
+  arcade(c, w, h, d) {
+    artGlow(c, w * 0.5, h * 0.5, h * 0.55, 'rgba(255,110,40,.55)');
+    for (const [n, x, y, r] of [[5, 0.2, 0.62, 0.11], [11, 0.78, 0.4, 0.1], [2, 0.3, 0.3, 0.08]]) {
+      const g = c.createLinearGradient(w * x - h * 0.4, 0, w * x, 0); g.addColorStop(0, 'rgba(255,170,90,0)'); g.addColorStop(1, 'rgba(255,170,90,.45)');
+      c.fillStyle = g; c.fillRect(w * x - h * 0.4, h * y - h * r * 0.6, h * 0.4, h * r * 1.2);
+      artBall(c, n, w * x, h * y, h * r, 0.5, x, d);
+    }
+    const x = w * 0.52, y = h * 0.14, s = h * 0.7;
+    c.save(); c.shadowColor = 'rgba(255,170,40,.9)'; c.shadowBlur = 24;
+    c.beginPath(); c.moveTo(x + s * 0.1, y); c.lineTo(x - s * 0.22, y + s * 0.55); c.lineTo(x - s * 0.02, y + s * 0.55); c.lineTo(x - s * 0.12, y + s); c.lineTo(x + s * 0.25, y + s * 0.38); c.lineTo(x + s * 0.04, y + s * 0.38); c.lineTo(x + s * 0.2, y); c.closePath();
+    c.fillStyle = artGold(c, y, y + s); c.fill(); c.restore(); c.strokeStyle = 'rgba(120,50,0,.8)'; c.lineWidth = 1.5; c.stroke();
+  },
+  human(c, w, h, d) {
+    artGlow(c, w / 2, h * 0.5, h * 0.55, 'rgba(70,220,160,.45)');
+    artCue(c, w * 0.42, h * 0.52, w * 1.05, h * 0.05, h * 0.06);
+    artCue(c, w * 0.58, h * 0.52, w * -0.05, h * 0.05, h * 0.06);
+    artBall(c, 0, w * 0.5, h * 0.66, h * 0.15, 0, 0, d);
+  },
+  training(c, w, h, d) {
+    artGlow(c, w * 0.6, h * 0.45, h * 0.6, 'rgba(60,220,230,.4)');
+    const px = w * 0.86, py = h * 0.18;
+    c.fillStyle = '#030506'; c.beginPath(); c.ellipse(px, py, h * 0.1, h * 0.06, 0, 0, TAU); c.fill();
+    c.strokeStyle = 'rgba(160,240,255,.35)'; c.lineWidth = 2; c.stroke();
+    const ox = w * 0.66, oy = h * 0.38, cx = w * 0.3, cy = h * 0.66, r = h * 0.1;
+    const ux = (px - ox), uy = (py - oy), ul = Math.hypot(ux, uy), gx = ox - ux / ul * 2 * r, gy = oy - uy / ul * 2 * r;
+    c.setLineDash([3, 5]); c.lineWidth = 2; c.strokeStyle = 'rgba(255,255,255,.85)';
+    c.beginPath(); c.moveTo(cx, cy); c.lineTo(gx, gy); c.stroke();
+    c.strokeStyle = 'rgba(255,214,90,.9)'; c.beginPath(); c.moveTo(ox, oy); c.lineTo(px, py); c.stroke(); c.setLineDash([]);
+    c.strokeStyle = 'rgba(255,255,255,.8)'; c.lineWidth = 1.5; c.beginPath(); c.arc(gx, gy, r, 0, TAU); c.stroke();
+    artBall(c, 2, ox, oy, r, 0.3, 0.6, d);
+    artCue(c, cx - (gx - cx) * 0.18, cy - (gy - cy) * 0.18, cx - (gx - cx) * 1.6, cy - (gy - cy) * 1.6, h * 0.05);
+    artBall(c, 0, cx, cy, r, 0, 0, d);
+  },
+  tourn(c, w, h, d) {
+    const cx = w / 2, top = h * 0.12, s = h * 0.72;
+    artGlow(c, cx, h * 0.45, h * 0.6, 'rgba(210,140,255,.55)');
+    for (let i = 0; i < 9; i++) { const a = -Math.PI / 2 + (i - 4) * 0.3; c.strokeStyle = 'rgba(255,230,160,.1)'; c.lineWidth = 8; c.beginPath(); c.moveTo(cx, h * 0.4); c.lineTo(cx + Math.cos(a) * h, h * 0.4 + Math.sin(a) * h); c.stroke(); }
+    const gold = artGold(c, top, top + s);
+    c.save(); c.shadowColor = 'rgba(0,0,0,.55)'; c.shadowBlur = 14; c.shadowOffsetY = 6;
+    c.fillStyle = gold;
+    c.beginPath(); c.moveTo(cx - s * 0.32, top); c.lineTo(cx + s * 0.32, top); c.bezierCurveTo(cx + s * 0.32, top + s * 0.42, cx + s * 0.15, top + s * 0.55, cx + s * 0.06, top + s * 0.58);
+    c.lineTo(cx + s * 0.06, top + s * 0.74); c.lineTo(cx + s * 0.2, top + s * 0.8); c.lineTo(cx + s * 0.2, top + s * 0.9); c.lineTo(cx - s * 0.2, top + s * 0.9); c.lineTo(cx - s * 0.2, top + s * 0.8); c.lineTo(cx - s * 0.06, top + s * 0.74);
+    c.lineTo(cx - s * 0.06, top + s * 0.58); c.bezierCurveTo(cx - s * 0.15, top + s * 0.55, cx - s * 0.32, top + s * 0.42, cx - s * 0.32, top); c.closePath(); c.fill(); c.restore();
+    c.strokeStyle = gold; c.lineWidth = s * 0.05;
+    c.beginPath(); c.arc(cx - s * 0.32, top + s * 0.16, s * 0.12, Math.PI * 0.5, Math.PI * 1.5); c.stroke();
+    c.beginPath(); c.arc(cx + s * 0.32, top + s * 0.16, s * 0.12, -Math.PI * 0.5, Math.PI * 0.5); c.stroke();
+    const hl = c.createLinearGradient(cx - s * 0.3, 0, cx + s * 0.3, 0); hl.addColorStop(0, 'rgba(255,255,255,0)'); hl.addColorStop(0.3, 'rgba(255,255,255,.55)'); hl.addColorStop(0.4, 'rgba(255,255,255,0)');
+    c.fillStyle = hl; c.fillRect(cx - s * 0.3, top + s * 0.02, s * 0.6, s * 0.4);
+    c.fillStyle = '#3a1060'; c.fillRect(cx - s * 0.2, top + s * 0.82, s * 0.4, s * 0.05);
+    artBall(c, 8, cx, top + s * 0.24, s * 0.13, 0.2, 0.3, d);
+    artSpark(c, cx - s * 0.48, top + s * 0.1, 6); artSpark(c, cx + s * 0.5, top + s * 0.45, 5);
+  },
+  target(c, w, h, d) {
+    const cx = w / 2, cy = h * 0.56;
+    artGlow(c, cx, cy, h * 0.6, 'rgba(255,90,100,.4)');
+    const rings = [[0.46, '#f4f1ea'], [0.37, '#d8323f'], [0.28, '#f4f1ea'], [0.19, '#d8323f'], [0.1, '#ffd447']];
+    c.save(); c.shadowColor = 'rgba(0,0,0,.6)'; c.shadowBlur = 16; c.shadowOffsetY = 8;
+    for (const [r, col] of rings) { c.fillStyle = col; c.beginPath(); c.ellipse(cx, cy, h * r * 1.25, h * r * 0.55, 0, 0, TAU); c.fill(); c.shadowColor = 'transparent'; }
+    c.restore();
+    artBall(c, 0, cx + h * 0.03, cy - h * 0.1, h * 0.12, 0, 0, d);
+    c.setLineDash([3, 5]); c.strokeStyle = 'rgba(255,255,255,.8)'; c.lineWidth = 2; c.beginPath(); c.moveTo(w * 0.08, h * 0.16); c.quadraticCurveTo(w * 0.3, h * 0.1, cx - h * 0.1, cy - h * 0.12); c.stroke(); c.setLineDash([]);
+  },
+  lucky(c, w, h, d) {
+    const cx = w / 2, cy = h * 0.6;
+    artGlow(c, cx, h * 0.45, h * 0.6, 'rgba(80,240,150,.45)');
+    c.fillStyle = '#020403'; c.beginPath(); c.ellipse(cx, cy + h * 0.1, h * 0.36, h * 0.12, 0, 0, TAU); c.fill();
+    const pg = c.createRadialGradient(cx, cy + h * 0.1, h * 0.1, cx, cy + h * 0.1, h * 0.36); pg.addColorStop(0, 'rgba(255,200,60,.4)'); pg.addColorStop(1, 'rgba(255,200,60,0)');
+    c.fillStyle = pg; c.fill();
+    for (const [x, y, r, t] of [[-0.28, 0.02, 0.09, 0.42], [0.3, 0.0, 0.085, 0.5], [-0.12, -0.2, 0.08, 0.7], [0.18, -0.26, 0.075, 0.3], [0.36, -0.18, 0.06, 0.85], [-0.36, -0.22, 0.06, 0.6]]) artCoin(c, cx + h * x * 1.3, cy + h * y, h * r, t);
+    artBall(c, 1, cx, cy - h * 0.06, h * 0.15, 0.3, -0.2, d);
+    artSpark(c, cx - h * 0.45, h * 0.18, 6); artSpark(c, cx + h * 0.42, h * 0.12, 7); artSpark(c, cx + h * 0.1, h * 0.06, 4);
+  }
+};
+function drawTileArts() {
+  for (const cv of document.querySelectorAll('#menu .art')) {
+    const w = cv.clientWidth, h = cv.clientHeight; if (!w || !h) continue;
+    const d = Math.min(window.devicePixelRatio || 1, 2), key = w + 'x' + h + '@' + d + (document.fonts && document.fonts.status);
+    if (ART.key[cv.dataset.art] === key) continue;
+    ART.key[cv.dataset.art] = key;
+    cv.width = Math.round(w * d); cv.height = Math.round(h * d);
+    const c = cv.getContext('2d'); c.setTransform(d, 0, 0, d, 0, 0); c.clearRect(0, 0, w, h);
+    try { ART_DRAW[cv.dataset.art](c, w, h, d); } catch (e) { console.error(e); }
+  }
 }
 
 // ===================== Ladebildschirm =====================
@@ -4626,6 +4948,7 @@ document.querySelectorAll('.tile').forEach(t => t.onclick = () => {
   else newSolo(go);
 });
 $('bDaily').onclick = () => claimDaily();
+$('lbCoinsBtn').onclick = () => showShop();
 $('bInv').onclick = () => showInventory();
 $('bQuests').onclick = () => { $('questMsg').textContent = ''; showQuests(); };
 $('bQuestTop').onclick = () => { hide('quests'); syncMenu(); show('menu'); };
@@ -4645,7 +4968,13 @@ function updateCarousel() {
     t.style.transform = 'rotateY(' + (-d * 32).toFixed(1) + 'deg) translateZ(' + (-a * 110).toFixed(0) + 'px) scale(' + (1 - a * 0.06).toFixed(3) + ')';
     t.style.opacity = (1 - Math.min(0.55, a * 0.3)).toFixed(2);
     t.style.zIndex = String(10 - Math.round(a * 3));
+    t.classList.toggle('act', a < 0.5);
   }
+  const dots = $('carDots');
+  if (dots.childElementCount !== car.childElementCount) dots.innerHTML = '<i></i>'.repeat(car.childElementCount);
+  const idx = Math.round(car.scrollLeft / ((car.children[0].offsetWidth + 14) || 1));
+  [...dots.children].forEach((d, i) => d.classList.toggle('on', i === idx));
+  drawTileArts();
 }
 $('carousel').addEventListener('scroll', updateCarousel, {passive: true});
 $('carousel').addEventListener('wheel', e => { if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) { e.preventDefault(); $('carousel').scrollBy({left: e.deltaY * 1.2}); } }, {passive: false});

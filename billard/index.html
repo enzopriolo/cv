@@ -174,7 +174,10 @@ input.name{background:#0c1512;color:var(--text);border:1px solid var(--line);bor
 #lsDemo{background:#245a8a;border-color:#4a8fd0}
 #lsNext{background:var(--accent);color:#2a1a00;border-color:var(--accent)}
 #lsNext.done{background:#3fb68b;border-color:#3fb68b;color:#06150f}
-.lvpanel{width:min(900px,96vw)}
+.lvpanel{width:min(900px,96vw);padding-top:0}
+.lvTop{position:sticky;top:0;z-index:5;display:grid;grid-template-columns:110px 1fr 110px;align-items:center;background:var(--panel);padding:10px 0 6px;margin-bottom:2px}
+.lvTop h1{margin:0}
+#bLevelsTop{justify-self:start;background:#24372f;border:1px solid var(--line);color:var(--text);border-radius:10px;padding:8px 12px;font-weight:700;font-size:14px}
 .lvhint{text-align:center;margin:0 0 4px}
 #lvMsg{color:var(--accent);font-size:13px;min-height:16px;text-align:center}
 #topicList{display:grid;grid-template-columns:1fr 1fr;gap:8px;text-align:left}
@@ -357,7 +360,7 @@ input.name{background:#0c1512;color:var(--text);border:1px solid var(--line);bor
 
 <div id="levels" class="overlay hidden">
   <div class="panel lvpanel">
-    <h1>Herausforderungen</h1>
+    <div class="lvTop"><button id="bLevelsTop">← Menü</button><h1>Herausforderungen</h1><span></span></div>
     <div class="muted lvhint">Jedes Thema beginnt mit einer Lektion. Sie zeigt dir am Tisch, wie und warum der Stoß funktioniert. Danach schaltest du die Herausforderungen frei und verdienst Münzen.</div>
     <div id="lvMsg"></div>
     <div id="topicList"></div>
@@ -447,7 +450,7 @@ function recPath(S, b, force) {
   if (!S.paths) return;
   const p = S.paths[b.n];
   const l = p[p.length - 1];
-  if (force || (l[0] - b.x) ** 2 + (l[1] - b.y) ** 2 > 0.8) p.push([b.x, b.y]);
+  if (force || (l[0] - b.x) ** 2 + (l[1] - b.y) ** 2 > 0.25) p.push([b.x, b.y]);
 }
 
 // Ein Simulationsschritt. Gibt false zurück, wenn alle Kugeln stehen.
@@ -760,6 +763,7 @@ function shoot() {
   initAudio();
   G.spinUI = false;
   if (G.online) netSend(aimMsg('shot'));
+  G.aimView = G.aim; G.powerView = G.power;
   G.strikeFrom = G.state; G.state = 'strike'; G.strikeT = performance.now();
   updateUI();
 }
@@ -3033,10 +3037,11 @@ function linesMode() {
 }
 function getPrediction() {
   const cue = getBall(G.balls, 0);
-  const key = [G.aim, G.power, G.sx, G.sy, cue.x, cue.y, G.ver, G.called].join('|');
+  const a = G.aimView === undefined ? G.aim : G.aimView, pw = G.powerView === undefined ? G.power : G.powerView;
+  const key = [a, pw, G.sx, G.sy, cue.x, cue.y, G.ver, G.called].join('|');
   if (key !== G.predKey) {
     G.predKey = key;
-    G.pred = runSim(G.balls, shotParams(), true);
+    G.pred = runSim(G.balls, shotParams(a, pw), true);
     G.predInfo = predictVerdict(G.pred);
   }
   return G.pred;
@@ -3063,7 +3068,28 @@ function predictVerdict(S) {
   if (r.cont) return {t: '✓ Kugel fällt – du bleibst dran', c: 'good'};
   return null;
 }
-function polyline(p) { ctx.beginPath(); ctx.moveTo(p[0][0], p[0][1]); for (let i = 1; i < p.length; i++) ctx.lineTo(p[i][0], p[i][1]); }
+function polyline(p) {
+  ctx.beginPath(); ctx.moveTo(p[0][0], p[0][1]);
+  if (p.length < 3) { for (let i = 1; i < p.length; i++) ctx.lineTo(p[i][0], p[i][1]); return; }
+  // Kurve durch die Mittelpunkte: weich, aber Abpraller bleiben klar erkennbar
+  for (let i = 1; i < p.length - 1; i++) ctx.quadraticCurveTo(p[i][0], p[i][1], (p[i][0] + p[i + 1][0]) / 2, (p[i][1] + p[i + 1][1]) / 2);
+  ctx.lineTo(p[p.length - 1][0], p[p.length - 1][1]);
+}
+// Linie, die am Ende weich ausläuft
+function fadeLine(p, col, w) {
+  const L2 = pathLen(p);
+  if (L2 < 0.5) return;
+  const solid = trimPath(p, L2 * 0.6);
+  glowLine(solid, col, w);
+  let rest = p.slice(solid.length - 1); rest[0] = solid[solid.length - 1];
+  const parts = 5, seg = L2 * 0.4 / parts;
+  for (let k = 0; k < parts && rest.length > 1; k++) {
+    const piece = trimPath(rest, seg), f = 1 - (k + 1) / (parts + 1);
+    glowLine(piece, a => col(a * f), w);
+    const used = piece.length - 1; rest = rest.slice(used); rest[0] = piece[piece.length - 1];
+    if (pathLen(rest) < 0.05) break;
+  }
+}
 // Linie mit Leuchtrand
 function glowLine(p, col, w) {
   if (p.length < 2) return;
@@ -3124,29 +3150,15 @@ function drawPrediction(S) {
   // Bahnen der Objektkugeln
   const objs = mode === 'all' ? Object.keys(S.paths).map(Number).filter(n => n !== 0 && movedPath(S, n)) : C ? [C.n] : [];
   for (const n of objs) {
-    let p = S.paths[n];
-    p = trimPath(p, mode === 'guide' ? Math.min(55, lim * 0.6) : lim * 0.6);
-    glowLine(p, a => lineCol(n, a), 2.1 * px);
+    const p = trimPath(S.paths[n], mode === 'guide' ? Math.min(55, lim * 0.6) : lim * 0.6);
+    fadeLine(p, a => lineCol(n, a), 2.1 * px);
     pathArrows(p, 'rgba(255,255,255,.85)', px, 22);
   }
-  // Bahn der Weißen (laufende Striche)
-  let cp = S.paths[0];
-  if (mode === 'guide') {
-    // bis zur getroffenen Kugel bzw. zur ersten Bande, danach ein kurzes Stück der neuen Richtung
-    const stop = C || S.cueRail;
-    if (stop) {
-      let i = cp.findIndex(q => Math.abs(q[0] - stop.x) < 0.01 && Math.abs(q[1] - stop.y) < 0.01);
-      if (i < 0) i = cp.length - 1;
-      cp = cp.slice(0, i + 1).concat(trimPath(cp.slice(i), 20).slice(1));
-    }
-  }
-  cp = trimPath(cp, lim);
+  // Bahn der Weißen: immer durchgehend bis dorthin, wo sie liegen bleibt
+  const cp = S.paths[0];
   if (cp.length > 1) {
-    ctx.lineJoin = 'round'; ctx.lineCap = 'round';
-    polyline(cp); ctx.strokeStyle = 'rgba(255,255,255,.18)'; ctx.lineWidth = 6 * px; ctx.stroke();
-    ctx.setLineDash([6 * px, 4.5 * px]); ctx.lineDashOffset = -(now / 25) * px;
-    polyline(cp); ctx.strokeStyle = 'rgba(255,255,255,.98)'; ctx.lineWidth = 2 * px; ctx.stroke();
-    ctx.setLineDash([]); ctx.lineDashOffset = 0;
+    glowLine(cp, a => 'rgba(255,255,255,' + a + ')', 1.9 * px);
+    pathArrows(cp, 'rgba(255,255,255,.75)', px, 30);
   }
   // Geisterkugel am Treffpunkt und Treffpunkt auf der Objektkugel
   if (C) {
@@ -3157,7 +3169,7 @@ function drawPrediction(S) {
   }
   // Endposition der Weißen
   const cf = getBall(S.balls, 0);
-  if (cf.on && mode === 'all' && full(0)) {
+  if (cf.on && movedPath(S, 0)) {
     ctx.setLineDash([2 * px, 2 * px]); ctx.beginPath(); ctx.arc(cf.x, cf.y, R, 0, TAU);
     ctx.strokeStyle = 'rgba(255,255,255,.85)'; ctx.lineWidth = 1.3 * px; ctx.stroke(); ctx.setLineDash([]);
   }
@@ -3169,7 +3181,7 @@ function drawPrediction(S) {
     ctx.beginPath(); ctx.arc(d.x, d.y, d.r - 0.6, 0, TAU); ctx.strokeStyle = lineCol(p.n, 1); ctx.lineWidth = (2.2 + pulse) * px; ctx.stroke();
     miniBallTable(p.n, d.x, d.y, R * 0.75);
   }
-  if (S.ev.cuePotted && full(0)) {
+  if (S.ev.cuePotted) {
     const p = S.paths[0][S.paths[0].length - 1];
     ctx.strokeStyle = '#ff4d3d'; ctx.lineWidth = 2.6 * px; ctx.lineCap = 'round';
     ctx.beginPath(); ctx.moveTo(p[0] - 3, p[1] - 3); ctx.lineTo(p[0] + 3, p[1] + 3); ctx.moveTo(p[0] + 3, p[1] - 3); ctx.lineTo(p[0] - 3, p[1] + 3); ctx.stroke();
@@ -3246,14 +3258,15 @@ function paintCueShape(c, x0, len, design, r0, r1) {
   c.restore();
 }
 function drawCue(cue, extra) {
-  const pull = 1.5 + G.power * 16 + (extra || 0);
+  const aim = G.state === 'aim' || G.state === 'aipreview' ? G.aimView : G.aim, pw = G.state === 'aim' ? G.powerView : G.power;
+  const pull = 1.5 + pw * 16 + (extra || 0);
   const off = G.sx * R * 0.55, len = 147, x0 = R + pull;
   const design = CUES[cueFor(G.cur)] || CUES.klassik;
-  ctx.save(); ctx.translate(cue.x + 2.2, cue.y + 3.2); ctx.rotate(G.aim + Math.PI); ctx.translate(0, -off);
+  ctx.save(); ctx.translate(cue.x + 2.2, cue.y + 3.2); ctx.rotate(aim + Math.PI); ctx.translate(0, -off);
   ctx.globalAlpha = 0.28; ctx.fillStyle = '#000';
   ctx.beginPath(); ctx.moveTo(x0, -0.62); ctx.lineTo(x0 + len, -1.5); ctx.lineTo(x0 + len, 1.5); ctx.lineTo(x0, 0.62); ctx.closePath(); ctx.fill();
   ctx.restore();
-  ctx.save(); ctx.translate(cue.x, cue.y); ctx.rotate(G.aim + Math.PI); ctx.translate(0, -off);
+  ctx.save(); ctx.translate(cue.x, cue.y); ctx.rotate(aim + Math.PI); ctx.translate(0, -off);
   paintCueShape(ctx, x0, len, design, 0.62, 1.5);
   ctx.restore();
 }
@@ -3273,9 +3286,18 @@ function cueStats(i) {
   };
 }
 // Der tatsächliche Stoß des Spielers am Zug (mit den Werten seines Queues)
-function shotParams() {
+function shotParams(angle, power) {
   const c = cueStats(G.cur);
-  return {angle: G.aim, power: G.power, sx: G.sx * c.spin, sy: G.sy * c.spin, force: c.force};
+  return {angle: angle === undefined ? G.aim : angle, power: power === undefined ? G.power : power, sx: G.sx * c.spin, sy: G.sy * c.spin, force: c.force};
+}
+// Geglättete Anzeige von Zielrichtung und Kraft: Linien und Queue gleiten weich nach
+function updateAimView(dt) {
+  if (G.aimView === undefined || G.state !== 'aim' && G.state !== 'aipreview') { G.aimView = G.aim; G.powerView = G.power; return; }
+  const k = 1 - Math.exp(-dt * 22);
+  const d = Math.atan2(Math.sin(G.aim - G.aimView), Math.cos(G.aim - G.aimView));
+  G.aimView = Math.abs(d) < 1e-6 ? G.aim : G.aimView + d * k;
+  const dp = G.power - G.powerView;
+  G.powerView = Math.abs(dp) < 1e-4 ? G.power : G.powerView + dp * k;
 }
 // Welcher Queue gehört zum Spieler am Zug?
 function cueFor(i) {
@@ -3550,6 +3572,7 @@ function draw() {
   const aiming = (G.state === 'aim' && !G.ai[G.cur]) || G.state === 'aipreview' || G.state === 'strike' || G.state === 'lessonaim';
   const now = performance.now();
   updateOrient(balls);
+  updateAimView(LAST_DT || 1 / 60);
   const humanAim = G.state === 'aim' && !G.ai[G.cur];
   if (humanAim) drawTargetGlow(now, true);
   // Taschenansage
@@ -3791,6 +3814,7 @@ $('bShop').onclick = () => showShop();
 $('bShopClose').onclick = () => { hide('shop'); syncMenu(); show('menu'); };
 document.querySelectorAll('#shopTabs button').forEach(b => b.onclick = () => { shopTab = b.dataset.tab; $('shopMsg').textContent = ''; renderShop(); });
 $('bLevelsBack').onclick = () => { hide('levels'); syncMenu(); show('menu'); };
+$('bLevelsTop').onclick = () => $('bLevelsBack').onclick();
 $('lsBack').onclick = () => { if (G && G.solo.step > 0) lessonStep(G.solo.step - 1); };
 $('lsNext').onclick = () => { if (!G) return; const n = LESSONS[G.solo.topic].length; if (G.solo.step < n - 1) lessonStep(G.solo.step + 1); else lessonFinish(); };
 $('lsDemo').onclick = () => lessonDemo();

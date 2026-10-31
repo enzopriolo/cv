@@ -190,6 +190,20 @@ input.name{background:#0c1512;color:var(--text);border:1px solid var(--line);bor
 .lessonBtn.done{background:#24372f;color:#7dffb0;border-color:#3fb68b}
 .tlevels{display:flex;gap:5px;flex-wrap:wrap}
 .tlevels .lvl{min-width:0;flex:0 1 calc(25% - 4px)}
+.pcard{cursor:pointer}
+.trkBtn{font-size:20px;margin-left:4px;animation:float 2.4s ease-in-out infinite}
+.trackPanel{width:min(900px,96vw)}
+.muted.center{text-align:center}
+#trackList{display:flex;gap:10px;overflow-x:auto;padding:12px 4px;scroll-snap-type:x proximity}
+.trk{flex:0 0 120px;scroll-snap-align:center;background:#17251f;border:1px solid var(--line);border-radius:14px;padding:10px 8px;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;opacity:.7}
+.trk b{font-size:13px;color:var(--muted)}
+.trkIcon{font-size:34px;filter:drop-shadow(0 4px 6px rgba(0,0,0,.5))}
+.trk small{font-size:12px;line-height:1.25}
+.trk small em{font-style:normal;color:#ffb020;font-weight:800}
+.trk i{font-style:normal;font-size:12px;color:var(--muted)}
+.trk.done{opacity:1;border-color:#3fb68b}.trk.done i{color:#7dffb0}
+.trk.excl{background:linear-gradient(160deg,#4a3208,#1a1408);border-color:#ffb020}
+.topicRew{font-size:11px;color:#ffd75a;margin-left:6px}
 #pushDlg{position:fixed;z-index:15;left:50%;top:50%;transform:translate(-50%,-50%);background:rgba(22,35,30,.96);border:1px solid var(--accent);border-radius:14px;padding:12px 16px;text-align:center;font-size:14px}
 #pushDlg .actions{margin-top:8px}
 </style>
@@ -224,7 +238,7 @@ input.name{background:#0c1512;color:var(--text);border:1px solid var(--line);bor
   <div class="lobbyWrap">
     <div class="lobbyHead">
       <div class="logo"><canvas id="heroBall"></canvas><div><b>BILLARD</b><i>LINIEN</i></div></div>
-      <div class="pcard"><div class="avatar" id="lbAvatar">S</div><div class="pinfo"><b id="lbName">Spieler 1</b><div class="xpbar"><div id="lbXp"></div></div><small id="lbLevel">Level 1</small></div></div>
+      <div class="pcard" id="pcard" title="Level-Belohnungen"><div class="avatar" id="lbAvatar">S</div><div class="pinfo"><b id="lbName">Spieler 1</b><div class="xpbar"><div id="lbXp"></div></div><small id="lbLevel">Level 1</small></div><span class="trkBtn">🎁</span></div>
       <div class="coins" id="lbCoins">🪙 0</div>
       <button id="bDaily" class="daily">🎁 Tagesbonus</button>
     </div>
@@ -249,6 +263,15 @@ input.name{background:#0c1512;color:var(--text);border:1px solid var(--line);bor
       <button id="bResume" class="hidden">▶ Weiterspielen</button>
       <button id="bShop">🛒 Shop</button><button id="bStats">📊 Statistik</button><button id="bSettings">⚙ Einstellungen</button><button id="bRules">📖 Regeln</button>
     </div>
+  </div>
+</div>
+
+<div id="track" class="overlay hidden">
+  <div class="panel trackPanel">
+    <h1>Level-Belohnungen</h1>
+    <div id="trackInfo" class="muted center"></div>
+    <div id="trackList"></div>
+    <div class="actions"><button id="bTrackClose" class="primary">Zurück</button></div>
   </div>
 </div>
 
@@ -1052,7 +1075,9 @@ function endSolo(win, text, stars) {
       const coins = (prev ? 0 : LEVEL_REWARDS[so.idx]) + Math.max(0, stars - prev) * 20, xp = 10 + stars * 10;
       showReward(gain(coins, xp), xp);
       if (!prev) text += ' Erstmals geschafft – Belohnung freigeschaltet!';
-      confetti(); playSound('win', 0); SOLO.stars[so.idx] = Math.max(prev, stars); saveSolo(); title = '★'.repeat(stars) + '☆'.repeat(3 - stars) + ' Geschafft!'; }
+      confetti(); playSound('win', 0); SOLO.stars[so.idx] = Math.max(prev, stars); saveSolo();
+      const tr = checkTopicReward(topicOf(so.idx));
+      if (tr) { const c2 = gain(tr, 50); text += ' 🎁 Thema „' + TOPICS[topicOf(so.idx)].name + '“ komplett: +' + c2 + ' Münzen!'; showReward(coins + c2, xp + 50); } title = '★'.repeat(stars) + '☆'.repeat(3 - stars) + ' Geschafft!'; }
     else title = 'Nicht geschafft';
   } else title = 'Spiel vorbei';
   $('overTitle').textContent = title;
@@ -1073,7 +1098,9 @@ function showLevels(focus) {
     const card = document.createElement('div');
     card.className = 'topic' + (focus === t ? ' focus' : '');
     const head = document.createElement('div'); head.className = 'thead';
-    head.innerHTML = '<span class="ticon">' + tp.icon + '</span><div class="tname"><b>' + tp.name + '</b><small>★ ' + stars + ' / ' + tp.levels.length * 3 + '</small></div>';
+    const rewDone = SOLO.topicRew && SOLO.topicRew[t];
+    head.innerHTML = '<span class="ticon">' + tp.icon + '</span><div class="tname"><b>' + tp.name + '</b><small>★ ' + stars + ' / ' + tp.levels.length * 3 +
+      '<span class="topicRew">' + (rewDone ? '🎁 ✓ erhalten' : '🎁 Thema komplett: ' + TOPIC_REWARDS[t] + ' 🪙') + '</span></small></div>';
     const lb = document.createElement('button');
     lb.className = 'lessonBtn' + (done ? ' done' : '');
     lb.textContent = done ? '✓ Lektion' : '📖 Lektion starten';
@@ -1139,6 +1166,14 @@ const TOPICS = [
   {icon: '↪️', name: 'Seiteneffet', levels: [17]},
   {icon: '🧠', name: 'Stellungsspiel & Abräumen', levels: [4, 7, 8, 9, 18, 19]}
 ];
+const TOPIC_REWARDS = [150, 150, 200, 200, 250, 500];
+// Alle Herausforderungen eines Themas geschafft: einmalige Themen-Belohnung
+function checkTopicReward(t) {
+  SOLO.topicRew = SOLO.topicRew || [];
+  if (SOLO.topicRew[t] || !TOPICS[t].levels.every(i => (SOLO.stars[i] || 0) > 0)) return 0;
+  SOLO.topicRew[t] = true; saveSolo();
+  return TOPIC_REWARDS[t];
+}
 const topicOf = i => TOPICS.findIndex(t => t.levels.includes(i));
 const lessonDone = t => !!(SOLO.lessons && SOLO.lessons[t]);
 function levelUnlocked(i) {
@@ -1844,6 +1879,43 @@ if (!PROFILE.ballsets.includes(PROFILE.balls)) PROFILE.balls = 'klassik';
 const levelOf = xp => Math.floor(Math.sqrt(xp / 60)) + 1;
 const levelXp = l => (l - 1) * (l - 1) * 60;
 const fmt = n => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+// Belohnungen für Spieler-Level (die mit ★ gibt es nur hier)
+const LEVEL_TRACK = [
+  {lv: 2, coins: 100}, {lv: 3, item: ['cloths', 'tuerkis']}, {lv: 4, coins: 150}, {lv: 5, item: ['cues', 'kirsch']},
+  {lv: 6, coins: 200}, {lv: 7, item: ['balls', 'pastell']}, {lv: 8, coins: 250}, {lv: 9, item: ['tables', 'eiche']},
+  {lv: 10, item: ['cues', 'champion']}, {lv: 12, coins: 400}, {lv: 14, item: ['tables', 'marmor']}, {lv: 15, item: ['tables', 'smaragd']},
+  {lv: 18, coins: 600}, {lv: 20, item: ['balls', 'gold']}, {lv: 22, coins: 800}, {lv: 25, item: ['cues', 'legende']}, {lv: 30, coins: 1500}
+];
+const ITEM_KIND = {cues: ['Queue', () => PROFILE.cues, () => CUES], tables: ['Tisch', () => PROFILE.tables, () => TABLE_SKINS], balls: ['Kugel-Set', () => PROFILE.ballsets, () => BALL_SETS], cloths: ['Tuch', () => PROFILE.cloths, () => Object.fromEntries(Object.keys(CLOTH_SHOP).map(k => [k, {name: CLOTH_SHOP[k][0]}]))]};
+const rewardName = r => r.coins ? r.coins + ' Münzen' : ITEM_KIND[r.item[0]][0] + ' „' + ITEM_KIND[r.item[0]][2]()[r.item[1]].name + '“';
+// Alle erreichten, noch nicht erhaltenen Level-Belohnungen gutschreiben
+function grantLevelRewards() {
+  PROFILE.lvClaimed = PROFILE.lvClaimed || [];
+  const lvl = levelOf(PROFILE.xp), got = [];
+  for (const r of LEVEL_TRACK) {
+    if (r.lv > lvl || PROFILE.lvClaimed.includes(r.lv)) continue;
+    PROFILE.lvClaimed.push(r.lv);
+    if (r.coins) PROFILE.coins += r.coins;
+    else { const own = ITEM_KIND[r.item[0]][1](); if (!own.includes(r.item[1])) own.push(r.item[1]); }
+    got.push(rewardName(r));
+  }
+  if (got.length) { saveProfile(); toast('🎁 Level-Belohnung: ' + got.join(', ') + '!', 4500); }
+  return got;
+}
+function showTrack() {
+  const lvl = levelOf(PROFILE.xp), box = $('trackList');
+  box.innerHTML = '';
+  for (const r of LEVEL_TRACK) {
+    const done = r.lv <= lvl, excl = r.item && ITEM_KIND[r.item[0]][2]()[r.item[1]].levelOnly;
+    const el = document.createElement('div');
+    el.className = 'trk' + (done ? ' done' : '') + (excl ? ' excl' : '');
+    el.innerHTML = '<b>Level ' + r.lv + '</b><span class="trkIcon">' + (r.coins ? '🪙' : {cues: '🎯', tables: '🎱', balls: '🔴', cloths: '🎨'}[r.item[0]]) + '</span><small>' + rewardName(r) + (excl ? '<br><em>★ exklusiv</em>' : '') + '</small><i>' + (done ? '✓ erhalten' : '🔒') + '</i>';
+    box.appendChild(el);
+  }
+  $('trackInfo').textContent = 'Du bist Level ' + lvl + '. Erfahrungspunkte bekommst du für Partien, Siege, Herausforderungen und die Trefferserie.';
+  hide('menu'); show('track');
+  setTimeout(() => { const next = box.querySelector('.trk:not(.done)'); if (next) next.scrollIntoView({inline: 'center', block: 'nearest'}); }, 50);
+}
 // Münzen und Erfahrung gutschreiben; gibt die Münzen inkl. Level-Bonus zurück
 function gain(coins, xp) {
   const before = levelOf(PROFILE.xp);
@@ -1852,6 +1924,7 @@ function gain(coins, xp) {
   let bonus = 0;
   if (after > before) { bonus = 75 * (after - before); PROFILE.coins += bonus; toast('⭐ Level ' + after + ' erreicht! Bonus: ' + bonus + ' 🪙', 4000); }
   saveProfile();
+  if (after > before) setTimeout(grantLevelRewards, 1500);
   return coins + bonus;
 }
 function showReward(coins, xp) {
@@ -1911,7 +1984,7 @@ function renderShop() {
   const grid = $('shopGrid'); grid.innerHTML = '';
   grid.className = 'g-' + shopTab;
   $('shopNote').textContent = shopTab === 'cloths' && tableSkin().cloth ? 'Hinweis: Dein Tisch „' + tableSkin().name + '“ hat ein eigenes Tuch. Die Tuchfarbe gilt für die anderen Tische.' : '';
-  const ids = Object.keys(all).sort((x, y) => all[x].price - all[y].price);
+  const ids = Object.keys(all).sort((x, y) => (all[x].levelOnly ? 1e6 + all[x].levelOnly : all[x].price) - (all[y].levelOnly ? 1e6 + all[y].levelOnly : all[y].price));
   for (const id of ids) {
     const d = all[id], tier = d.tier || 0, it = {id, name: d.name, price: d.price, owned: owned.includes(id), active: act === id};
     const card = document.createElement('div');
@@ -1928,6 +2001,7 @@ function renderShop() {
     const btn = document.createElement('button');
     if (it.active) { btn.textContent = '✓ Ausgerüstet'; btn.disabled = true; }
     else if (it.owned) { btn.textContent = 'Ausrüsten'; btn.className = 'eq'; }
+    else if (d.levelOnly) { btn.textContent = '🔒 Ab Level ' + d.levelOnly; btn.disabled = true; }
     else { btn.textContent = '🪙 ' + fmt(it.price); btn.className = 'buy'; if (PROFILE.coins < it.price) btn.classList.add('poor'); }
     btn.onclick = () => shopAction(it);
     card.appendChild(btn);
@@ -2637,6 +2711,7 @@ const TABLE_SKINS = {
     cloth: {main: '#2a0d08', band: '#1a0604', cush: ['#5a1a0c', '#441208', '#320c05', '#1c0602'], rgb: [70, 20, 10]}},
   galaxie: {name: 'Galaxie', price: 6000, tier: 3, rail: spaceRail, gloss: 0.35, diamond: 'star', rim: ['#b48cff', '#1a0f3a'], deco: 'nebula', anim: 'galaxy',
     cloth: {main: '#140f36', band: '#0b0822', cush: ['#3a2a7a', '#2c1f60', '#211749', '#150e30'], rgb: [30, 22, 80]}},
+  smaragd: {name: 'Smaragd', price: 0, tier: 2, levelOnly: 15, rail: stoneRail(['#0e6b4a', '#064030', '#0f7a55'], 'rgba(0,30,15,', 'rgba(140,255,200,'), gloss: 0.45, diamond: 'gold', rim: ['#ffe28a', '#7a5a12'], deco: 'medallion', anim: 'glint'},
   royal: {name: 'Königsthron', price: 8000, tier: 3, rail: goldRail, gloss: 0.55, diamond: 'ruby', rim: ['#fff0b0', '#8a6410'], deco: 'crest', anim: 'sparkle',
     cloth: {main: '#7a0d1e', band: '#520814', cush: ['#a8213a', '#8a182e', '#6c1224', '#4c0b18'], rgb: [130, 20, 40]}}
 };
@@ -2767,6 +2842,7 @@ const BALL_SETS = {
   pastell: {name: 'Pastell', price: 500, tier: 1, pal: {1: [252, 222, 120], 2: [130, 170, 240], 3: [245, 140, 140], 4: [190, 150, 230], 5: [252, 180, 120], 6: [130, 210, 160], 7: [210, 130, 140], 8: [70, 70, 80]}},
   neon: {name: 'Neon', price: 1600, tier: 2, pal: {1: [255, 250, 0], 2: [0, 200, 255], 3: [255, 30, 90], 4: [190, 60, 255], 5: [255, 140, 0], 6: [0, 255, 120], 7: [255, 0, 200], 8: [20, 20, 30]}, glow: true},
   metall: {name: 'Flüssigmetall', price: 2600, tier: 2, pal: {1: [230, 190, 60], 2: [90, 130, 210], 3: [200, 70, 60], 4: [140, 100, 190], 5: [230, 140, 60], 6: [70, 170, 120], 7: [170, 80, 90], 8: [60, 62, 68]}, metal: true},
+  gold: {name: 'Goldrausch', price: 0, tier: 3, levelOnly: 20, pal: {1: [255, 214, 90], 2: [200, 170, 90], 3: [230, 150, 70], 4: [190, 140, 110], 5: [245, 180, 80], 6: [180, 170, 80], 7: [200, 120, 80], 8: [70, 55, 25]}, metal: true},
   kristall: {name: 'Kristallglas', price: 5500, tier: 3, pal: {1: [255, 210, 40], 2: [40, 110, 255], 3: [255, 50, 60], 4: [170, 70, 255], 5: [255, 140, 30], 6: [30, 220, 120], 7: [200, 40, 80], 8: [30, 30, 40]}, glass: true}
 };
 const ballSet = () => BALL_SETS[PROFILE.balls] || BALL_SETS.klassik;
@@ -3208,6 +3284,8 @@ const CUES = {
   schlange: {name: 'Schlangenhaut', price: 2800, tier: 2, s1: '#ead39f', s2: '#d5b175', ring: '#c9b037', f1: '#3a7a30', f2: '#14330f', wrap: '#0f1a0c', b1: '#3a7a30', b2: '#0f240b', inlay: '#e8d870', tip: '#2f6b2a', pattern: 'scales'},
   phoenix: {name: 'Phönix', price: 3800, tier: 3, s1: '#f6e2b8', s2: '#e8c58c', ring: '#ffd23a', f1: '#ff8a1f', f2: '#b3200a', wrap: '#2a0a02', b1: '#ff5a1f', b2: '#5a0802', inlay: '#fff0a0', tip: '#b3200a', glow: '#ff7a20', pattern: 'flames'},
   kosmos: {name: 'Kosmos', price: 5000, tier: 3, s1: '#e8e4ff', s2: '#c8c0f0', ring: '#c8b0ff', f1: '#2a1a6a', f2: '#0b0624', wrap: '#07051a', b1: '#3a2290', b2: '#0b0624', inlay: '#ffffff', tip: '#3a2290', glow: '#9a6cff', pattern: 'stars'},
+  champion: {name: 'Champion', price: 0, tier: 2, levelOnly: 10, s1: '#f4ead2', s2: '#e0c896', ring: '#3fd6ff', f1: '#0f3d5a', f2: '#061c2a', wrap: '#0a0a0a', b1: '#1f6f8f', b2: '#0b2a3a', inlay: '#3fd6ff', tip: '#0f3d5a', glow: '#3fd6ff', pattern: 'stars'},
+  legende: {name: 'Legende', price: 0, tier: 3, levelOnly: 25, s1: '#f6ecd0', s2: '#e6cf98', ring: '#ffd54a', f1: '#1a1206', f2: '#050402', wrap: '#120c02', b1: '#2a1c08', b2: '#050402', inlay: '#ffd54a', tip: '#1a1206', glow: '#ffcc33', pattern: 'flames'},
   blitz: {name: 'Donnerkeil', price: 7000, tier: 3, s1: '#eaf6ff', s2: '#c8e4f8', ring: '#7fe8ff', f1: '#0a3a7a', f2: '#020a1a', wrap: '#02060f', b1: '#0a3a7a', b2: '#020a1a', inlay: '#7fe8ff', tip: '#0a3a7a', glow: '#40c8ff', pattern: 'bolt'}
 };
 // Muster auf Vorderteil und Griff der Queues
@@ -3273,7 +3351,7 @@ function drawCue(cue, extra) {
 // Werte der Queues: Kraft, Zielen (Linienlänge), Effet, Zeit (0–10)
 const CUE_STATS = {klassik: [1, 1, 1, 1], ebenholz: [2, 2, 1, 2], kirsch: [2, 2, 2, 2], carbon: [3, 3, 3, 2], chrom: [3, 4, 3, 3],
   eis: [4, 3, 4, 3], jade: [4, 4, 4, 4], neon: [5, 5, 4, 5], gold: [5, 5, 5, 5], lava: [6, 5, 6, 5], schlange: [6, 6, 6, 6],
-  royal: [7, 6, 6, 7], phoenix: [8, 7, 7, 7], kosmos: [8, 8, 8, 8], blitz: [10, 9, 9, 10]};
+  royal: [7, 6, 6, 7], phoenix: [8, 7, 7, 7], kosmos: [8, 8, 8, 8], blitz: [10, 9, 9, 10], champion: [6, 6, 6, 6], legende: [9, 9, 9, 9]};
 // Gelten in Partien und der Trefferserie – Lektionen, Herausforderungen und Training bleiben neutral
 const statsActive = () => G && (G.mode !== 0 || G.solo.type === 'arcade');
 function cueStats(i) {
@@ -3671,6 +3749,7 @@ cv.addEventListener('pointerdown', e => {
   if (kind === 'power' && pullMode()) { st.kind = 'pull'; st.y0 = y; st.p0 = G.power; st.pull = 0; G.pulling = true; return; }
   if (kind === 'table') {
     const t = toTable(x, y);
+    st.tx = t.x; st.ty = t.y;
     // Taschenansage nur durch Antippen einer Tasche
     if (needCall()) {
       for (let k = 0; k < 6; k++) { const d = POCKET_DRAW[k]; if (Math.hypot(t.x - d.x, t.y - d.y) < 9) { G.called = k; G.calledManual = true; st.kind = 'none'; return; } }
@@ -3679,7 +3758,7 @@ cv.addEventListener('pointerdown', e => {
     const mv = movableBallAt(t);
     if (mv) { st.kind = 'hold'; st.n = mv.n; st.dx = mv.x - t.x; st.dy = mv.y - t.y; return; }
   }
-  handlePtr(st, x, y);
+  if (st.kind !== 'table') handlePtr(st, x, y);
 });
 cv.addEventListener('pointermove', e => {
   const st = ptrs.get(e.pointerId);
@@ -3688,6 +3767,7 @@ cv.addEventListener('pointermove', e => {
   if (st.kind === 'hold') {
     if (Math.hypot(x - st.x0, y - st.y0) < 9) return;
     st.kind = 'table'; // bewegt, bevor die Kugel aufgenommen wurde: zielen
+    const t0 = toTable(st.x0, st.y0); st.tx = t0.x; st.ty = t0.y;
   }
   handlePtr(st, x, y);
 });
@@ -3701,8 +3781,6 @@ const endPtr = e => {
       // loslassen = stoßen; kaum gezogen = abbrechen
       if (st.pull >= 0.04 && isHumanTurn()) shoot(); else G.power = st.p0;
     }
-    // kurzes Antippen einer Kugel: auf sie zielen
-    if (st.kind === 'hold' && isHumanTurn() && st.n !== 0) { const b = getBall(G.balls, st.n), c = getBall(G.balls, 0); G.aim = Math.atan2(b.y - c.y, b.x - c.x); }
   }
   ptrs.delete(e.pointerId);
 };
@@ -3737,7 +3815,15 @@ function handlePtr(st, x, y) {
       const px = clamp(t.x + st.dx, R, kitchen ? HEAD_X : W - R), py = clamp(t.y + st.dy, R, H - R);
       if (placeOK(G.balls, px, py, kitchen, st.dragN)) { b.x = px; b.y = py; b.on = true; G.ver++; }
       else G.badPlaceT = performance.now();
-    } else if (Math.hypot(t.x - cue.x, t.y - cue.y) > 1) G.aim = Math.atan2(t.y - cue.y, t.x - cue.x);
+    } else {
+      // Der Queue dreht sich mit der Fingerbewegung um die Weiße – egal wo man den Tisch berührt.
+      // Nahe an der Weißen wird die Drehung gedämpft, damit es fein bleibt.
+      if (st.tx !== undefined) {
+        const vx = st.tx - cue.x, vy = st.ty - cue.y, r = Math.hypot(vx, vy);
+        if (r > 0.5) G.aim += (vx * (t.y - st.ty) - vy * (t.x - st.tx)) / (r * Math.max(r, 45));
+      }
+      st.tx = t.x; st.ty = t.y;
+    }
   }
 }
 
@@ -3796,6 +3882,8 @@ document.querySelectorAll('.tile').forEach(t => t.onclick = () => {
   else newSolo(go);
 });
 $('bDaily').onclick = () => claimDaily();
+$('pcard').onclick = () => showTrack();
+$('bTrackClose').onclick = () => { hide('track'); syncMenu(); show('menu'); };
 // 3D-Karussell: die Karte in der Mitte steht vorne, die anderen drehen sich in die Tiefe
 function updateCarousel() {
   const car = $('carousel'); if (!car || !car.clientWidth) return;
@@ -3893,6 +3981,7 @@ $('bPass').onclick = () => {
 window.onAndroidBack = () => {
   for (const id of ['chatDlg', 'settings', 'stats']) if (!$(id).classList.contains('hidden')) { hide(id); return true; }
   if (!$('shop').classList.contains('hidden')) { $('bShopClose').onclick(); return true; }
+  if (!$('track').classList.contains('hidden')) { $('bTrackClose').onclick(); return true; }
   if (!$('online').classList.contains('hidden')) { $('bOnlineBack').onclick(); return true; }
   if (G && G.state === 'replay') { endReplay(); return true; }
   if (!$('lessonBox').classList.contains('hidden')) { lessonExit(); return true; }
@@ -3907,7 +3996,7 @@ window.onAndroidBack = () => {
 let lastT = performance.now(), LAST_DT = 0;
 function frame(now) {
   const dt = Math.min(0.05, (now - lastT) / 1000); lastT = now; LAST_DT = dt;
-  const paused = G && !G.online && ['menu', 'shop', 'stats', 'settings', 'levels', 'rules', 'online'].some(id => !$(id).classList.contains('hidden'));
+  const paused = G && !G.online && ['menu', 'shop', 'stats', 'settings', 'levels', 'rules', 'online', 'track'].some(id => !$(id).classList.contains('hidden'));
   if (G && !paused) {
     netTick(now);
     pointerTick(now);
@@ -3940,6 +4029,7 @@ function frame(now) {
 }
 window.addEventListener('resize', () => { layout(); });
 CLOTH_RGB = activeCloth().rgb;
+grantLevelRewards();
 layout(); syncMenu(); updateUI(); show('menu');
 startLoading();
 requestAnimationFrame(frame);

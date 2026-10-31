@@ -2839,11 +2839,16 @@ function drawTableAnim(now) {
 // ===================== Kugel-Sets =====================
 const BALL_SETS = {
   klassik: {name: 'Klassik', price: 0, tier: 0, pal: null},
-  pastell: {name: 'Pastell', price: 500, tier: 1, pal: {1: [252, 222, 120], 2: [130, 170, 240], 3: [245, 140, 140], 4: [190, 150, 230], 5: [252, 180, 120], 6: [130, 210, 160], 7: [210, 130, 140], 8: [70, 70, 80]}},
-  neon: {name: 'Neon', price: 1600, tier: 2, pal: {1: [255, 250, 0], 2: [0, 200, 255], 3: [255, 30, 90], 4: [190, 60, 255], 5: [255, 140, 0], 6: [0, 255, 120], 7: [255, 0, 200], 8: [20, 20, 30]}, glow: true},
-  metall: {name: 'Flüssigmetall', price: 2600, tier: 2, pal: {1: [230, 190, 60], 2: [90, 130, 210], 3: [200, 70, 60], 4: [140, 100, 190], 5: [230, 140, 60], 6: [70, 170, 120], 7: [170, 80, 90], 8: [60, 62, 68]}, metal: true},
-  gold: {name: 'Goldrausch', price: 0, tier: 3, levelOnly: 20, pal: {1: [255, 214, 90], 2: [200, 170, 90], 3: [230, 150, 70], 4: [190, 140, 110], 5: [245, 180, 80], 6: [180, 170, 80], 7: [200, 120, 80], 8: [70, 55, 25]}, metal: true},
-  kristall: {name: 'Kristallglas', price: 5500, tier: 3, pal: {1: [255, 210, 40], 2: [40, 110, 255], 3: [255, 50, 60], 4: [170, 70, 255], 5: [255, 140, 30], 6: [30, 220, 120], 7: [200, 40, 80], 8: [30, 30, 40]}, glass: true}
+  pastell: {name: 'Pastell', price: 500, tier: 1, mat: 'matte', pal: {1: [252, 222, 120], 2: [130, 170, 240], 3: [245, 140, 140], 4: [190, 150, 230], 5: [252, 180, 120], 6: [130, 210, 160], 7: [210, 130, 140], 8: [70, 70, 80]}},
+  holz: {name: 'Edelholz', price: 900, tier: 1, mat: 'satin', pat: 'wood'},
+  marmor: {name: 'Marmor', price: 1500, tier: 2, pat: 'marble'},
+  neon: {name: 'Neon', price: 1600, tier: 2, mat: 'glow', pal: {1: [255, 250, 0], 2: [0, 200, 255], 3: [255, 30, 90], 4: [190, 60, 255], 5: [255, 140, 0], 6: [0, 255, 120], 7: [255, 0, 200], 8: [40, 40, 60]}},
+  karbon: {name: 'Carbon', price: 1800, tier: 2, pat: 'carbon'},
+  metall: {name: 'Flüssigmetall', price: 2600, tier: 2, mat: 'metal', pal: {1: [230, 190, 60], 2: [90, 130, 210], 3: [200, 70, 60], 4: [140, 100, 190], 5: [230, 140, 60], 6: [70, 170, 120], 7: [170, 80, 90], 8: [60, 62, 68]}},
+  gold: {name: 'Goldrausch', price: 0, tier: 3, levelOnly: 20, mat: 'metal', pal: {1: [255, 214, 90], 2: [200, 170, 90], 3: [230, 150, 70], 4: [190, 140, 110], 5: [245, 180, 80], 6: [180, 170, 80], 7: [200, 120, 80], 8: [70, 55, 25]}},
+  lava: {name: 'Lava', price: 4200, tier: 3, pat: 'lava'},
+  galaxie: {name: 'Galaxie', price: 4800, tier: 3, pat: 'galaxy'},
+  kristall: {name: 'Kristallglas', price: 5500, tier: 3, mat: 'glass', pal: {1: [255, 210, 40], 2: [40, 110, 255], 3: [255, 50, 60], 4: [170, 70, 255], 5: [255, 140, 30], 6: [30, 220, 120], 7: [200, 40, 80], 8: [30, 30, 40]}}
 };
 const ballSet = () => BALL_SETS[PROFILE.balls] || BALL_SETS.klassik;
 function applySkins() { tableCacheKey = ''; CLOTH_RGB = activeCloth().rgb; for (const key in SPR) delete SPR[key]; }
@@ -2867,9 +2872,13 @@ function glyph(n) {
   return (GLYPHS[n] = a);
 }
 // Zeichnet eine glänzende Kugel pixelweise; M dreht Kugel-Koordinaten in die Ansicht.
+// Zeichnet eine Kugel pixelweise; M dreht Kugel-Koordinaten in die Ansicht.
+// Kugel-Sets bestimmen Material (glänzend, matt, Metall, Glas, Leuchten) und Muster, die sich mitdrehen.
+const fract = v => v - Math.floor(v);
 function renderSphere(img, size, rpx, n, M, setId) {
   const d = img.data, c = size / 2, set = BALL_SETS[setId] || ballSet(), pal = set.pal || BALL_RGB;
   const base = n > 0 ? pal[n > 8 ? n - 8 : n] : BALL_WHITE, stripe = n > 8, gl = n > 0 ? glyph(n) : null;
+  const mat = n > 0 ? set.mat || 'plain' : 'plain', pat = n > 0 ? set.pat : null;
   const cosA = Math.cos(0.45), sinA = Math.sin(0.45);
   for (let y = 0; y < size; y++) {
     const dy = (y + 0.5 - c) / rpx;
@@ -2881,13 +2890,13 @@ function renderSphere(img, size, rpx, n, M, setId) {
       if (a > 1) a = 1;
       const nz = d2 < 1 ? Math.sqrt(1 - d2) : 0;
       const bx = M[0] * dx + M[3] * dy + M[6] * nz, by = M[1] * dx + M[4] * dy + M[7] * nz, bz = M[2] * dx + M[5] * dy + M[8] * nz;
-      let r = base[0], g = base[1], b = base[2], disc = n <= 0;
+      let r = base[0], g = base[1], b = base[2], num = false, wh = false, e0 = 0, e1 = 0, e2 = 0;
       if (n === 0) {
         if (Math.abs(bx) > 0.993 || Math.abs(by) > 0.993 || Math.abs(bz) > 0.993) { r = 190; g = 28; b = 30; }
       } else if (n > 0) {
-        if (stripe && Math.abs(bx) > 0.5) { r = BALL_WHITE[0]; g = BALL_WHITE[1]; b = BALL_WHITE[2]; disc = true; }
+        if (stripe && Math.abs(bx) > 0.5) { r = BALL_WHITE[0]; g = BALL_WHITE[1]; b = BALL_WHITE[2]; wh = true; }
         if (bz > cosA || bz < -cosA) {
-          disc = true;
+          num = true;
           const u = (bz > 0 ? bx : -bx) / sinA, v = by / sinA;
           r = BALL_WHITE[0]; g = BALL_WHITE[1]; b = BALL_WHITE[2];
           const gx = (u * 0.5 + 0.5) * 63.99 | 0, gy = (v * 0.5 + 0.5) * 63.99 | 0;
@@ -2895,23 +2904,79 @@ function renderSphere(img, size, rpx, n, M, setId) {
           if (t > 0) { r += (22 - r) * t; g += (20 - g) * t; b += (20 - b) * t; }
         }
       }
+      // Muster auf der Kugeloberfläche (drehen sich beim Rollen mit)
+      if (pat && !num) {
+        if (pat === 'wood') {
+          const tone = wh ? [214, 178, 128] : [r * 0.55 + 70, g * 0.45 + 40, b * 0.35 + 20];
+          const ring = fract(Math.sqrt(bx * bx + bz * bz) * 8 + 0.45 * Math.sin(by * 6 + bx * 3));
+          const f = 0.8 + 0.2 * Math.sin(ring * TAU) + 0.04 * Math.sin(by * 70 + bx * 9);
+          r = tone[0] * f; g = tone[1] * f; b = tone[2] * f;
+        } else if (pat === 'marble') {
+          const v = Math.sin(bx * 5 + 3 * Math.sin(by * 4 + bz * 3) + 2 * Math.sin(bz * 6));
+          const v2 = Math.sin(by * 9 + 2 * Math.sin(bx * 7) + bz * 4);
+          const vein = Math.max(0, 1 - Math.abs(v) / 0.2), dark = Math.max(0, 1 - Math.abs(v2) / 0.07);
+          const w = wh ? 0.35 : 0.6;
+          r += (250 - r) * vein * w; g += (250 - g) * vein * w; b += (248 - b) * vein * w;
+          r *= 1 - dark * 0.35; g *= 1 - dark * 0.35; b *= 1 - dark * 0.35;
+        } else if (pat === 'carbon') {
+          const q = 11, cx = Math.floor(bx * q) + Math.floor(by * q) + Math.floor(bz * q);
+          const sh = (cx & 1) ? 0.62 + 0.38 * Math.sin(fract(bx * q + bz * q) * Math.PI) : 0.62 + 0.38 * Math.sin(fract(by * q + bz * q) * Math.PI);
+          const k = wh ? 0.5 : 0.42;
+          r = (r * k + 12) * sh; g = (g * k + 12) * sh; b = (b * k + 14) * sh;
+        } else if (pat === 'lava') {
+          const glow = wh ? [255, 170, 60] : [Math.min(255, r * 0.6 + 140), Math.min(255, g * 0.4 + 70), b * 0.2 + 10];
+          r = 36 + r * 0.12; g = 26 + g * 0.08; b = 22 + b * 0.06;
+          const cr = Math.abs(Math.sin(bx * 7 + 2.3 * Math.sin(bz * 5)) * Math.sin(by * 6 + 2 * Math.sin(bx * 4)) * Math.sin(bz * 8 + 1.5 * Math.sin(by * 5)));
+          const k = Math.max(0, 1 - cr / 0.07);
+          e0 = glow[0] * k; e1 = glow[1] * k; e2 = glow[2] * k;
+        } else if (pat === 'galaxy') {
+          const neb = 0.5 + 0.5 * Math.sin(bx * 4 + 2 * Math.sin(by * 3)) * Math.sin(bz * 3 + Math.sin(bx * 2) * 2);
+          const tint = wh ? [150, 140, 220] : [r, g, b];
+          r = 14 + tint[0] * 0.55 * neb + 40 * (1 - neb); g = 10 + tint[1] * 0.55 * neb + 18 * (1 - neb); b = 30 + tint[2] * 0.55 * neb + 70 * (1 - neb);
+          const qx = Math.floor(bx * 26), qy = Math.floor(by * 26), qz = Math.floor(bz * 26);
+          const h = fract(Math.sin(qx * 12.9898 + qy * 78.233 + qz * 37.719) * 43758.5453);
+          if (h > 0.965) { const st = (h - 0.965) / 0.035 * 230; e0 = st; e1 = st; e2 = st; }
+        }
+      }
       const l1 = dx * LIGHT1[0] + dy * LIGHT1[1] + nz * LIGHT1[2], l2 = dx * LIGHT2[0] + dy * LIGHT2[1] + nz * LIGHT2[2];
-      let dif = 0.2 + 0.72 * (l1 > 0 ? l1 : 0) + 0.2 * (l2 > 0 ? l2 : 0);
-      if (!disc && set.metal) { const l3 = l1 > 0 ? l1 * l1 * l1 : 0; dif = 0.3 + 0.95 * l3 + 0.35 * (0.5 - dy * 0.5) + 0.25 * (1 - nz); }
-      if (!disc && set.glow) dif = 0.55 + 0.5 * (l1 > 0 ? l1 : 0);
       const h1 = dx * HALF1[0] + dy * HALF1[1] + nz * HALF1[2], h2 = dx * HALF2[0] + dy * HALF2[1] + nz * HALF2[2];
-      let sp = 0;
-      if (h1 > 0) { const p = h1 * h1, p4 = p * p, p16 = p4 * p4 * p4 * p4; sp += p16 * p16 * p16 * 1.25 + p4 * p4 * 0.07; }
+      let sp = 0, broad = 0;
+      if (h1 > 0) { const p = h1 * h1, p4 = p * p, p16 = p4 * p4 * p4 * p4; sp += p16 * p16 * p16 * 1.25 + p4 * p4 * 0.07; broad = p4; }
       if (h2 > 0) { const p = h2 * h2, p4 = p * p, p16 = p4 * p4 * p4 * p4; sp += p16 * p16 * 0.4; }
       const rim = (1 - nz) * (1 - nz) * (1 - nz);
-      const k = dif * (1 - rim * 0.45);
-      r = r * k + CLOTH_RGB[0] * rim * 0.4 + 255 * sp;
-      g = g * k + CLOTH_RGB[1] * rim * 0.4 + 255 * sp;
-      b = b * k + CLOTH_RGB[2] * rim * 0.4 + 255 * sp;
-      if (set.metal && !disc) { r += 255 * sp * 0.8; g += 255 * sp * 0.8; b += 255 * sp * 0.8; }
-      if (set.glow && !disc) { r += base[0] * rim * 0.9; g += base[1] * rim * 0.9; b += base[2] * rim * 0.9; }
-      if (set.glass && n > 0 && !disc) { a *= 0.32 + 0.68 * rim + Math.min(0.5, sp * 1.5); r += 70 * (1 - nz) + 30; g += 70 * (1 - nz) + 30; b += 70 * (1 - nz) + 30; }
-      d[i] = r > 255 ? 255 : r; d[i + 1] = g > 255 ? 255 : g; d[i + 2] = b > 255 ? 255 : b; d[i + 3] = a * 255;
+      const m = num ? 'plain' : mat;
+      if (m === 'metal') {
+        // Spiegelung der Umgebung: helle Lampenbänder oben, dunkler Boden unten
+        const Rx = 2 * nz * dx, Ry = 2 * nz * dy;
+        // weicher Verlauf von hellem Raum (oben) zu dunklem Boden (unten), dazu zwei weiche Lampenbänder
+        let env = clamp(0.32 - 0.62 * Ry, 0.06, 1);
+        const up = clamp((-Ry - 0.1) / 0.35, 0, 1);
+        env += 0.85 * up * Math.max(0, 1 - Math.abs(Rx) / 0.22) ** 2;
+        env += 0.45 * up * Math.max(0, 1 - Math.abs(Rx - 0.55) / 0.1) ** 2;
+        const k = 0.18 + 1.15 * env;
+        r = r * k + 255 * sp * 1.3 + 60 * rim; g = g * k + 255 * sp * 1.3 + 60 * rim; b = b * k + 255 * sp * 1.3 + 60 * rim;
+      } else if (m === 'matte') {
+        const wrap = 0.42 + 0.58 * (l1 * 0.5 + 0.5);
+        r = r * wrap + 60 * rim + 50 * broad; g = g * wrap + 60 * rim + 50 * broad; b = b * wrap + 60 * rim + 50 * broad;
+      } else if (m === 'glow') {
+        const k = 0.78 + 0.32 * (l1 > 0 ? l1 : 0);
+        r = r * k + r * rim * 1.1 + 255 * sp; g = g * k + g * rim * 1.1 + 255 * sp; b = b * k + b * rim * 1.1 + 255 * sp;
+      } else {
+        const dif = 0.2 + 0.72 * (l1 > 0 ? l1 : 0) + 0.2 * (l2 > 0 ? l2 : 0), k = dif * (1 - rim * 0.45);
+        const gloss = m === 'satin' ? 0.45 : 1;
+        r = r * k + CLOTH_RGB[0] * rim * 0.4 + 255 * sp * gloss; g = g * k + CLOTH_RGB[1] * rim * 0.4 + 255 * sp * gloss; b = b * k + CLOTH_RGB[2] * rim * 0.4 + 255 * sp * gloss;
+      }
+      r += e0; g += e1; b += e2;
+      if (m === 'glass' && n > 0) {
+        // Glas: durchsichtig in der Mitte, gebündeltes Licht unten rechts, funkelnder Rand
+        const cau = Math.max(0, 1 - Math.hypot(dx - 0.32, dy - 0.38) / 0.42);
+        const c2 = cau * cau;
+        r += base[0] * 0.9 * c2 + 70 * c2; g += base[1] * 0.9 * c2 + 70 * c2; b += base[2] * 0.9 * c2 + 70 * c2;
+        const edge = dist > 0.9 ? (dist - 0.9) / 0.1 : 0;
+        r += 120 * edge + 60 * rim; g += 120 * edge + 60 * rim; b += 120 * edge + 60 * rim;
+        a *= Math.min(1, 0.3 + 0.6 * rim + 0.5 * c2 + Math.min(0.6, sp * 1.8) + edge * 0.5);
+      }
+      d[i] = r > 255 ? 255 : r < 0 ? 0 : r; d[i + 1] = g > 255 ? 255 : g < 0 ? 0 : g; d[i + 2] = b > 255 ? 255 : b < 0 ? 0 : b; d[i + 3] = a * 255;
     }
   }
 }
@@ -2969,11 +3034,21 @@ function ballSprite(id, n, M, ver, rpx, setId) {
   if (s.ver !== ver) { renderSphere(s.img, size, rpx, n, M, setId); s.ctx.putImageData(s.img, 0, 0); s.ver = ver; }
   return s;
 }
+// Zeitbudget fürs Neuzeichnen rollender Kugeln pro Bild (aufwendige Kugel-Sets bleiben flüssig)
+const BALL_BUDGET_MS = 5;
+let ballBudgetEnd = 0;
+function resetBallBudget() { ballBudgetEnd = performance.now() + BALL_BUDGET_MS; }
 // Kugel im Tisch-Koordinatensystem zeichnen
 function drawBall(n, x, y, scale, alpha) {
   const o = G && G.orient && G.orient[n];
   const rpx = R * L.s * DPR;
-  const s = o ? ballSprite('t' + n, n, o.M, o.ver + '@' + rpx, rpx) : ballSprite('ti' + n, n, IDENT3, 'i' + rpx, rpx);
+  let s;
+  if (o) {
+    const ver = o.ver + '@' + rpx, old = SPR['t' + n];
+    // Ist das Budget aufgebraucht, darf eine Kugel höchstens zwei Bilder lang ihr letztes Bild behalten
+    if (old && old.ver !== ver && old.size === Math.ceil(rpx * 2) + 2 && performance.now() > ballBudgetEnd && (old.skip || 0) < 2) { old.skip = (old.skip || 0) + 1; s = old; }
+    else { s = ballSprite('t' + n, n, o.M, ver, rpx); s.skip = 0; }
+  } else s = ballSprite('ti' + n, n, IDENT3, 'i' + rpx, rpx);
   const hs = s.size / 2 / (L.s * DPR) * (scale || 1);
   if (alpha !== undefined) ctx.globalAlpha = alpha;
   ctx.drawImage(s.cv, x - hs, y - hs, hs * 2, hs * 2);
@@ -3651,6 +3726,7 @@ function draw() {
   const now = performance.now();
   updateOrient(balls);
   updateAimView(LAST_DT || 1 / 60);
+  resetBallBudget();
   const humanAim = G.state === 'aim' && !G.ai[G.cur];
   if (humanAim) drawTargetGlow(now, true);
   // Taschenansage

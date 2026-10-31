@@ -3409,8 +3409,9 @@ function pathLen(p) { let l = 0; for (let i = 1; i < p.length; i++) l += Math.hy
 // Wie lang die Linien sein dürfen (abhängig vom Queue); Training und Lektionen zeigen alles
 function lineLimit(mode) {
   if (G.mode === 0 && (G.solo.type === 'lesson' || G.solo.type === 'training')) return Infinity;
-  const base = cueStats(G.cur).line;
-  return mode === 'all' ? base * 1.6 : base;
+  // „Alle“: jede Bahn vollständig bis zur Endposition
+  if (mode === 'all') return Infinity;
+  return cueStats(G.cur).line;
 }
 function movedPath(S, n) {
   const p = S.paths[n];
@@ -3428,7 +3429,8 @@ function drawPrediction(S) {
   // Bahnen der Objektkugeln
   const objs = mode === 'all' ? Object.keys(S.paths).map(Number).filter(n => n !== 0 && movedPath(S, n)) : C ? [C.n] : [];
   for (const n of objs) {
-    const p = trimPath(S.paths[n], mode === 'guide' ? Math.min(55, lim * 0.6) : lim * 0.6);
+    if (mode === 'all') { const p = S.paths[n]; glowLine(p, a => lineCol(n, a), 2.1 * px); pathArrows(p, 'rgba(255,255,255,.85)', px, 22); continue; }
+    const p = trimPath(S.paths[n], Math.min(55, lim * 0.6));
     fadeLine(p, a => lineCol(n, a), 2.1 * px);
     pathArrows(p, 'rgba(255,255,255,.85)', px, 22);
   }

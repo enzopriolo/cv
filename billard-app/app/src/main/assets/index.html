@@ -202,7 +202,8 @@ input.name{background:#0c1512;color:var(--text);border:1px solid var(--line);bor
 .lessonBtn{background:linear-gradient(#f2b632,#d58a10);color:#2a1a00;border:1px solid #ffd75a;border-radius:9px;padding:6px 10px;font-weight:800;font-size:12px}
 .lessonBtn.done{background:#24372f;color:#7dffb0;border-color:#3fb68b}
 .tlevels{display:flex;gap:5px;flex-wrap:wrap}
-.tlevels .lvl{min-width:0;flex:0 1 calc(25% - 4px)}
+.tlevels .lvl{min-width:0;flex:0 1 calc(20% - 4px)}
+.tlevels .lvl span{font-size:10px;white-space:normal;line-height:1.1}
 .pcard{cursor:pointer}
 .trkBtn{font-size:20px;margin-left:4px;animation:float 2.4s ease-in-out infinite}
 .trackPanel{width:min(900px,96vw)}
@@ -253,6 +254,7 @@ input.name{background:#0c1512;color:var(--text);border:1px solid var(--line);bor
 <button id="bPush" class="b hidden">Push-Out</button>
 <button id="bUndo" class="b hidden">↶ Zurück</button>
 <button id="bReplay" class="b" disabled>⟲ Replay</button>
+<button id="bHint" class="b hidden">💡 Tipp</button>
 <div id="chatDlg" class="hidden"><button>👍 Guter Stoß!</button><button>😮 Wow!</button><button>😂</button><button>🔥 Heiß!</button><button>🍀 Viel Glück!</button><button>🤝 GG</button></div>
 <button id="bLines" class="b">Linien: Alle</button>
 <button id="bShoot" class="b shoot">STOSS</button>
@@ -950,8 +952,8 @@ function endGame(winner, reason) {
 // Hilfen für Level-Aufbau: Punkt auf der Linie von einer Tasche ins Feld
 function fromPocket(k, dx, dy, dist) { const l = Math.hypot(dx, dy); return [POCKETS[k].x + dx / l * dist, POCKETS[k].y + dy / l * dist]; }
 let EFFET_ZONE = {x: 66, y: 42.5, r: 11};
-const LEVEL_REWARDS = [40, 40, 50, 60, 60, 70, 90, 100, 120, 150, 80, 90, 100, 110, 120, 120, 140, 150, 200, 400];
-const LEVELS = (() => {
+// Aufstellungen der Lektionen (die Vorführstöße sind darauf abgestimmt)
+const LESSON_LEVELS = (() => {
   const l3b2 = fromPocket(3, 1, -0.5, 30), l3b1 = [l3b2[0] + 0.894 * (2 * R + 0.4), l3b2[1] - 0.447 * (2 * R + 0.4)];
   const rack15 = []; { const dx = R * Math.sqrt(3) + 0.03, dy = R + 0.015, ord = [1, 9, 2, 10, 8, 3, 11, 4, 12, 5, 13, 6, 14, 7, 15]; let i = 0;
     for (let r = 0; r < 5; r++) for (let j = 0; j <= r; j++) rack15.push([ord[i++], FOOT.x + r * dx, FOOT.y + (j - r / 2) * 2 * dy]); }
@@ -980,8 +982,13 @@ const LEVELS = (() => {
     {name: 'Großmeister', desc: 'Anstoß auf 15 Kugeln und alles abräumen.', cue: [W * 0.2, H / 2], balls: rack15, shots: 24, par: 16}
   ];
 })();
+// 90 Herausforderungen (6 Themen × 15), automatisch mit der Spielphysik erzeugt und geprüft.
+// Jede enthält in „sol“ einen nachweislich funktionierenden Lösungsweg.
+const LEVELS = [{"name":"Gerade drauf","desc":"Versenke die 3 – Schnittwinkel etwa 4°.","cue":[196.15,96.66],"balls":[[3,222.97,111.58]],"shots":2,"par":1,"sol":[{"angle":0.520048,"power":0.4,"sx":0,"sy":0}]},{"name":"Leichter Schnitt","desc":"Versenke die 2 – Schnittwinkel etwa 8°.","cue":[154.01,65.47],"balls":[[2,138.35,32.33]],"shots":2,"par":1,"sol":[{"angle":-2.033282,"power":0.4,"sx":0,"sy":0}]},{"name":"Halbe Kugel","desc":"Versenke die 6 – Schnittwinkel etwa 11°.","cue":[73.35,56.97],"balls":[[6,95.94,93.1]],"shots":2,"par":1,"sol":[{"angle":1.037344,"power":0.4,"sx":0,"sy":0}]},{"name":"Mittelschnitt","desc":"Versenke die 9 – Schnittwinkel etwa 17°.","cue":[130.63,22.6],"balls":[[9,135.88,70.8]],"shots":2,"par":1,"sol":[{"angle":1.427976,"power":0.3,"sx":0,"sy":0}]},{"name":"Ecke anvisieren","desc":"Versenke die 13 – Schnittwinkel etwa 22°.","cue":[88.57,58.26],"balls":[[13,119.93,102.62]],"shots":2,"par":1,"sol":[{"angle":0.916029,"power":0.4,"sx":0,"sy":0}]},{"name":"Weiter Weg","desc":"Versenke die 5 – Schnittwinkel etwa 28°.","cue":[160.86,52.42],"balls":[[5,206.48,13.32]],"shots":2,"par":1,"sol":[{"angle":-0.753164,"power":0.4,"sx":0,"sy":0}]},{"name":"Viertelkugel","desc":"Versenke die 12 – Schnittwinkel etwa 31°. Nur in die markierte Tasche.","cue":[169.07,52.17],"balls":[[12,230.45,28.08]],"shots":2,"par":1,"sol":[{"angle":-0.329122,"power":0.4,"sx":0,"sy":0}],"pocket":{"12":2}},{"name":"Spitzer Winkel","desc":"Versenke die 13 – Schnittwinkel etwa 38°.","cue":[22.3,102.87],"balls":[[13,22.46,31.31]],"shots":2,"par":1,"sol":[{"angle":-1.519143,"power":0.4,"sx":0,"sy":0}]},{"name":"Feinarbeit","desc":"Versenke die 3 – Schnittwinkel etwa 44°.","cue":[172.14,64.45],"balls":[[3,241.17,29.84]],"shots":2,"par":1,"sol":[{"angle":-0.413861,"power":0.4,"sx":0,"sy":0}]},{"name":"Hauchdünn","desc":"Versenke die 5 – Schnittwinkel etwa 46°. Nur in die markierte Tasche.","cue":[11.89,115.9],"balls":[[5,23.62,33.65]],"shots":2,"par":1,"sol":[{"angle":-1.379945,"power":0.4,"sx":0,"sy":0}],"pocket":{"5":0}},{"name":"Nur Hilfslinie I","desc":"Nur die einfache Hilfslinie. Versenke die 5 – Schnittwinkel etwa 54°.","cue":[128.69,55.13],"balls":[[5,217.05,50.39]],"lines":"guide","shots":2,"par":1,"sol":[{"angle":-0.001571,"power":0.4,"sx":0,"sy":0}]},{"name":"Nur Hilfslinie II","desc":"Nur die einfache Hilfslinie. Versenke die 2 – Schnittwinkel etwa 56°.","cue":[122.72,87.6],"balls":[[2,216.86,82.4]],"lines":"guide","shots":2,"par":1,"sol":[{"angle":-0.105533,"power":0.4,"sx":0,"sy":0}]},{"name":"Nur Hilfslinie III","desc":"Nur die einfache Hilfslinie. Versenke die 3 – Schnittwinkel etwa 63°. Nur in die markierte Tasche.","cue":[112.8,74.9],"balls":[[3,14.3,90.29]],"lines":"guide","shots":2,"par":1,"sol":[{"angle":3.037694,"power":0.7,"sx":0,"sy":0}],"pocket":{"3":3}},{"name":"Blind gezielt I","desc":"Keine Linien! Versenke die 15 – Schnittwinkel etwa 69°.","cue":[12.81,8.49],"balls":[[15,23.69,113.11]],"lines":"off","shots":2,"par":1,"sol":[{"angle":1.416561,"power":0.4,"sx":0,"sy":0}]},{"name":"Blind gezielt II","desc":"Keine Linien! Versenke die 11 – Schnittwinkel etwa 72°.","cue":[114.94,49.24],"balls":[[11,7.13,75.2]],"lines":"off","shots":2,"par":1,"sol":[{"angle":2.95421,"power":0.4,"sx":0,"sy":0}]},{"name":"Kette","desc":"Versenke die 11 – triff aber zuerst die 6.","cue":[172.22,75.03],"balls":[[11,220.74,105.4],[6,215.52,102.05]],"targets":[11],"first":6,"shots":2,"par":1,"sol":[{"angle":0.367851,"power":0.9,"sx":0,"sy":0}]},{"name":"Doppel","desc":"Versenke die 2 – triff aber zuerst die 9.","cue":[198.17,45.96],"balls":[[2,234.39,96.39],[9,230.72,90.67]],"targets":[2],"first":9,"shots":2,"par":1,"sol":[{"angle":0.873515,"power":0.5,"sx":0,"sy":0}]},{"name":"Anstupser","desc":"Versenke die 3 – triff aber zuerst die 1.","cue":[226.24,54.18],"balls":[[3,243.73,106.59],[1,240.45,99.96]],"targets":[3],"first":1,"shots":2,"par":1,"sol":[{"angle":1.175835,"power":0.7,"sx":0,"sy":0}]},{"name":"Durchreicher","desc":"Versenke die 11 – triff aber zuerst die 5.","cue":[186.19,41.79],"balls":[[11,236.29,11.75],[5,229.5,15.98]],"targets":[11],"first":5,"shots":2,"par":1,"sol":[{"angle":-0.627392,"power":0.5,"sx":0,"sy":0}]},{"name":"Schräg weiter","desc":"Versenke die 2 – triff aber zuerst die 4.","cue":[172.61,99.8],"balls":[[2,225.46,31.54],[4,219.6,37.84]],"targets":[2],"first":4,"shots":2,"par":1,"sol":[{"angle":-0.94389,"power":0.5,"sx":0,"sy":0}]},{"name":"Domino","desc":"Versenke die 7 – triff aber zuerst die 14.","cue":[129.74,106.48],"balls":[[7,129.9,18.79],[14,131.15,27.9]],"targets":[7],"first":14,"shots":2,"par":1,"sol":[{"angle":-1.570855,"power":0.5,"sx":0,"sy":0}]},{"name":"Stellvertreter","desc":"Versenke die 3 – triff aber zuerst die 5.","cue":[131.73,17.61],"balls":[[3,126,105.82],[5,125.19,96.06]],"targets":[3],"first":5,"shots":2,"par":1,"sol":[{"angle":1.605983,"power":0.7,"sx":0,"sy":0}]},{"name":"Umweg","desc":"Versenke die 14 – triff aber zuerst die 6.","cue":[209.56,82.83],"balls":[[14,247.24,18.59],[6,243.85,28.42]],"targets":[14],"first":6,"shots":2,"par":1,"sol":[{"angle":-1.080454,"power":0.5,"sx":0,"sy":0}]},{"name":"Präzisionskette","desc":"Versenke die 11 – triff aber zuerst die 9.","cue":[172.15,38.72],"balls":[[11,238.58,7.19],[9,228.31,11.14]],"targets":[11],"first":9,"shots":2,"par":1,"sol":[{"angle":-0.698611,"power":0.9,"sx":0,"sy":0}]},{"name":"Dreierkette","desc":"Versenke die 1 – triff aber zuerst die 2 (über 12).","cue":[77.4,112.12],"balls":[[1,26.17,36.4],[12,32.87,45.87],[2,39.57,55.34]],"targets":[1],"first":2,"shots":2,"par":1,"sol":[{"angle":-2.224495,"power":0.9,"sx":0,"sy":0}]},{"name":"Lange Leitung","desc":"Versenke die 11 – triff aber zuerst die 14 (über 13).","cue":[192.95,44.1],"balls":[[11,140.33,115.83],[13,149.61,107.92],[14,158.78,99.88]],"targets":[11],"first":14,"shots":2,"par":1,"sol":[{"angle":1.876385,"power":0.9,"sx":0,"sy":0}]},{"name":"Kettenreaktion","desc":"Versenke die 6 – triff aber zuerst die 4 (über 12).","cue":[236.01,41.15],"balls":[[6,137.46,117.08],[12,145.71,107.3],[4,154.17,97.68]],"targets":[6],"first":4,"shots":2,"par":1,"sol":[{"angle":2.483123,"power":0.9,"sx":0,"sy":0}]},{"name":"Dreifach","desc":"Versenke die 7 – triff aber zuerst die 5 (über 6).","cue":[154.02,93.5],"balls":[[7,231.18,19.67],[6,221.86,29.29],[5,211.68,38.01]],"targets":[7],"first":5,"shots":2,"par":1,"sol":[{"angle":-0.824148,"power":0.9,"sx":0,"sy":0}]},{"name":"Meisterkette","desc":"Versenke die 9 – triff aber zuerst die 2 (über 13).","cue":[244.22,88.86],"balls":[[9,140.46,6.53],[13,152.95,12.85],[2,165.89,18.21]],"targets":[9],"first":2,"shots":2,"par":1,"sol":[{"angle":-2.565712,"power":0.7,"sx":0,"sy":0}]},{"name":"Kombi-König","desc":"Versenke die 14 – triff aber zuerst die 15 (über 9).","cue":[136.43,72.93],"balls":[[14,15.51,12.03],[9,27.18,20.8],[15,39.22,29.06]],"targets":[14],"first":15,"shots":2,"par":1,"sol":[{"angle":-2.759651,"power":0.7,"sx":0,"sy":0}]},{"name":"Erster Kick","desc":"Die Weiße muss zuerst eine Bande treffen. Rot markierte Kugeln nicht berühren!","cue":[198.64,28.31],"balls":[[12,25.18,118.88],[8,113.43,72.35]],"kick":true,"bomb":[8],"shots":3,"par":1,"sol":[{"angle":0.253073,"power":0.45,"sx":0,"sy":0}]},{"name":"Erste Bande","desc":"Versenke die 6 – sie muss vorher eine Bande berühren.","cue":[167.6,88.54],"balls":[[6,131.25,14.34]],"bank":true,"shots":3,"par":1,"sol":[{"angle":0.737402,"power":0.45,"sx":0,"sy":0}]},{"name":"Umleitung","desc":"Die Weiße muss zuerst eine Bande treffen. Rot markierte Kugeln nicht berühren!","cue":[98.8,57.66],"balls":[[2,141.28,118.63],[8,121.47,89.69]],"kick":true,"bomb":[8],"shots":3,"par":1,"sol":[{"angle":0.200713,"power":0.45,"sx":0,"sy":0}]},{"name":"Spiegelbild","desc":"Versenke die 5 – sie muss vorher eine Bande berühren.","cue":[92.5,36.38],"balls":[[5,13.8,107.5]],"bank":true,"shots":3,"par":1,"sol":[{"angle":2.172935,"power":0.45,"sx":0,"sy":0}]},{"name":"Bandenumweg","desc":"Die Weiße muss zuerst eine Bande treffen. Rot markierte Kugeln nicht berühren!","cue":[56.49,76.84],"balls":[[10,240.49,121.37],[8,147.94,100.11]],"kick":true,"bomb":[8],"shots":3,"par":1,"sol":[{"angle":1.143191,"power":0.45,"sx":0,"sy":0}]},{"name":"Rückpass","desc":"Versenke die 3 – sie muss vorher eine Bande berühren.","cue":[37.73,38.06],"balls":[[3,137.47,16.64]],"bank":true,"shots":3,"par":1,"sol":[{"angle":5.772677,"power":0.45,"sx":0,"sy":0}]},{"name":"Versteckspiel","desc":"Die Weiße muss zuerst eine Bande treffen. Rot markierte Kugeln nicht berühren!","cue":[48.73,24.24],"balls":[[9,19.22,106.57],[8,33.23,65.88]],"kick":true,"bomb":[8],"shots":3,"par":1,"sol":[{"angle":0.15708,"power":0.45,"sx":0,"sy":0}]},{"name":"Querschläger","desc":"Versenke die 3 – sie muss vorher eine Bande berühren.","cue":[218.02,85.88],"balls":[[3,239.12,22.58]],"bank":true,"shots":3,"par":1,"sol":[{"angle":1.45735,"power":0.45,"sx":0,"sy":0}]},{"name":"Über Eck","desc":"Die Weiße muss zuerst eine Bande treffen. Rot markierte Kugeln nicht berühren!","cue":[131.11,77.03],"balls":[[3,105.48,16.91],[8,119.55,48.82],[14,111.89,33.52]],"kick":true,"bomb":[8,14],"shots":3,"par":1,"sol":[{"angle":2.434734,"power":0.45,"sx":0,"sy":0}]},{"name":"Eins-Bande","desc":"Versenke die 14 – sie muss vorher eine Bande berühren.","cue":[150.11,48.57],"balls":[[14,10.85,13.49]],"bank":true,"shots":3,"par":1,"sol":[{"angle":2.129302,"power":0.45,"sx":0,"sy":0}]},{"name":"Hindernislauf","desc":"Die Weiße muss zuerst eine Bande treffen. Rot markierte Kugeln nicht berühren!","cue":[78.21,46.93],"balls":[[12,239.14,17.1],[8,160.08,33.82],[14,198.91,24.84]],"kick":true,"bomb":[8,14],"shots":3,"par":1,"sol":[{"angle":0.920661,"power":0.45,"sx":0,"sy":0}]},{"name":"Langer Bogen","desc":"Versenke die 10 – sie muss vorher eine Bande berühren.","cue":[41.23,70.13],"balls":[[10,245.16,34.87]],"bank":true,"shots":3,"par":1,"sol":[{"angle":0.658862,"power":0.45,"sx":0,"sy":0}]},{"name":"Doppelte Deckung","desc":"Die Weiße muss zuerst eine Bande treffen. Rot markierte Kugeln nicht berühren!","cue":[134.18,55.38],"balls":[[5,15.58,13.82],[8,73.28,36.17],[14,45.23,22.9]],"kick":true,"bomb":[8,14],"shots":3,"par":1,"sol":[{"angle":0.436332,"power":0.45,"sx":0,"sy":0}]},{"name":"Bandenkönig","desc":"Versenke die 4 – sie muss vorher eine Bande berühren.","cue":[31.61,58.06],"balls":[[4,223.85,120.98]],"bank":true,"shots":3,"par":1,"sol":[{"angle":0.318523,"power":0.45,"sx":0,"sy":0}]},{"name":"Kick-Profi","desc":"Die Weiße muss zuerst eine Bande treffen. Rot markierte Kugeln nicht berühren!","cue":[199.31,44.36],"balls":[[3,12.16,94.46],[8,104.92,68.67],[14,58.94,83.32]],"kick":true,"bomb":[8,14],"shots":3,"par":1,"sol":[{"angle":0.798488,"power":0.45,"sx":0,"sy":0}]},{"name":"Stopp I","desc":"Versenke die 12 und bring die Weiße in den goldenen Kreis. Stoppball: wenig Kraft, knapp unter der Mitte.","cue":[145.13,91.45],"balls":[[12,203.37,110.25]],"zone":{"x":197.65,"y":108.4,"r":10},"shots":2,"par":1,"sol":[{"angle":0.312267,"power":0.29425314778660105,"sx":0,"sy":-0.3459990073442455}]},{"name":"Nachlauf I","desc":"Versenke die 13 und bring die Weiße in den goldenen Kreis. Nachläufer: Effet oben.","cue":[218.92,112.68],"balls":[[13,238.54,52.07]],"zone":{"x":185.38,"y":117.83,"r":9.65},"shots":2,"par":1,"sol":[{"angle":-1.254735,"power":0.5711801697133017,"sx":0,"sy":0.5115113452829008}]},{"name":"Rücklauf I","desc":"Versenke die 2 und bring die Weiße in den goldenen Kreis. Rückläufer: Effet weit unten.","cue":[17.13,111.8],"balls":[[2,4.95,41.27]],"zone":{"x":19.04,"y":116.49,"r":9.3},"shots":2,"par":1,"sol":[{"angle":-1.747265,"power":0.6295917833361736,"sx":0,"sy":-0.7568413462987362}]},{"name":"Stopp II","desc":"Versenke die 15 und bring die Weiße in den goldenen Kreis. Stoppball: wenig Kraft, knapp unter der Mitte.","cue":[177.25,39.42],"balls":[[15,227.76,93.19]],"zone":{"x":235.02,"y":80.97,"r":8.95},"shots":2,"par":1,"sol":[{"angle":0.808574,"power":0.3461294361837811,"sx":0,"sy":-0.3735955353004837}]},{"name":"Nachlauf II","desc":"Versenke die 4 und bring die Weiße in den goldenen Kreis. Nachläufer: Effet oben.","cue":[149.97,24.65],"balls":[[4,199.76,9.68]],"zone":{"x":168.18,"y":88.85,"r":8.6},"shots":2,"par":1,"sol":[{"angle":-0.307355,"power":0.43327654238477187,"sx":0,"sy":0.554568529573534}]},{"name":"Rücklauf II","desc":"Versenke die 15 und bring die Weiße in den goldenen Kreis. Rückläufer: Effet weit unten.","cue":[27.73,101.78],"balls":[[15,16.47,44.02]],"zone":{"x":91.81,"y":75.56,"r":8.25},"shots":2,"par":1,"sol":[{"angle":-1.746608,"power":0.5025485692091978,"sx":0,"sy":-0.5574536569916894}]},{"name":"Stopp III","desc":"Versenke die 6 und bring die Weiße in den goldenen Kreis. Stoppball: wenig Kraft, knapp unter der Mitte.","cue":[139.53,20.5],"balls":[[6,196.21,5.03]],"zone":{"x":190.09,"y":34.76,"r":7.9},"shots":2,"par":1,"sol":[{"angle":-0.286666,"power":0.3533362166505941,"sx":0,"sy":-0.2575729856768497}]},{"name":"Nachlauf III","desc":"Versenke die 14 und bring die Weiße in den goldenen Kreis. Nachläufer: Effet oben.","cue":[187.64,90.06],"balls":[[14,226.75,27.35]],"zone":{"x":226.2,"y":6.17,"r":7.55},"shots":2,"par":1,"sol":[{"angle":-1.031711,"power":0.6457027856007697,"sx":0,"sy":0.4761346880933897}]},{"name":"Rücklauf III","desc":"Versenke die 11 und bring die Weiße in den goldenen Kreis. Rückläufer: Effet weit unten.","cue":[219.58,113.67],"balls":[[11,238.19,29.86]],"zone":{"x":178.91,"y":32.14,"r":7.2},"shots":2,"par":1,"sol":[{"angle":-1.370603,"power":0.3308749400223023,"sx":0,"sy":-0.803520941526406}]},{"name":"Stopp IV","desc":"Versenke die 10 und bring die Weiße in den goldenen Kreis. Stoppball: wenig Kraft, knapp unter der Mitte.","cue":[101.93,93.24],"balls":[[10,45.36,28.56]],"zone":{"x":69.03,"y":8.98,"r":6.85},"shots":2,"par":1,"sol":[{"angle":-2.268989,"power":0.25442971261424463,"sx":0,"sy":-0.40460257851733017}]},{"name":"Nachlauf IV","desc":"Versenke die 14 und bring die Weiße in den goldenen Kreis. Nachläufer: Effet oben.","cue":[153.46,86.38],"balls":[[14,207.26,26.6]],"zone":{"x":243.83,"y":28.24,"r":6.5},"shots":2,"par":1,"sol":[{"angle":-0.862241,"power":0.47526099971740554,"sx":0,"sy":0.6991982662580899}]},{"name":"Rücklauf IV","desc":"Versenke die 1 und bring die Weiße in den goldenen Kreis. Rückläufer: Effet weit unten.","cue":[195.92,56],"balls":[[1,231.91,110.53]],"zone":{"x":143.9,"y":95.64,"r":6.15},"shots":2,"par":1,"sol":[{"angle":1.020085,"power":0.33610524473996145,"sx":0,"sy":-0.7641269082734953}]},{"name":"Stopp-Meister","desc":"Versenke die 12 und bring die Weiße in den goldenen Kreis. Stoppball: wenig Kraft, knapp unter der Mitte.","cue":[169.61,46.55],"balls":[[12,232.88,20.64]],"zone":{"x":190.46,"y":104.58,"r":5.8},"shots":2,"par":1,"sol":[{"angle":-0.35475,"power":0.3556470588341574,"sx":0,"sy":-0.24811281363857576}]},{"name":"Nachlauf-Meister","desc":"Versenke die 1 und bring die Weiße in den goldenen Kreis. Nachläufer: Effet oben.","cue":[102.79,107.04],"balls":[[1,29.2,111.89]],"zone":{"x":219.68,"y":72.47,"r":5.45},"shots":2,"par":1,"sol":[{"angle":3.108453,"power":0.4391146554560934,"sx":0,"sy":0.5984672526123316}]},{"name":"Rücklauf-Meister","desc":"Versenke die 5 und bring die Weiße in den goldenen Kreis. Rückläufer: Effet weit unten.","cue":[60.39,117.56],"balls":[[5,9.58,44.82]],"zone":{"x":220.11,"y":92.48,"r":5.1},"shots":2,"par":1,"sol":[{"angle":-2.207574,"power":0.6493333194867397,"sx":0,"sy":-0.7858302747997596}]},{"name":"Dreh mal","desc":"Versenke die 11 und bring die Weiße mit Seiteneffet (rechts) über die Bande in den Kreis.","cue":[167.59,25.47],"balls":[[11,208.92,15.25]],"zone":{"x":180.52,"y":28.75,"r":11},"shots":2,"par":1,"sol":[{"angle":-0.230828,"power":0.7410764224087244,"sx":0.6450552259315994,"sy":0.10636446478141678}]},{"name":"Links rum","desc":"Versenke die 3 und bring die Weiße mit Seiteneffet (links) über die Bande in den Kreis.","cue":[30.11,36],"balls":[[3,7.72,97.19]],"zone":{"x":161.27,"y":19.11,"r":10.7},"shots":2,"par":1,"sol":[{"angle":1.93219,"power":0.8645569728522361,"sx":-0.5686486268735718,"sy":0.37494372823971495}]},{"name":"Rechts rum","desc":"Versenke die 1 und bring die Weiße mit Seiteneffet (rechts) über die Bande in den Kreis.","cue":[14.89,81.96],"balls":[[1,10.31,39.62]],"zone":{"x":151.1,"y":15.19,"r":10.4},"shots":2,"par":1,"sol":[{"angle":-1.657581,"power":0.8838898916886607,"sx":0.7854352838757612,"sy":-0.15836780016234506}]},{"name":"Bandenkurve","desc":"Versenke die 3 und bring die Weiße mit Seiteneffet (rechts) über die Bande in den Kreis.","cue":[206.78,84.96],"balls":[[3,236.42,108.03]],"zone":{"x":62.29,"y":49.87,"r":10.1},"shots":2,"par":1,"sol":[{"angle":0.632525,"power":0.7188609207369672,"sx":0.5308555237161254,"sy":0.19757419383971683}]},{"name":"Schräglage","desc":"Versenke die 11 und bring die Weiße mit Seiteneffet (rechts) über die Bande in den Kreis.","cue":[188.76,55.12],"balls":[[11,222.28,99.25]],"zone":{"x":182.99,"y":117.88,"r":9.8},"shots":2,"par":1,"sol":[{"angle":0.944285,"power":0.6794160256997757,"sx":0.5950832892652057,"sy":0.34968536062617106}]},{"name":"Seitenwechsel","desc":"Versenke die 9 und bring die Weiße mit Seiteneffet (rechts) über die Bande in den Kreis.","cue":[210.17,22.72],"balls":[[9,226.92,80.21]],"zone":{"x":170.61,"y":42.29,"r":9.5},"shots":2,"par":1,"sol":[{"angle":1.31204,"power":0.6323211557382351,"sx":0.6984298786141118,"sy":0.2419397347522619}]},{"name":"Englisch","desc":"Versenke die 12 und bring die Weiße mit Seiteneffet (rechts) über die Bande in den Kreis.","cue":[187.63,95.92],"balls":[[12,228.63,109.92]],"zone":{"x":45.72,"y":68.99,"r":9.2},"shots":2,"par":1,"sol":[{"angle":0.290466,"power":0.802770730505125,"sx":0.7593641388972123,"sy":0.08616489089381178}]},{"name":"Kurvenlage","desc":"Versenke die 1 und bring die Weiße mit Seiteneffet (rechts) über die Bande in den Kreis.","cue":[55.53,85.65],"balls":[[1,36.37,42.32]],"zone":{"x":92.6,"y":44.75,"r":8.9},"shots":2,"par":1,"sol":[{"angle":-1.947951,"power":0.767906899665439,"sx":0.6430093080005652,"sy":0.33487913099810435}]},{"name":"Drall","desc":"Versenke die 14 und bring die Weiße mit Seiteneffet (links) über die Bande in den Kreis.","cue":[181.63,64.87],"balls":[[14,222.31,109.47]],"zone":{"x":63.67,"y":68.52,"r":8.6},"shots":2,"par":1,"sol":[{"angle":0.86515,"power":0.62452554287134,"sx":-0.7307080807772968,"sy":-0.15857275194422002}]},{"name":"Schnitt mit Dreh","desc":"Versenke die 12 und bring die Weiße mit Seiteneffet (links) über die Bande in den Kreis.","cue":[58.15,63.7],"balls":[[12,32.77,102.53]],"zone":{"x":101.26,"y":102.12,"r":8.3},"shots":2,"par":1,"sol":[{"angle":2.101803,"power":0.6643836799843161,"sx":-0.7866886730243865,"sy":-0.026944958272830076}]},{"name":"Zwei Banden","desc":"Versenke die 13 und bring die Weiße mit Seiteneffet (links) über die Bande in den Kreis.","cue":[41.59,96.6],"balls":[[13,10.32,49.77]],"zone":{"x":15.79,"y":5.73,"r":8},"shots":2,"par":1,"sol":[{"angle":-2.202287,"power":0.8111780531756478,"sx":-0.7427871109651342,"sy":0.2659479820197206}]},{"name":"Spin-Kunst","desc":"Versenke die 12 und bring die Weiße mit Seiteneffet (links) über die Bande in den Kreis.","cue":[204.73,70.33],"balls":[[12,227.49,108.07]],"zone":{"x":5.82,"y":106.65,"r":7.7},"shots":2,"par":1,"sol":[{"angle":1.086844,"power":0.6266856033479262,"sx":-0.5035936046408459,"sy":0.015426397395984458}]},{"name":"Effet-Profi","desc":"Versenke die 7 und bring die Weiße mit Seiteneffet (links) über die Bande in den Kreis.","cue":[72.6,41.66],"balls":[[7,38.72,32.38]],"zone":{"x":177.24,"y":45.7,"r":7.4},"shots":2,"par":1,"sol":[{"angle":-2.952874,"power":0.6003226447386307,"sx":-0.7201622321364294,"sy":-0.04672896606229663}]},{"name":"Drehmeister","desc":"Versenke die 7 und bring die Weiße mit Seiteneffet (rechts) über die Bande in den Kreis.","cue":[192.16,76.26],"balls":[[7,215.29,29.24]],"zone":{"x":102.32,"y":31.91,"r":7.1},"shots":2,"par":1,"sol":[{"angle":-1.16805,"power":0.6859899737806945,"sx":0.6418527154446825,"sy":-0.14282304244247407}]},{"name":"Kunststoß","desc":"Versenke die 4 und bring die Weiße mit Seiteneffet (links) über die Bande in den Kreis.","cue":[62.4,70.14],"balls":[[4,40.28,103.2]],"zone":{"x":38.03,"y":55,"r":6.8},"shots":2,"par":1,"sol":[{"angle":2.088856,"power":0.5949331692396352,"sx":-0.5298077710111662,"sy":0.3784147693395683}]},{"name":"Aufwärmen","desc":"Räume alle 3 Kugeln ab. Plane die Weiße für den nächsten Stoß!","cue":[62.41,87.53],"balls":[[5,169.19,32.62],[12,169.75,80.74],[6,39.83,101.54]],"shots":7,"par":3,"sol":[{"angle":2.707992,"power":0.6,"sx":0,"sy":-0.4},{"angle":-1.4291,"power":0.8,"sx":0,"sy":0.4}]},{"name":"Der Reihe nach","desc":"Räume 3 Kugeln der Reihe nach ab (immer die niedrigste zuerst). Plane die Weiße für den nächsten Stoß!","cue":[56.05,59.42],"balls":[[1,205.93,48.72],[2,94.75,28.53],[3,94.1,42.41]],"order":true,"shots":7,"par":3,"sol":[{"angle":-0.0484,"power":0.8,"sx":0,"sy":0},{"angle":3.011639,"power":0.8,"sx":0,"sy":0}]},{"name":"Kleines Feld","desc":"Räume alle 4 Kugeln ab. Plane die Weiße für den nächsten Stoß!","cue":[60.44,54.13],"balls":[[11,226.97,111.05],[9,208.62,21.3],[7,100.83,32.81],[10,72.37,44.99]],"shots":8,"par":3,"sol":[{"angle":-0.707121,"power":0.8,"sx":0,"sy":0},{"angle":-0.184553,"power":0.45,"sx":0,"sy":0}]},{"name":"Zählen lernen","desc":"Räume 4 Kugeln der Reihe nach ab (immer die niedrigste zuerst). Plane die Weiße für den nächsten Stoß!","cue":[63.02,91.09],"balls":[[1,240,95.65],[2,212.11,110.6],[3,88.2,62.22],[4,186.11,73.99]],"order":true,"shots":8,"par":4,"sol":[{"angle":0.010989,"power":0.8,"sx":0,"sy":-0.4},{"angle":1.873503,"power":0.45,"sx":0,"sy":-0.4},{"angle":0.535176,"power":0.3,"sx":0,"sy":-0.4},{"angle":0.043881,"power":0.3,"sx":0,"sy":0}]},{"name":"Vierer-Pack","desc":"Räume alle 5 Kugeln ab. Plane die Weiße für den nächsten Stoß!","cue":[68.13,76.35],"balls":[[14,228.32,29.41],[1,214.42,79.08],[9,65.65,90.06],[12,43.32,90.15],[15,60.01,111.37]],"shots":9,"par":4,"sol":[{"angle":2.017659,"power":0.6,"sx":0,"sy":-0.4},{"angle":0.149036,"power":0.8,"sx":0,"sy":0},{"angle":-0.472301,"power":0.8,"sx":0,"sy":-0.4}]},{"name":"Rechenaufgabe","desc":"Räume 5 Kugeln der Reihe nach ab (immer die niedrigste zuerst). Plane die Weiße für den nächsten Stoß!","cue":[74.52,57.91],"balls":[[1,164.37,46.79],[2,63.94,80.37],[3,149.64,105.83],[4,193.36,58.17],[5,201.85,110.35]],"order":true,"shots":9,"par":5,"sol":[{"angle":-0.070825,"power":0.6,"sx":0,"sy":-0.4},{"angle":1.07714,"power":0.6,"sx":0,"sy":-0.4},{"angle":1.509539,"power":0.3,"sx":0,"sy":0.4},{"angle":0.445965,"power":0.8,"sx":0,"sy":0.4}]},{"name":"Fünf gewinnt","desc":"Räume alle 6 Kugeln ab. Plane die Weiße für den nächsten Stoß!","cue":[73.18,86.54],"balls":[[4,36.63,91.47],[6,127.13,35.86],[13,197.74,112.38],[2,24.91,56.35],[15,210.66,72.74],[5,137.41,50.56]],"shots":10,"par":4,"sol":[{"angle":-0.456787,"power":0.6,"sx":0,"sy":0},{"angle":-2.786418,"power":0.8,"sx":0,"sy":0},{"angle":-0.666423,"power":0.45,"sx":0,"sy":-0.4}]},{"name":"Ordnung muss sein","desc":"Räume 6 Kugeln der Reihe nach ab (immer die niedrigste zuerst). Plane die Weiße für den nächsten Stoß!","cue":[62.38,57.55],"balls":[[1,192.32,108.97],[2,185.19,64.24],[3,82.91,72.22],[4,154.83,101.4],[5,51.26,65.73],[6,85.83,26.83]],"order":true,"shots":10,"par":6,"sol":[{"angle":0.380192,"power":0.8,"sx":0,"sy":0},{"angle":1.607109,"power":0.8,"sx":0,"sy":0},{"angle":2.947851,"power":0.45,"sx":0,"sy":0},{"angle":2.753466,"power":0.45,"sx":0,"sy":0.4},{"angle":0.084725,"power":0.6,"sx":0,"sy":0}]},{"name":"Halbes Dutzend","desc":"Räume alle 7 Kugeln ab. Plane die Weiße für den nächsten Stoß!","cue":[60.03,77.39],"balls":[[9,104.53,102.88],[1,13.82,90.92],[13,39.18,21.72],[12,99.91,19.49],[3,117.16,50.89],[11,191.58,51.54],[7,159.92,10.57]],"shots":11,"par":4,"sol":[{"angle":2.903469,"power":0.8,"sx":0,"sy":-0.4},{"angle":0.103261,"power":0.6,"sx":0,"sy":0.4},{"angle":-2.110093,"power":0.8,"sx":0,"sy":0.4}]},{"name":"Siebener-Lauf","desc":"Räume 7 Kugeln der Reihe nach ab (immer die niedrigste zuerst). Plane die Weiße für den nächsten Stoß!","cue":[67.43,69.36],"balls":[[1,85.12,96.81],[2,107.9,57.54],[3,172.02,74.54],[4,73.21,87.23],[5,89.2,68.81],[6,132.28,10.77],[7,13.91,106.44]],"order":true,"shots":11,"par":5,"sol":[{"angle":0.838687,"power":0.6,"sx":0,"sy":-0.4},{"angle":-1.323983,"power":0.8,"sx":0,"sy":-0.4},{"angle":-1.152864,"power":0.8,"sx":0,"sy":-0.4},{"angle":-2.172456,"power":0.8,"sx":0,"sy":0}]},{"name":"Gemischte Tüte","desc":"Räume alle 8 Kugeln ab. Plane die Weiße für den nächsten Stoß!","cue":[34.75,78.88],"balls":[[1,157.65,32.33],[15,89.71,51.22],[4,166.38,40.33],[10,33.89,93.37],[11,25.38,10.92],[6,170.24,71.98],[3,63.96,39.47],[13,129.66,69.98]],"shots":12,"par":5,"sol":[{"angle":-0.387077,"power":0.8,"sx":0,"sy":0.4},{"angle":1.844377,"power":0.45,"sx":0,"sy":0},{"angle":0.719416,"power":0.8,"sx":0,"sy":0},{"angle":-2.632857,"power":0.8,"sx":0,"sy":0.4}]},{"name":"Acht in Folge","desc":"Räume 8 Kugeln der Reihe nach ab (immer die niedrigste zuerst). Plane die Weiße für den nächsten Stoß!","cue":[52,80.93],"balls":[[1,113.41,56.7],[2,157.26,91.99],[3,150.46,25.69],[4,115.98,43.18],[5,205.01,112.19],[6,87.63,91.99],[7,166.96,41.66],[8,82.85,59.5]],"order":true,"shots":12,"par":6,"sol":[{"angle":-0.319251,"power":0.6,"sx":0,"sy":0.4},{"angle":1.964957,"power":0.6,"sx":0,"sy":-0.4},{"angle":-3.070103,"power":0.8,"sx":0,"sy":0},{"angle":1.626407,"power":0.3,"sx":0,"sy":-0.4},{"angle":-0.050267,"power":0.8,"sx":0,"sy":-0.4}]},{"name":"Großer Tisch","desc":"Räume alle 9 Kugeln ab. Plane die Weiße für den nächsten Stoß!","cue":[62.54,52.54],"balls":[[6,109.86,115.66],[15,192.96,49.53],[4,181.29,92.77],[12,168.66,91.62],[14,222.41,83.19],[5,202.55,114.61],[11,71.58,84.51],[1,37.94,31.57],[9,53.82,81.03]],"shots":13,"par":6,"sol":[{"angle":0.014576,"power":0.6,"sx":0,"sy":0},{"angle":-2.998936,"power":0.45,"sx":0,"sy":0},{"angle":1.592168,"power":0.8,"sx":0,"sy":0.4},{"angle":2.692402,"power":0.6,"sx":0,"sy":-0.4},{"angle":0.242038,"power":0.8,"sx":0,"sy":-0.4}]},{"name":"Neuner-Lauf","desc":"Räume 9 Kugeln der Reihe nach ab (immer die niedrigste zuerst). Plane die Weiße für den nächsten Stoß!","cue":[52.17,88.91],"balls":[[1,167.25,116.05],[2,84.85,47.77],[3,147.97,86.18],[4,197.21,16.33],[5,239.5,14.78],[6,226.67,102.09],[7,83.39,113.47],[8,24.25,43.12],[9,211.95,108.6]],"order":true,"shots":13,"par":6,"sol":[{"angle":0.252469,"power":0.8,"sx":0,"sy":0.4},{"angle":-2.747073,"power":0.6,"sx":0,"sy":-0.4},{"angle":-0.052922,"power":0.8,"sx":0,"sy":0},{"angle":1.76827,"power":0.3,"sx":0,"sy":0},{"angle":1.105652,"power":0.8,"sx":0,"sy":-0.4}]},{"name":"Grand Final","desc":"Räume alle 9 Kugeln ab. Plane die Weiße für den nächsten Stoß!","cue":[41.12,27.42],"balls":[[10,45.16,57.07],[2,241.73,37.58],[3,159.42,83.26],[13,144.47,44.72],[5,237.06,93.4],[15,191.42,99.22],[9,196.61,55.15],[14,61.69,25.01],[12,238.99,83.73]],"shots":13,"par":6,"sol":[{"angle":0.469772,"power":0.8,"sx":0,"sy":0.4},{"angle":3.027322,"power":0.8,"sx":0,"sy":0.4},{"angle":-3.123744,"power":0.6,"sx":0,"sy":0.4},{"angle":-0.059626,"power":0.45,"sx":0,"sy":0.4},{"angle":0.004207,"power":0.6,"sx":0,"sy":0}]}];
+const LEVEL_REWARDS = LEVELS.map((lv, i) => 40 + Math.floor(i / 15) * 10 + (i % 15) * 8);
 const SOLO = {stars: [], hi: 0, lessons: []};
 try { Object.assign(SOLO, JSON.parse(localStorage.getItem('billard_solo') || '{}')); } catch (e) {}
+if (!SOLO.v2) { SOLO.stars = []; SOLO.topicRew = []; SOLO.v2 = true; }
 const saveSolo = () => { try { localStorage.setItem('billard_solo', JSON.stringify(SOLO)); } catch (e) {} };
 const LINES_MULT = {all: 1, guide: 1.5, off: 2};
 
@@ -1020,7 +1027,7 @@ function newSolo(type, idx) {
   };
   initOrient();
   if (type === 'arcade') spawnBalls(5);
-  else if (LEVELS[so.idx].order && so.idx === LEVELS.length - 1) G.power = 0.9;
+  else if (LEVELS[so.idx].sol && LEVELS[so.idx].sol[0]) G.power = 0.5;
   ['over', 'menu', 'levels', 'stats', 'settings'].forEach(hide);
   if (type === 'levels') toast(LEVELS[so.idx].desc, 3500);
   else if (type === 'training') toast('Training: Kugel kurz gedrückt halten und ziehen, um sie zu versetzen. ↶ macht den letzten Stoß rückgängig.', 4500);
@@ -1213,15 +1220,16 @@ function miniBallTable(n, x, y, r) {
 
 // ===================== Lern-Modus =====================
 // Themen: erst die Lektion ansehen, dann werden die Herausforderungen freigeschaltet.
+const range15 = t => Array.from({length: 15}, (_, i) => t * 15 + i);
 const TOPICS = [
-  {icon: '🎯', name: 'Zielen & Geisterkugel', levels: [0, 1, 15, 16, 5]},
-  {icon: '🔗', name: 'Kombinationen', levels: [2, 14]},
-  {icon: '↗️', name: 'Banden', levels: [3, 12, 13]},
-  {icon: '⬆️', name: 'Effet: Stopp, Nachlauf, Rücklauf', levels: [10, 11, 6]},
-  {icon: '↪️', name: 'Seiteneffet', levels: [17]},
-  {icon: '🧠', name: 'Stellungsspiel & Abräumen', levels: [4, 7, 8, 9, 18, 19]}
+  {icon: '🎯', name: 'Zielen & Geisterkugel', levels: range15(0)},
+  {icon: '🔗', name: 'Kombinationen', levels: range15(1)},
+  {icon: '↗️', name: 'Banden', levels: range15(2)},
+  {icon: '⬆️', name: 'Effet: Stopp, Nachlauf, Rücklauf', levels: range15(3)},
+  {icon: '↪️', name: 'Seiteneffet', levels: range15(4)},
+  {icon: '🧠', name: 'Stellungsspiel & Abräumen', levels: range15(5)}
 ];
-const TOPIC_REWARDS = [150, 150, 200, 200, 250, 500];
+const TOPIC_REWARDS = [300, 350, 400, 400, 450, 800];
 // Alle Herausforderungen eines Themas geschafft: einmalige Themen-Belohnung
 function checkTopicReward(t) {
   SOLO.topicRew = SOLO.topicRew || [];
@@ -1307,7 +1315,7 @@ const LESSONS = [
   ]
 ];
 function lessonBalls(level) {
-  const lv = LEVELS[level];
+  const lv = LESSON_LEVELS[level];
   return [{n: 0, x: lv.cue[0], y: lv.cue[1], vx: 0, vy: 0, on: true}].concat(lv.balls.map(b => ({n: b[0], x: b[1], y: b[2], vx: 0, vy: 0, on: true})));
 }
 function newLesson(t) {
@@ -1406,7 +1414,7 @@ function demoPathOf(key, n) {
 function drawLesson(now) {
   const so = G.solo, st = LESSONS[so.topic][so.step], px = 1 / L.s, pulse = 0.5 + 0.5 * Math.sin(now / 300);
   if (G.state === 'moving' || G.state === 'strike') return;
-  const lv = LEVELS[so.level];
+  const lv = LESSON_LEVELS[so.level];
   for (const m of st.marks || []) {
     if (m.t === 'pocketLine') {
       const g = ghostOf(m.n, m.k);
@@ -2471,6 +2479,22 @@ const CLOTHS = {
   eisblau: {main: '#4a8fb8', band: '#346c8e', cush: ['#78b8dc', '#5ea0c8', '#4886ae', '#326482'], rgb: [76, 144, 186]},
   lila: {main: '#4c2a6e', band: '#371e51', cush: ['#6f479a', '#5b397f', '#482d66', '#33204a'], rgb: [80, 46, 116]}
 };
+// Weitere Tücher aus einer Grundfarbe erzeugen
+function mkCloth(hex) {
+  const n = parseInt(hex.slice(1), 16), c = [n >> 16, (n >> 8) & 255, n & 255];
+  const f = (k, add) => '#' + c.map(v => clamp(Math.round(v * k + (add || 0)), 0, 255).toString(16).padStart(2, '0')).join('');
+  return {main: hex, band: f(0.72), cush: [f(1.25, 18), f(1.08, 6), f(0.86), f(0.62)], rgb: c};
+}
+const MORE_CLOTHS = {
+  nachtblau: ['#1b2f6b', 'Nachtblau', 300, 0], koenigsblau: ['#1f4fa8', 'Königsblau', 350, 0], petrol: ['#0e5a63', 'Petrol', 350, 0],
+  mint: ['#3a9e86', 'Minze', 400, 0], waldgruen: ['#24502c', 'Waldgrün', 300, 0], limette: ['#6f9a1e', 'Limette', 500, 1],
+  senf: ['#a8841c', 'Senf', 450, 1], bernstein: ['#b26a12', 'Bernstein', 600, 1], kupfer: ['#9a4a28', 'Kupfer', 600, 1],
+  rost: ['#7a3418', 'Rost', 450, 0], bordeaux: ['#5e1426', 'Bordeaux', 650, 1], himbeere: ['#a32353', 'Himbeere', 700, 1],
+  flieder: ['#8a6bb8', 'Flieder', 750, 1], lavendel: ['#6d5aa6', 'Lavendel', 750, 1], aubergine: ['#3e1f45', 'Aubergine', 850, 2],
+  schiefergrau: ['#3d4752', 'Schiefer', 400, 0], sand: ['#a8946a', 'Wüstensand', 800, 2], schoko: ['#4a2c1c', 'Schokolade', 900, 2], eisgrau: ['#8fa3ad', 'Eisgrau', 950, 2]
+};
+for (const k in MORE_CLOTHS) CLOTHS[k] = mkCloth(MORE_CLOTHS[k][0]);
+for (const k in MORE_CLOTHS) CLOTH_SHOP[k] = [MORE_CLOTHS[k][1], MORE_CLOTHS[k][2], MORE_CLOTHS[k][3]];
 const cloth = () => CLOTHS[CFG.cloth] || CLOTHS.blau;
 function applyCloth() { applySkins(); }
 let tableCache = null, tableCacheKey = '';
@@ -2622,6 +2646,31 @@ function ornament(c, x, y, r) {
   c.closePath(); c.fill();
   c.fillStyle = '#0d4c3a'; c.beginPath(); c.arc(x, y, r * 0.28, 0, TAU); c.fill();
 }
+function metalRailC(stops, rivet) {
+  return (c, rnd) => {
+    fillRails(c, stops, true);
+    c.save(); rrPath(c, T_OX, T_OY, T_OW, T_OH, 4); c.clip(); c.lineWidth = 0.06;
+    for (let i = 0; i < 220; i++) { const y = T_OY + rnd() * T_OH; c.strokeStyle = 'rgba(' + (rnd() < 0.5 ? '255,240,220' : '0,0,0') + ',' + (0.05 + rnd() * 0.1) + ')'; c.beginPath(); c.moveTo(T_OX, y); c.lineTo(T_OX + T_OW, y); c.stroke(); }
+    c.restore();
+    for (const [x1, y1, x2, y2] of railMid()) { const n = Math.round(Math.hypot(x2 - x1, y2 - y1) / 16); for (let i = 0; i <= n; i++) { const x = x1 + (x2 - x1) * i / n, y = y1 + (y2 - y1) * i / n; const g = c.createRadialGradient(x - 0.25, y - 0.25, 0.05, x, y, 0.8); g.addColorStop(0, '#fff6e0'); g.addColorStop(0.6, rivet); g.addColorStop(1, '#2a1a0a'); c.fillStyle = g; c.beginPath(); c.arc(x, y, 0.75, 0, TAU); c.fill(); } }
+  };
+}
+// Allgemeine Teilchen-Animation auf dem Rahmen (Blüten, Blätter, Blasen)
+function particleAnim(seedN, count, cols, kind, dir) {
+  return (c, now) => {
+    const rnd = seeded(seedN);
+    for (let i = 0; i < count; i++) {
+      const sp = 3 + rnd() * 6, ph = rnd() * 9000, x0 = T_OX + rnd() * T_OW, col = cols[i % cols.length], sz = 0.5 + rnd() * 0.8;
+      const t = ((now + ph) / 1000 * sp) % (T_OH + 8);
+      const y = dir > 0 ? T_OY - 4 + t : T_OY + T_OH + 4 - t, x = x0 + Math.sin((now + ph) / 700) * 3;
+      c.save(); c.translate(x, y); c.rotate((now + ph) / 600); c.fillStyle = col;
+      if (kind === 'petal') { c.beginPath(); c.ellipse(0, 0, sz * 1.2, sz * 0.6, 0, 0, TAU); c.fill(); }
+      else if (kind === 'leaf') { c.beginPath(); c.moveTo(0, -sz * 1.4); c.quadraticCurveTo(sz, 0, 0, sz * 1.4); c.quadraticCurveTo(-sz, 0, 0, -sz * 1.4); c.fill(); }
+      else { c.globalAlpha = 0.6; c.strokeStyle = col; c.lineWidth = 0.15; c.beginPath(); c.arc(0, 0, sz * 0.8, 0, TAU); c.stroke(); }
+      c.restore();
+    }
+  };
+}
 function iceRail(c, rnd) {
   fillRails(c, ['#e9f7ff', '#a9d6f0', '#d6efff', '#7fb8de'], false);
   c.save(); rrPath(c, T_OX, T_OY, T_OW, T_OH, 4); c.clip();
@@ -2708,6 +2757,15 @@ const CLOTH_DECOS = {
     c.beginPath(); c.arc(W / 2, H / 2, 16, 0, TAU); c.stroke(); c.beginPath(); c.arc(W / 2, H / 2, 13, 0, TAU); c.stroke();
     c.beginPath(); for (let k = 0; k < 16; k++) { const a = k * TAU / 16, r = k % 2 ? 6 : 12; c.lineTo(W / 2 + Math.cos(a) * r, H / 2 + Math.sin(a) * r); } c.closePath(); c.stroke();
     c.restore();
+  },
+  waves(c) {
+    c.save(); c.strokeStyle = 'rgba(255,255,255,.06)'; c.lineWidth = 0.4;
+    for (let y = 8; y < H; y += 10) { c.beginPath(); for (let x = 0; x <= W; x += 4) { const yy = y + Math.sin(x * 0.06 + y) * 1.5; x === 0 ? c.moveTo(x, yy) : c.lineTo(x, yy); } c.stroke(); }
+    c.restore();
+  },
+  petalsDeco(c) {
+    const rnd = seeded(77);
+    for (let i = 0; i < 22; i++) { c.fillStyle = 'rgba(255,200,220,.18)'; c.beginPath(); c.ellipse(rnd() * W, rnd() * H, 1.4, 0.7, rnd() * 3, 0, TAU); c.fill(); }
   },
   grid(c) {
     c.save(); c.strokeStyle = 'rgba(0,240,255,.07)'; c.lineWidth = 0.2;
@@ -2808,6 +2866,19 @@ const SKIN_ANIMS = {
       }
     }
   },
+  petals: particleAnim(17, 30, ['rgba(255,190,215,.9)', 'rgba(255,225,235,.9)', 'rgba(240,150,190,.85)'], 'petal', 1),
+  leaves: particleAnim(23, 26, ['rgba(220,120,30,.9)', 'rgba(190,60,20,.9)', 'rgba(240,180,40,.9)'], 'leaf', 1),
+  bubbles: particleAnim(41, 34, ['rgba(200,240,255,.9)', 'rgba(150,220,255,.8)'], 'bubble', -1),
+  aurora(c, now) {
+    for (let band = 0; band < 3; band++) {
+      const col = ['rgba(80,255,170,', 'rgba(120,180,255,', 'rgba(200,110,255,'][band];
+      for (const [y0, dir] of [[-CUSH - WOOD / 2, 1], [H + CUSH + WOOD / 2, -1]]) {
+        c.beginPath();
+        for (let x = T_OX; x <= T_OX + T_OW; x += 4) { const y = y0 + Math.sin(x * 0.04 + now / 900 + band * 2) * 1.6 * dir + band * 0.7 * dir; x === T_OX ? c.moveTo(x, y) : c.lineTo(x, y); }
+        c.strokeStyle = col + (0.35 + 0.25 * Math.sin(now / 700 + band)) + ')'; c.lineWidth = 1.4; c.stroke();
+      }
+    }
+  },
   sparkle(c, now) {
     const cyc = 900;
     for (let i = 0; i < 7; i++) {
@@ -2840,6 +2911,21 @@ const TABLE_SKINS = {
   galaxie: {name: 'Galaxie', price: 6000, tier: 3, rail: spaceRail, gloss: 0.35, diamond: 'star', rim: ['#b48cff', '#1a0f3a'], deco: 'nebula', anim: 'galaxy',
     cloth: {main: '#140f36', band: '#0b0822', cush: ['#3a2a7a', '#2c1f60', '#211749', '#150e30'], rgb: [30, 22, 80]}},
   smaragd: {name: 'Smaragd', price: 0, tier: 2, levelOnly: 15, rail: stoneRail(['#0e6b4a', '#064030', '#0f7a55'], 'rgba(0,30,15,', 'rgba(140,255,200,'), gloss: 0.45, diamond: 'gold', rim: ['#ffe28a', '#7a5a12'], deco: 'medallion', anim: 'glint'},
+  ahorn: {name: 'Ahorn', price: 300, tier: 0, rail: woodRail(['#d6ae6a', '#b38a48'], 'rgba(90,60,20,', 'rgba(255,230,170,'), diamond: 'pearl', rim: ['#a89070', '#3e3224']},
+  wenge: {name: 'Wenge', price: 500, tier: 0, rail: woodRail(['#2a1e16', '#120c08'], 'rgba(0,0,0,', 'rgba(110,80,50,', 70), gloss: 0.35, diamond: 'silver', rim: ['#c8cdd2', '#2a2a2a']},
+  treibholz: {name: 'Treibholz', price: 600, tier: 0, rail: woodRail(['#8a8478', '#5e584e'], 'rgba(30,28,24,', 'rgba(220,214,200,', 60), gloss: 0.1, diamond: 'pearl', rim: ['#b8b0a0', '#4a463e']},
+  bambus: {name: 'Bambus', price: 800, tier: 1, rail: woodRail(['#b8b45a', '#8a8a34'], 'rgba(60,60,10,', 'rgba(240,240,170,', 50), gloss: 0.3, diamond: 'brass', rim: ['#d0c890', '#4a4a20'], cloth: mkCloth('#4a7a32')},
+  sandstein: {name: 'Sandstein', price: 900, tier: 1, rail: stoneRail(['#d8c49a', '#bfa878', '#e0cea6'], 'rgba(120,90,50,', 'rgba(255,245,220,'), gloss: 0.15, diamond: 'brass', rim: ['#e0cea6', '#6a5434']},
+  granit: {name: 'Granit', price: 1000, tier: 1, rail: stoneRail(['#6a6a6e', '#4a4a4e', '#7a7a7e'], 'rgba(20,20,22,', 'rgba(230,230,235,'), gloss: 0.3, diamond: 'silver', rim: ['#d0d4d8', '#3a3a3e']},
+  kupferwerk: {name: 'Kupferwerk', price: 1300, tier: 1, rail: metalRailC(['#d08a5a', '#8a4a24', '#c47a48', '#6a3418'], '#c47a48'), gloss: 0.35, diamond: 'brass', rim: ['#f0b080', '#5a2a10']},
+  rubin: {name: 'Rubin', price: 2000, tier: 2, rail: stoneRail(['#8a0f24', '#5a0614', '#a01a30'], 'rgba(30,0,6,', 'rgba(255,150,170,'), gloss: 0.5, diamond: 'gold', rim: ['#ffe28a', '#7a5a12'], deco: 'medallion', anim: 'glint'},
+  saphir: {name: 'Saphir', price: 2100, tier: 2, rail: stoneRail(['#103a8a', '#06205a', '#1a4aa0'], 'rgba(0,6,30,', 'rgba(160,200,255,'), gloss: 0.5, diamond: 'silver', rim: ['#ffffff', '#3a4a6a'], deco: 'medallion', anim: 'glint', cloth: mkCloth('#16406e')},
+  amethyst: {name: 'Amethyst', price: 2300, tier: 2, rail: stoneRail(['#5a2a8a', '#36125a', '#6a3aa0'], 'rgba(20,0,30,', 'rgba(230,190,255,'), gloss: 0.5, diamond: 'gold', rim: ['#ffe28a', '#5a3a12'], deco: 'medallion', anim: 'glint', cloth: mkCloth('#3e1f45')},
+  kirschbluete: {name: 'Kirschblüte', price: 2600, tier: 2, rail: woodRail(['#4a2028', '#2a1014'], 'rgba(10,0,4,', 'rgba(255,170,200,', 50), gloss: 0.35, diamond: 'pearl', rim: ['#ffc8dc', '#4a2028'], deco: 'petalsDeco', anim: 'petals', cloth: mkCloth('#7a3a5a')},
+  herbst: {name: 'Herbstwald', price: 2800, tier: 2, rail: woodRail(['#7a3a12', '#4a1e06'], 'rgba(20,6,0,', 'rgba(240,150,60,', 55), gloss: 0.25, diamond: 'brass', rim: ['#e0a050', '#4a1e06'], anim: 'leaves', cloth: mkCloth('#5a4a1e')},
+  ozean: {name: 'Tiefsee', price: 3000, tier: 2, rail: stoneRail(['#0a3a5a', '#04203a', '#0e4a6e'], 'rgba(0,10,20,', 'rgba(120,220,255,'), gloss: 0.45, diamond: 'crystal', rim: ['#bfe8ff', '#0a3a5a'], deco: 'waves', anim: 'bubbles', cloth: mkCloth('#0e5a7a')},
+  cyber: {name: 'Cyber', price: 3400, tier: 2, rail: neonRail, gloss: 0.5, diamond: 'neon', rim: ['#555', '#111'], deco: 'grid', anim: 'neon', cloth: mkCloth('#2a0e3a')},
+  nordlicht: {name: 'Nordlicht', price: 7000, tier: 3, rail: spaceRail, gloss: 0.4, diamond: 'star', rim: ['#a0ffd0', '#0a2a2a'], deco: 'nebula', anim: 'aurora', cloth: mkCloth('#0a3a3e')},
   royal: {name: 'Königsthron', price: 8000, tier: 3, rail: goldRail, gloss: 0.55, diamond: 'ruby', rim: ['#fff0b0', '#8a6410'], deco: 'crest', anim: 'sparkle',
     cloth: {main: '#7a0d1e', band: '#520814', cush: ['#a8213a', '#8a182e', '#6c1224', '#4c0b18'], rgb: [130, 20, 40]}}
 };
@@ -2976,6 +3062,25 @@ const BALL_SETS = {
   gold: {name: 'Goldrausch', price: 0, tier: 3, levelOnly: 20, mat: 'metal', pal: {1: [255, 214, 90], 2: [200, 170, 90], 3: [230, 150, 70], 4: [190, 140, 110], 5: [245, 180, 80], 6: [180, 170, 80], 7: [200, 120, 80], 8: [70, 55, 25]}},
   lava: {name: 'Lava', price: 4200, tier: 3, pat: 'lava'},
   galaxie: {name: 'Galaxie', price: 4800, tier: 3, pat: 'galaxy'},
+  bonbon: {name: 'Bonbon', price: 300, tier: 0, mat: 'matte', pal: {1: [255, 236, 140], 2: [150, 200, 255], 3: [255, 150, 170], 4: [210, 170, 255], 5: [255, 200, 150], 6: [160, 240, 190], 7: [240, 160, 200], 8: [90, 80, 110]}},
+  retro: {name: 'Retro 70er', price: 400, tier: 0, pal: {1: [228, 180, 60], 2: [70, 110, 140], 3: [190, 80, 50], 4: [120, 80, 120], 5: [220, 120, 40], 6: [100, 130, 60], 7: [140, 60, 40], 8: [40, 34, 30]}},
+  erde: {name: 'Erdtöne', price: 450, tier: 0, mat: 'satin', pal: {1: [200, 160, 90], 2: [90, 110, 120], 3: [160, 80, 60], 4: [110, 90, 110], 5: [190, 120, 70], 6: [100, 120, 80], 7: [120, 70, 60], 8: [50, 44, 40]}},
+  tarn: {name: 'Tarnung', price: 900, tier: 1, pat: 'camo'},
+  zebra: {name: 'Zebra', price: 1000, tier: 1, pat: 'zebra'},
+  tupfen: {name: 'Tupfen', price: 1100, tier: 1, pat: 'dots', mat: 'matte'},
+  schach: {name: 'Schachbrett', price: 1200, tier: 1, pat: 'checker'},
+  kohle: {name: 'Holzkohle', price: 1300, tier: 1, mat: 'satin', pat: 'wood', pal: {1: [120, 100, 60], 2: [60, 70, 80], 3: [110, 50, 40], 4: [80, 60, 80], 5: [120, 80, 50], 6: [60, 80, 50], 7: [90, 50, 40], 8: [30, 26, 24]}},
+  eismarmor: {name: 'Eismarmor', price: 1900, tier: 2, pat: 'marble', pal: {1: [220, 230, 250], 2: [120, 170, 230], 3: [170, 200, 240], 4: [150, 150, 220], 5: [200, 220, 245], 6: [130, 210, 220], 7: [160, 180, 220], 8: [50, 60, 80]}},
+  bronze: {name: 'Bronze', price: 2000, tier: 2, mat: 'metal', pal: {1: [200, 140, 70], 2: [120, 110, 100], 3: [180, 90, 60], 4: [140, 100, 90], 5: [210, 130, 70], 6: [130, 120, 70], 7: [150, 80, 60], 8: [60, 44, 30]}},
+  leopard: {name: 'Leopard', price: 2100, tier: 2, pat: 'spots', mat: 'satin'},
+  silber: {name: 'Silber', price: 2200, tier: 2, mat: 'metal', pal: {1: [230, 225, 200], 2: [170, 190, 220], 3: [220, 180, 180], 4: [200, 190, 220], 5: [230, 210, 190], 6: [180, 220, 200], 7: [210, 180, 190], 8: [70, 72, 78]}},
+  wabe: {name: 'Wabe', price: 2300, tier: 2, pat: 'hex'},
+  rosegold: {name: 'Roségold', price: 2400, tier: 2, mat: 'metal', pal: {1: [250, 200, 170], 2: [210, 170, 180], 3: [240, 150, 150], 4: [220, 170, 200], 5: [250, 180, 150], 6: [210, 200, 170], 7: [230, 150, 160], 8: [90, 60, 60]}},
+  sonne: {name: 'Sonnenglut', price: 2600, tier: 2, mat: 'glow', pal: {1: [255, 230, 80], 2: [255, 160, 60], 3: [255, 80, 60], 4: [255, 120, 160], 5: [255, 190, 40], 6: [220, 255, 90], 7: [255, 90, 120], 8: [60, 30, 20]}},
+  giftlava: {name: 'Giftlava', price: 4500, tier: 3, pat: 'lava', glowCol: [90, 255, 120]},
+  nordlicht: {name: 'Nordlicht', price: 4600, tier: 3, pat: 'galaxy', pal: {1: [120, 255, 190], 2: [90, 160, 255], 3: [200, 120, 255], 4: [120, 220, 255], 5: [160, 255, 160], 6: [90, 255, 220], 7: [230, 140, 255], 8: [40, 60, 80]}},
+  obsidian: {name: 'Obsidian', price: 5000, tier: 3, mat: 'glass', pal: {1: [90, 80, 40], 2: [30, 40, 80], 3: [90, 30, 30], 4: [60, 30, 80], 5: [100, 60, 20], 6: [20, 80, 50], 7: [80, 20, 40], 8: [10, 10, 14]}},
+  saphirglas: {name: 'Saphirglas', price: 5200, tier: 3, mat: 'glass', pal: {1: [120, 200, 255], 2: [40, 90, 255], 3: [150, 120, 255], 4: [90, 140, 255], 5: [100, 220, 255], 6: [60, 200, 230], 7: [130, 100, 230], 8: [10, 20, 60]}},
   kristall: {name: 'Kristallglas', price: 5500, tier: 3, mat: 'glass', pal: {1: [255, 210, 40], 2: [40, 110, 255], 3: [255, 50, 60], 4: [170, 70, 255], 5: [255, 140, 30], 6: [30, 220, 120], 7: [200, 40, 80], 8: [30, 30, 40]}}
 };
 const ballSet = () => BALL_SETS[PROFILE.balls] || BALL_SETS.klassik;
@@ -3052,11 +3157,29 @@ function renderSphere(img, size, rpx, n, M, setId) {
           const k = wh ? 0.5 : 0.42;
           r = (r * k + 12) * sh; g = (g * k + 12) * sh; b = (b * k + 14) * sh;
         } else if (pat === 'lava') {
-          const glow = wh ? [255, 170, 60] : [Math.min(255, r * 0.6 + 140), Math.min(255, g * 0.4 + 70), b * 0.2 + 10];
+          const glow = set.glowCol ? set.glowCol : wh ? [255, 170, 60] : [Math.min(255, r * 0.6 + 140), Math.min(255, g * 0.4 + 70), b * 0.2 + 10];
           r = 36 + r * 0.12; g = 26 + g * 0.08; b = 22 + b * 0.06;
           const cr = Math.abs(Math.sin(bx * 7 + 2.3 * Math.sin(bz * 5)) * Math.sin(by * 6 + 2 * Math.sin(bx * 4)) * Math.sin(bz * 8 + 1.5 * Math.sin(by * 5)));
           const k = Math.max(0, 1 - cr / 0.07);
           e0 = glow[0] * k; e1 = glow[1] * k; e2 = glow[2] * k;
+        } else if (pat === 'camo') {
+          const v = Math.sin(bx * 6 + 2 * Math.sin(by * 5)) + Math.sin(by * 7 + 2 * Math.sin(bz * 4)) + Math.sin(bz * 5 + Math.sin(bx * 3));
+          const k = wh ? 0.85 : 1, f = v > 1 ? 0.45 : v > 0 ? 0.75 : v > -1 ? 1 : 0.6, add = v > 0 && v <= 1 ? 1 : 0;
+          r = r * f * k + 25 * add; g = g * f * k + 30 * add; b = b * f * k;
+        } else if (pat === 'zebra') {
+          if (Math.sin((by + 0.25 * Math.sin(bx * 6) + 0.15 * Math.sin(bz * 5)) * 13) > 0.25) { r *= 0.16; g *= 0.16; b *= 0.18; }
+        } else if (pat === 'dots') {
+          const qx = fract(bx * 3.2) - 0.5, qy = fract(by * 3.2) - 0.5, qz = fract(bz * 3.2) - 0.5;
+          if (qx * qx + qy * qy + qz * qz < 0.06) { const tr = wh ? 0.5 : 0; r += ((wh ? r * tr : 255) - r) * 0.85; g += ((wh ? g * tr : 255) - g) * 0.85; b += ((wh ? b * tr : 255) - b) * 0.85; }
+        } else if (pat === 'checker') {
+          if ((Math.floor(bx * 3.5 + 8) + Math.floor(by * 3.5 + 8) + Math.floor(bz * 3.5 + 8)) & 1) { r *= 0.5; g *= 0.5; b *= 0.5; }
+        } else if (pat === 'hex') {
+          const p1 = fract(bx * 6), p2 = fract((bx * 0.5 + by * 0.866) * 6 + bz * 2), p3 = fract((-bx * 0.5 + by * 0.866) * 6 - bz * 2);
+          const e = Math.min(p1, 1 - p1, p2, 1 - p2, p3, 1 - p3);
+          if (e < 0.06) { r = r * 0.3 + 50; g = g * 0.3 + 40; b = b * 0.3 + 10; } else { const sh = 0.85 + 0.3 * e; r *= sh; g *= sh; b *= sh; }
+        } else if (pat === 'spots') {
+          const v = Math.sin(bx * 9 + 2 * Math.sin(by * 7)) * Math.sin(by * 8 + 2 * Math.sin(bz * 6)) * Math.sin(bz * 9 + 2 * Math.sin(bx * 5));
+          if (v > 0.22) { const ring = v < 0.34 ? 0.15 : 0.6; r *= ring; g *= ring; b *= ring; }
         } else if (pat === 'galaxy') {
           const neb = 0.5 + 0.5 * Math.sin(bx * 4 + 2 * Math.sin(by * 3)) * Math.sin(bz * 3 + Math.sin(bx * 2) * 2);
           const tint = wh ? [150, 140, 220] : [r, g, b];
@@ -3490,6 +3613,19 @@ const CUES = {
   kosmos: {name: 'Kosmos', price: 5000, tier: 3, s1: '#e8e4ff', s2: '#c8c0f0', ring: '#c8b0ff', f1: '#2a1a6a', f2: '#0b0624', wrap: '#07051a', b1: '#3a2290', b2: '#0b0624', inlay: '#ffffff', tip: '#3a2290', glow: '#9a6cff', pattern: 'stars'},
   champion: {name: 'Champion', price: 0, tier: 2, levelOnly: 10, s1: '#f4ead2', s2: '#e0c896', ring: '#3fd6ff', f1: '#0f3d5a', f2: '#061c2a', wrap: '#0a0a0a', b1: '#1f6f8f', b2: '#0b2a3a', inlay: '#3fd6ff', tip: '#0f3d5a', glow: '#3fd6ff', pattern: 'stars'},
   legende: {name: 'Legende', price: 0, tier: 3, levelOnly: 25, s1: '#f6ecd0', s2: '#e6cf98', ring: '#ffd54a', f1: '#1a1206', f2: '#050402', wrap: '#120c02', b1: '#2a1c08', b2: '#050402', inlay: '#ffd54a', tip: '#1a1206', glow: '#ffcc33', pattern: 'flames'},
+  ahorn: {name: 'Ahorn', price: 250, tier: 0, s1: '#f2e2b4', s2: '#e3cb92', ring: '#e0d6c2', f1: '#d9b878', f2: '#b8935a', wrap: '#3a2a1a', b1: '#c49a5a', b2: '#8a6434', inlay: '#5a3a1a', tip: '#3567a8'},
+  mahagoni: {name: 'Mahagoni', price: 350, tier: 0, s1: '#ead39f', s2: '#d5b175', ring: '#e8d8b0', f1: '#6a2412', f2: '#3e1206', wrap: '#1a1a1a', b1: '#6a2412', b2: '#2a0a04', inlay: '#f2e6c8', tip: '#3567a8'},
+  zebra: {name: 'Zebra', price: 700, tier: 1, s1: '#f4f0e6', s2: '#e2dccb', ring: '#ffffff', f1: '#f2f2f2', f2: '#d8d8d8', wrap: '#111', b1: '#f2f2f2', b2: '#bdbdbd', inlay: '#111', tip: '#111', pattern: 'stripes'},
+  ozeanqueue: {name: 'Ozean', price: 950, tier: 1, s1: '#e8f2f6', s2: '#c8dde6', ring: '#7fd0ff', f1: '#1a6aa8', f2: '#0a2a5a', wrap: '#06142a', b1: '#1a6aa8', b2: '#062048', inlay: '#bfe8ff', tip: '#1a6aa8', pattern: 'waves'},
+  tarnqueue: {name: 'Tarnung', price: 1000, tier: 1, s1: '#e6dcc0', s2: '#cfc29c', ring: '#8a8a5a', f1: '#5a6a3a', f2: '#2e3a1e', wrap: '#1e2414', b1: '#5a6a3a', b2: '#232a14', inlay: '#c8c090', tip: '#3a4a2a', pattern: 'camo'},
+  bonbonqueue: {name: 'Bonbon', price: 1050, tier: 1, s1: '#fff0f6', s2: '#f6d6e6', ring: '#ff9ac8', f1: '#ff6aa8', f2: '#c83a7a', wrap: '#4a1a32', b1: '#ff8ab8', b2: '#a82a62', inlay: '#ffffff', tip: '#c83a7a', pattern: 'dots'},
+  wabe: {name: 'Wabe', price: 1700, tier: 2, s1: '#f6e8c0', s2: '#e6cf90', ring: '#ffd54a', f1: '#2a2008', f2: '#120c02', wrap: '#0c0802', b1: '#3a2c0c', b2: '#120c02', inlay: '#ffd54a', tip: '#2a2008', pattern: 'hex'},
+  smaragdqueue: {name: 'Smaragd', price: 2200, tier: 2, s1: '#eef6ea', s2: '#d0e6c8', ring: '#7dffb0', f1: '#0f6a45', f2: '#04301e', wrap: '#021a10', b1: '#0f6a45', b2: '#021a10', inlay: '#c8ffe0', tip: '#0f6a45', glow: '#3fd68b', pattern: 'stars'},
+  frostqueue: {name: 'Frost', price: 2500, tier: 2, s1: '#f6fbff', s2: '#e0eef8', ring: '#bfe6ff', f1: '#d8f0ff', f2: '#7fb8de', wrap: '#e8f6ff', b1: '#bfe6ff', b2: '#4a90c8', inlay: '#ffffff', tip: '#6fb6e8', glow: '#bfe6ff', pattern: 'hex'},
+  magma: {name: 'Magma', price: 3000, tier: 2, s1: '#f2dcc0', s2: '#e0b88c', ring: '#ff7a20', f1: '#3a0a02', f2: '#120200', wrap: '#0a0100', b1: '#4a0c02', b2: '#120200', inlay: '#ffb347', tip: '#4a0c02', glow: '#ff4a10', pattern: 'flames'},
+  nebel: {name: 'Nebula', price: 4200, tier: 3, s1: '#f0eaff', s2: '#d6c8f6', ring: '#e0b0ff', f1: '#4a1a8a', f2: '#14062e', wrap: '#0c041e', b1: '#6a2ab0', b2: '#14062e', inlay: '#ffd0ff', tip: '#6a2ab0', glow: '#c070ff', pattern: 'waves'},
+  diamant: {name: 'Diamant', price: 6000, tier: 3, s1: '#ffffff', s2: '#e8eef4', ring: '#ffffff', f1: '#d8e2ec', f2: '#8a9aac', wrap: '#f4f8fc', b1: '#e8eef4', b2: '#6a7a8c', inlay: '#6ae0ff', tip: '#8a9aac', glow: '#ffffff', pattern: 'stars'},
+  sonnenfeuer: {name: 'Sonnenfeuer', price: 9000, tier: 3, s1: '#fff4d0', s2: '#ffe08a', ring: '#ffffff', f1: '#ffb020', f2: '#c84a00', wrap: '#2a0a00', b1: '#ffd040', b2: '#a83a00', inlay: '#ffffff', tip: '#c84a00', glow: '#ffd040', pattern: 'flames'},
   blitz: {name: 'Donnerkeil', price: 7000, tier: 3, s1: '#eaf6ff', s2: '#c8e4f8', ring: '#7fe8ff', f1: '#0a3a7a', f2: '#020a1a', wrap: '#02060f', b1: '#0a3a7a', b2: '#020a1a', inlay: '#7fe8ff', tip: '#0a3a7a', glow: '#40c8ff', pattern: 'bolt'}
 };
 // Muster auf Vorderteil und Griff der Queues
@@ -3508,6 +3644,21 @@ function paintCuePattern(c, x0, len, d, k) {
   } else if (d.pattern === 'scales') {
     c.strokeStyle = 'rgba(220,230,120,.45)'; c.lineWidth = 0.12 * k;
     for (let x = a; x < b; x += 1.1 * k) for (let y = -2; y <= 2; y++) { c.beginPath(); c.arc(x + (y % 2 ? 0.55 * k : 0), y * 0.6 * k, 0.55 * k, 0, Math.PI); c.stroke(); }
+  } else if (d.pattern === 'stripes') {
+    c.fillStyle = 'rgba(15,15,15,.9)';
+    for (let x = a; x < b; x += 2.4 * k) { c.beginPath(); c.moveTo(x, -3 * k); c.lineTo(x + 1.1 * k, -3 * k); c.lineTo(x + 0.2 * k, 3 * k); c.lineTo(x - 0.9 * k, 3 * k); c.closePath(); c.fill(); }
+  } else if (d.pattern === 'waves') {
+    c.strokeStyle = 'rgba(200,240,255,.55)'; c.lineWidth = 0.22 * k;
+    for (let row = -1; row <= 1; row++) { c.beginPath(); for (let x = a; x <= b; x += 0.5 * k) { const y = row * 0.9 * k + Math.sin((x - a) / k * 0.9 + row) * 0.35 * k; x === a ? c.moveTo(x, y) : c.lineTo(x, y); } c.stroke(); }
+  } else if (d.pattern === 'camo') {
+    for (let i = 0; i < 26; i++) { c.fillStyle = ['rgba(90,100,50,.85)', 'rgba(40,46,22,.85)', 'rgba(150,140,90,.8)'][i % 3]; c.beginPath(); c.ellipse(a + rnd() * (b - a), (rnd() - 0.5) * 2.4 * k, (1.2 + rnd() * 1.6) * k, (0.6 + rnd() * 0.8) * k, rnd() * 3, 0, TAU); c.fill(); }
+  } else if (d.pattern === 'dots') {
+    c.fillStyle = 'rgba(255,255,255,.9)';
+    for (let x = a; x < b; x += 1.6 * k) for (const y of [-0.8, 0.8]) { c.beginPath(); c.arc(x + (y > 0 ? 0.8 * k : 0), y * k, 0.35 * k, 0, TAU); c.fill(); }
+  } else if (d.pattern === 'hex') {
+    c.strokeStyle = 'rgba(255,215,90,.5)'; c.lineWidth = 0.12 * k;
+    const hs = 0.7 * k;
+    for (let x = a; x < b; x += hs * 1.5) for (let y = -2; y <= 2; y++) { const cx = x, cy = y * hs * 1.7 + ((Math.round((x - a) / (hs * 1.5)) % 2) ? hs * 0.85 : 0); c.beginPath(); for (let q = 0; q < 6; q++) { const an = q * Math.PI / 3; c.lineTo(cx + Math.cos(an) * hs, cy + Math.sin(an) * hs); } c.closePath(); c.stroke(); }
   } else if (d.pattern === 'bolt') {
     const pts = []; let y = 0;
     for (let x = a; x <= b; x += 3.5 * k) { pts.push([x, y]); y = (rnd() - 0.5) * 2.2 * k; }
@@ -3555,7 +3706,9 @@ function drawCue(cue, extra) {
 // Werte der Queues: Kraft, Zielen (Linienlänge), Effet, Zeit (0–10)
 const CUE_STATS = {klassik: [1, 1, 1, 1], ebenholz: [2, 2, 1, 2], kirsch: [2, 2, 2, 2], carbon: [3, 3, 3, 2], chrom: [3, 4, 3, 3],
   eis: [4, 3, 4, 3], jade: [4, 4, 4, 4], neon: [5, 5, 4, 5], gold: [5, 5, 5, 5], lava: [6, 5, 6, 5], schlange: [6, 6, 6, 6],
-  royal: [7, 6, 6, 7], phoenix: [8, 7, 7, 7], kosmos: [8, 8, 8, 8], blitz: [10, 9, 9, 10], champion: [6, 6, 6, 6], legende: [9, 9, 9, 9]};
+  royal: [7, 6, 6, 7], phoenix: [8, 7, 7, 7], kosmos: [8, 8, 8, 8], blitz: [10, 9, 9, 10], champion: [6, 6, 6, 6], legende: [9, 9, 9, 9],
+  ahorn: [1, 2, 1, 2], mahagoni: [2, 1, 2, 2], zebra: [3, 3, 3, 3], ozeanqueue: [3, 4, 4, 3], tarnqueue: [4, 3, 3, 4], bonbonqueue: [3, 4, 4, 4],
+  wabe: [5, 5, 5, 4], smaragdqueue: [5, 6, 5, 5], frostqueue: [6, 5, 6, 6], magma: [6, 6, 7, 6], nebel: [7, 8, 7, 8], diamant: [9, 8, 9, 9], sonnenfeuer: [10, 10, 10, 10]};
 // Gelten in Partien und der Trefferserie – Lektionen, Herausforderungen und Training bleiben neutral
 const statsActive = () => G && (G.mode !== 0 || G.solo.type === 'arcade');
 function cueStats(i) {
@@ -3597,7 +3750,7 @@ function drawHUD() {
   const midY = top + railH / 2 + 1;
   ctx.textBaseline = 'middle';
   if (G.mode === 0) {
-    const so = G.solo, lv = LEVELS[so.type === 'lesson' ? so.level : so.idx];
+    const so = G.solo, lv = so.type === 'lesson' ? LESSON_LEVELS[so.level] : LEVELS[so.idx];
     const left = so.type === 'lesson' ? '🎓 Lern-Modus' : so.type === 'levels' ? 'Level ' + (so.idx + 1) + ': ' + lv.name : so.type === 'training' ? 'Training' : 'Punkte: ' + so.score;
     const right = so.type === 'lesson' ? TOPICS[so.topic].name : so.type === 'levels' ? 'Stöße: ' + so.shots + ' / ' + lv.shots + ' · Par ' + lv.par
       : so.type === 'training' ? 'Stöße: ' + so.shots + ' · Versenkt: ' + (so.pots || 0)
@@ -4087,6 +4240,9 @@ function updateUI() {
   $('bReplay').textContent = half ? '⟲' : '⟲ Replay';
   $('bReplay').disabled = !(isHumanTurn() && G.lastShot);
   $('bChat').classList.toggle('hidden', !G.online);
+  const hintOk = G.mode === 0 && G.solo.type === 'levels' && G.solo.shots === 0 && isHumanTurn();
+  $('bHint').classList.toggle('hidden', !hintOk);
+  if (hintOk) place('bHint', L.bx, L.row.y - Math.round(36 * L.u) - 7, L.bw, Math.round(36 * L.u));
   const bh = Math.round(36 * L.u), cw = Math.round(38 * L.u);
   place('bMenu', L.bx, 6, G.online ? L.bw - cw - 6 : L.bw, bh);
   place('bChat', L.bx + L.bw - cw, 6, cw, bh);
@@ -4166,6 +4322,18 @@ $('bStats').onclick = () => showStats();
 $('bStatsClose').onclick = () => { hide('stats'); syncMenu(); };
 $('bStatsReset').onclick = () => { Object.assign(STATS, {games: 0, wins: 0, shots: 0, pots: 0, fouls: 0, best: 0}); saveStats(); showStats(); };
 $('bReplay').onclick = () => startReplay();
+// Tipp: stellt den geprüften Lösungsstoß ein (kostet 25 Münzen, nur vor dem ersten Stoß)
+$('bHint').onclick = () => {
+  if (!G || G.mode !== 0 || G.solo.type !== 'levels' || G.solo.shots !== 0 || !isHumanTurn()) return;
+  const sol = LEVELS[G.solo.idx].sol && LEVELS[G.solo.idx].sol[0];
+  if (!sol) return;
+  if (!G.solo.hinted) {
+    if (PROFILE.coins < 25) { toast('Für einen Tipp brauchst du 25 Münzen.'); return; }
+    PROFILE.coins -= 25; saveProfile(); G.solo.hinted = true;
+  }
+  G.aim = sol.angle; G.power = sol.power; G.sx = sol.sx || 0; G.sy = sol.sy || 0;
+  toast('💡 So geht es: Richtung, Kraft und Effet sind eingestellt. Ziehe den Queue auf ' + Math.round(sol.power * 100) + ' % und lass los.', 5000);
+};
 $('bUndo').onclick = () => {
   if (!isHumanTurn() || !G.beforeBalls) return;
   G.balls = cloneBalls(G.beforeBalls); G.ver++; G.bih = 'any';

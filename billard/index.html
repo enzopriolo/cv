@@ -1,0 +1,3245 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#0d1512">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="description" content="Billard mit Linienvorschau: 8-Ball, 9-Ball, Lektionen, Herausforderungen und Online-Spiel ohne Server.">
+<title>Billard Linien</title>
+<style>
+:root{--bg:#0d1512;--panel:#16231e;--line:#2c4a3e;--text:#eef4f0;--muted:#9fb5aa;--accent:#f2b632;--accent2:#3fb68b}
+html,body{margin:0;height:100%;background:var(--bg);overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;font-family:system-ui,-apple-system,Roboto,"Segoe UI",sans-serif;color:var(--text)}
+#c{display:block;position:fixed;inset:0;width:100%;height:100%}
+.card canvas{display:block}
+.b{position:fixed;z-index:5;border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:10px;font-size:13px;font-weight:600;padding:0;cursor:pointer}
+.b:active{filter:brightness(1.3)}
+.b.on{background:#5a3d0b;border-color:var(--accent);color:var(--accent)}
+.shoot{background:linear-gradient(#e0412f,#a52418);border-color:#ff7a66;font-size:17px;letter-spacing:1px}
+.shoot:disabled,.b:disabled{opacity:.35}
+.hidden{display:none!important}
+#over{background:rgba(5,10,8,.6)}
+#menu.lobby{background:#050403;align-items:stretch;perspective:900px}
+#lobbyBg{position:absolute;inset:0;width:100%;height:100%;z-index:0}
+.lobbyWrap{position:relative;z-index:1}
+#heroBall{width:46px;height:46px;filter:drop-shadow(0 6px 10px rgba(0,0,0,.7));animation:bob 3s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+.logo b{background:linear-gradient(#fff,#cfd8d4);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:none;filter:drop-shadow(0 2px 0 #6b5212) drop-shadow(0 4px 6px rgba(0,0,0,.8))}
+.logo i{filter:drop-shadow(0 2px 4px rgba(0,0,0,.8))}
+.pcard,.coins,.daily,.lobbyOpts .seg,.lobbyBar button{backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.pcard{background:rgba(10,18,15,.55);box-shadow:0 8px 24px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.08)}
+.coins{background:rgba(20,14,2,.6);box-shadow:0 0 18px rgba(242,182,50,.25),inset 0 1px 0 rgba(255,255,255,.1)}
+.lobbyOpts .seg{background:rgba(10,18,15,.55)}
+.lobbyOpts span{text-shadow:0 1px 3px #000}
+.tiles{perspective:800px}
+.tile{transform-style:preserve-3d;transform:rotateX(8deg);transition:transform .18s,box-shadow .18s;box-shadow:0 14px 28px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.25),inset 0 -6px 14px rgba(0,0,0,.35);animation:tileIn .6s cubic-bezier(.2,.9,.3,1.2) backwards}
+.tile:nth-child(1){animation-delay:.05s}.tile:nth-child(2){animation-delay:.1s}.tile:nth-child(3){animation-delay:.15s}
+.tile:nth-child(4){animation-delay:.2s}.tile:nth-child(5){animation-delay:.25s}.tile:nth-child(6){animation-delay:.3s}
+@keyframes tileIn{from{opacity:0;transform:rotateX(50deg) translateY(30px) scale(.9)}}
+.tile:active{transform:rotateX(0) translateY(3px) scale(.97);box-shadow:0 4px 10px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.2)}
+.tile::before{content:'';position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.22) 45%,transparent 60%);transform:translateX(-120%);animation:shine 5s ease-in-out infinite}
+.tile:nth-child(2)::before{animation-delay:.8s}.tile:nth-child(3)::before{animation-delay:1.6s}.tile:nth-child(4)::before{animation-delay:2.4s}.tile:nth-child(5)::before{animation-delay:3.2s}.tile:nth-child(6)::before{animation-delay:4s}
+@keyframes shine{0%,70%{transform:translateX(-120%)}100%{transform:translateX(120%)}}
+.tile::after{content:'';position:absolute;left:0;right:0;top:0;height:45%;background:linear-gradient(rgba(255,255,255,.16),transparent);border-radius:16px 16px 0 0;pointer-events:none}
+.tile em{transform:translateZ(30px);animation:float 3.2s ease-in-out infinite}
+.tile:nth-child(even) em{animation-delay:1.2s}
+@keyframes float{0%,100%{translate:0 0}50%{translate:0 -5px}}
+.tile b,.tile small{transform:translateZ(18px);text-shadow:0 2px 4px rgba(0,0,0,.6);position:relative;z-index:1}
+.lobbyBar button{background:rgba(20,32,27,.7);box-shadow:0 6px 14px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.08)}
+#loader{position:fixed;inset:0;z-index:100;background:radial-gradient(ellipse at 50% 35%,#1d3a30 0%,#0a1411 55%,#030605 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;transition:opacity .6s}
+#loader.fade{opacity:0}
+.ldGlow{position:absolute;width:340px;height:340px;border-radius:50%;background:radial-gradient(circle,rgba(242,182,50,.18),transparent 65%);animation:glow 2.4s ease-in-out infinite}
+@keyframes glow{50%{transform:scale(1.15);opacity:.7}}
+#ldBall{width:min(34vh,150px);height:min(34vh,150px);position:relative;filter:drop-shadow(0 18px 22px rgba(0,0,0,.8))}
+.ldLogo{text-align:center;position:relative}
+.ldLogo b{display:block;font-size:30px;letter-spacing:8px;line-height:1;background:linear-gradient(#fff,#bfcac5);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 3px 0 #6b5212) drop-shadow(0 6px 8px #000)}
+.ldLogo i{display:block;font-style:normal;color:var(--accent);letter-spacing:12px;font-weight:800;font-size:15px;margin-top:2px}
+.ldBarWrap{width:min(70vw,360px);height:10px;border-radius:6px;background:rgba(0,0,0,.5);border:1px solid #2c4a3e;overflow:hidden;position:relative}
+#ldBar{height:100%;width:0;background:linear-gradient(90deg,#3fb68b,#f2b632,#e0412f);box-shadow:0 0 12px rgba(242,182,50,.6)}
+.ldRow{width:min(70vw,360px);display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
+#ldTip{position:absolute;bottom:14px;left:16px;right:16px;text-align:center;color:#cfe;font-size:13px;opacity:.85}
+#rotate{display:none;position:fixed;inset:0;z-index:200;background:#0a1411;color:#fff;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;padding:20px}
+#rotate div{font-size:56px;animation:float 2s ease-in-out infinite}
+#rotate small{color:var(--muted)}
+@media (orientation:portrait) and (max-width:820px){#rotate{display:flex}}
+.lobbyWrap{width:100%;max-width:980px;margin:auto;padding:10px 16px;box-sizing:border-box;display:flex;flex-direction:column;gap:8px;max-height:100%;overflow:auto}
+.lobbyHead{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:8px;margin-right:auto}
+.logo b{display:block;font-size:20px;letter-spacing:3px;line-height:1}
+.logo i{display:block;font-style:normal;font-size:13px;letter-spacing:6px;color:var(--accent);font-weight:800}
+.pcard{display:flex;align-items:center;gap:8px;background:rgba(0,0,0,.35);border:1px solid var(--line);border-radius:14px;padding:5px 12px 5px 6px}
+.avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#f2b632,#e0412f);display:flex;align-items:center;justify-content:center;font-weight:900;color:#2a1200}
+.pinfo b{font-size:14px}.pinfo small{font-size:11px;color:var(--muted)}
+.xpbar{width:120px;height:6px;background:#0a1210;border-radius:4px;overflow:hidden;margin:2px 0}
+.xpbar div{height:100%;background:linear-gradient(90deg,#3fb68b,#f2b632);width:0}
+.coins{background:rgba(0,0,0,.4);border:1px solid #6b5212;color:#ffd75a;border-radius:20px;padding:6px 14px;font-weight:800;font-size:15px}
+.daily{background:#1f3029;border:1px solid var(--line);color:var(--muted);border-radius:20px;padding:7px 12px;font-weight:700;font-size:13px}
+.daily.ready{background:linear-gradient(#f2b632,#d58a10);color:#2a1a00;border-color:#ffd75a;animation:pulse 1.2s infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+.lobbyOpts{display:flex;align-items:center;gap:10px;flex-wrap:wrap;color:var(--muted);font-size:13px}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.tile{position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:12px 14px;min-height:min(19vh,110px);text-align:left;color:#fff;cursor:pointer;display:flex;flex-direction:column;justify-content:flex-end;box-shadow:0 6px 18px rgba(0,0,0,.45)}
+.tile:active{transform:scale(.97)}
+.tile em{position:absolute;right:10px;top:4px;font-style:normal;font-size:42px;opacity:.9;filter:drop-shadow(0 3px 6px rgba(0,0,0,.5))}
+.tile b{font-size:17px}.tile small{font-size:12px;opacity:.85}
+.t1{background:linear-gradient(135deg,#1f6f8f,#0d3447)}.t2{background:linear-gradient(135deg,#2f7d4f,#123a24)}.t3{background:linear-gradient(135deg,#6a3fa8,#2a1450)}
+.t4{background:linear-gradient(135deg,#c58a12,#5e3b05)}.t5{background:linear-gradient(135deg,#c23a2a,#5a120a)}.t6{background:linear-gradient(135deg,#3a6f7a,#122e33)}
+#lbMsg{color:var(--accent);font-size:13px;text-align:center;min-height:16px}
+.lobbyBar{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.lobbyBar button{background:#1f3029;border:1px solid var(--line);color:var(--text);border-radius:10px;padding:8px 14px;font-size:14px;font-weight:600}
+#bResume{background:var(--accent);color:#2a1a00;border-color:var(--accent)}
+#overReward{display:flex;gap:12px;justify-content:center;margin-top:8px;font-weight:800;font-size:17px}
+#overReward span{background:rgba(0,0,0,.35);border:1px solid #6b5212;color:#ffd75a;border-radius:16px;padding:4px 12px}
+.shop{width:min(760px,96vw)}
+.shopHead{display:flex;justify-content:space-between;align-items:center}
+.tabs{display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;margin:4px 0 8px}
+.tabs button{background:transparent;border:0;color:var(--text);padding:7px 16px;font-size:14px}
+.tabs button.sel{background:var(--accent2);color:#06150f;font-weight:700}
+#shopGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.card{background:#1a2924;border:1px solid var(--line);border-radius:12px;padding:6px 8px;display:flex;flex-direction:column;gap:3px;align-items:stretch}
+.card.active{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+.card .prev{width:100%;height:24px}
+.cname{font-size:13px;font-weight:700}
+.card button{border:1px solid var(--line);background:#24372f;color:var(--text);border-radius:8px;padding:6px;font-weight:700;font-size:13px}
+.card button.buy{background:linear-gradient(#f2b632,#d58a10);color:#2a1a00;border-color:#ffd75a}
+.card button.buy.poor{filter:grayscale(.7) brightness(.7)}
+.card button.eq{background:var(--accent2);color:#06150f}
+.lvl small{font-size:10px;color:#ffd75a}
+.overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(5,10,8,.84);z-index:20}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 20px;max-width:92vw;max-height:92vh;overflow:auto;text-align:center;box-sizing:border-box}
+h1{margin:0 0 8px;font-size:22px;letter-spacing:1px}
+h1 span{color:var(--accent)}
+.row{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:6px 0}
+.row>span{color:var(--muted);font-size:14px;min-width:84px;text-align:left}
+.seg{display:flex;border:1px solid var(--line);border-radius:9px;overflow:hidden}
+.seg button{background:transparent;border:0;color:var(--text);padding:7px 12px;font-size:14px;cursor:pointer}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button.sel{background:var(--accent2);color:#06150f;font-weight:700}
+.actions{display:flex;gap:10px;justify-content:center;margin-top:12px;flex-wrap:wrap}
+.actions button{border:1px solid var(--line);background:#1f3029;color:var(--text);border-radius:10px;padding:9px 16px;font-size:15px;font-weight:600;cursor:pointer}
+.actions button.primary{background:var(--accent);color:#2a1a00;border-color:var(--accent)}
+.rules{text-align:left;font-size:13px;line-height:1.45;max-width:640px}
+.rules h2{font-size:15px;margin:10px 0 4px;color:var(--accent)}
+.rules ul{margin:0;padding-left:18px}
+.lvl{display:flex;flex-direction:column;align-items:center;gap:1px;background:#1f3029;border:1px solid var(--line);border-radius:10px;color:var(--text);padding:4px 4px;min-width:96px;cursor:pointer}
+.lvl b{font-size:17px}
+.lvl span{font-size:11px;color:var(--muted);white-space:nowrap}
+.lvl i{font-style:normal;color:var(--accent);font-size:13px;letter-spacing:1px}
+.lvl.locked{opacity:.4;cursor:default}
+textarea{width:100%;box-sizing:border-box;height:62px;background:#0c1512;color:#cfe;border:1px solid var(--line);border-radius:8px;font:11px monospace;padding:6px;resize:none;word-break:break-all}
+.online p,.muted{color:var(--muted);font-size:13px;margin:8px 0 4px;text-align:left}
+.online{max-width:560px}
+#onStatus{text-align:center;color:var(--accent)}
+.stats table{border-collapse:collapse;margin:6px auto;font-size:14px}
+.stats td{padding:4px 10px;border-bottom:1px solid var(--line);text-align:left}
+.stats td+td{text-align:right;color:var(--accent);font-weight:700}
+input.name{background:#0c1512;color:var(--text);border:1px solid var(--line);border-radius:8px;padding:7px 10px;font-size:14px;width:150px}
+#chatDlg{position:fixed;z-index:16;right:110px;top:6px;background:rgba(22,35,30,.97);border:1px solid var(--line);border-radius:12px;padding:8px;display:grid;grid-template-columns:repeat(3,auto);gap:6px}
+#chatDlg button{background:#1f3029;border:1px solid var(--line);color:var(--text);border-radius:8px;padding:7px 9px;font-size:14px}
+#lessonBox{position:fixed;z-index:12;top:8px;bottom:8px;right:8px;width:260px;background:linear-gradient(#18302a,#0f1c18);border:1px solid var(--accent);border-radius:14px;padding:10px 12px;display:flex;flex-direction:column;box-sizing:border-box;box-shadow:0 8px 24px rgba(0,0,0,.6)}
+.lsHead{display:flex;justify-content:space-between;align-items:center;color:var(--accent);font-weight:800;font-size:13px}
+.lsHead button{background:transparent;border:0;color:var(--muted);font-size:18px}
+#lsStep{color:var(--muted);font-size:11px;margin-top:2px}
+#lsTitle{margin:4px 0;font-size:17px}
+#lsText{flex:1;overflow:auto;margin:0;font-size:13.5px;line-height:1.45;color:#dfe9e4}
+.lsBtns{display:flex;gap:6px;margin-top:8px}
+.lsBtns button{flex:1;border:1px solid var(--line);background:#1f3029;color:var(--text);border-radius:10px;padding:9px 4px;font-weight:700;font-size:13px}
+#lsBack{flex:0 0 44px}
+#lsDemo{background:#245a8a;border-color:#4a8fd0}
+#lsNext{background:var(--accent);color:#2a1a00;border-color:var(--accent)}
+#lsNext.done{background:#3fb68b;border-color:#3fb68b;color:#06150f}
+.lvpanel{width:min(900px,96vw)}
+.lvhint{text-align:center;margin:0 0 4px}
+#lvMsg{color:var(--accent);font-size:13px;min-height:16px;text-align:center}
+#topicList{display:grid;grid-template-columns:1fr 1fr;gap:8px;text-align:left}
+.topic{background:#17251f;border:1px solid var(--line);border-radius:12px;padding:8px}
+.topic.focus{border-color:var(--accent)}
+.thead{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.ticon{font-size:22px}
+.tname{flex:1}.tname b{display:block;font-size:14px}.tname small{color:var(--accent);font-size:11px}
+.lessonBtn{background:linear-gradient(#f2b632,#d58a10);color:#2a1a00;border:1px solid #ffd75a;border-radius:9px;padding:6px 10px;font-weight:800;font-size:12px}
+.lessonBtn.done{background:#24372f;color:#7dffb0;border-color:#3fb68b}
+.tlevels{display:flex;gap:5px;flex-wrap:wrap}
+.tlevels .lvl{min-width:0;flex:0 1 calc(25% - 4px)}
+#pushDlg{position:fixed;z-index:15;left:50%;top:50%;transform:translate(-50%,-50%);background:rgba(22,35,30,.96);border:1px solid var(--accent);border-radius:14px;padding:12px 16px;text-align:center;font-size:14px}
+#pushDlg .actions{margin-top:8px}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="loader">
+  <div class="ldGlow"></div>
+  <canvas id="ldBall"></canvas>
+  <div class="ldLogo"><b>BILLARD</b><i>LINIEN</i></div>
+  <div class="ldBarWrap"><div id="ldBar"></div></div>
+  <div class="ldRow"><span id="ldText">Lade …</span><span id="ldPct">0 %</span></div>
+  <div id="ldTip"></div>
+</div>
+<div id="rotate"><div>📱↻</div><b>Bitte dreh dein Handy quer</b><small>Billard spielt sich im Querformat am besten.</small></div>
+<button id="bMenu" class="b">☰ Menü</button>
+<button id="bChat" class="b hidden">💬</button>
+<button id="bPush" class="b hidden">Push-Out</button>
+<button id="bUndo" class="b hidden">↶ Zurück</button>
+<button id="bReplay" class="b" disabled>⟲ Replay</button>
+<div id="chatDlg" class="hidden"><button>👍 Guter Stoß!</button><button>😮 Wow!</button><button>😂</button><button>🔥 Heiß!</button><button>🍀 Viel Glück!</button><button>🤝 GG</button></div>
+<button id="bLines" class="b">Linien: Alle</button>
+<button id="bShoot" class="b shoot">STOSS</button>
+
+<div id="pushDlg" class="hidden">
+  <div id="pushTxt">Push-Out gespielt. Wie geht es weiter?</div>
+  <div class="actions"><button id="bTake" class="primary">Selbst spielen</button><button id="bPass">Zurückgeben</button></div>
+</div>
+
+<div id="menu" class="overlay lobby">
+  <canvas id="lobbyBg"></canvas>
+  <div class="lobbyWrap">
+    <div class="lobbyHead">
+      <div class="logo"><canvas id="heroBall"></canvas><div><b>BILLARD</b><i>LINIEN</i></div></div>
+      <div class="pcard"><div class="avatar" id="lbAvatar">S</div><div class="pinfo"><b id="lbName">Spieler 1</b><div class="xpbar"><div id="lbXp"></div></div><small id="lbLevel">Level 1</small></div></div>
+      <div class="coins" id="lbCoins">🪙 0</div>
+      <button id="bDaily" class="daily">🎁 Tagesbonus</button>
+    </div>
+    <div class="lobbyOpts">
+      <span>Spiel</span><div class="seg" data-k="mode"><button data-v="8">8-Ball</button><button data-v="9">9-Ball</button></div>
+      <span>Computer</span><div class="seg" data-k="diff"><button data-v="0">Leicht</button><button data-v="1">Mittel</button><button data-v="2">Schwer</button></div>
+    </div>
+    <div class="tiles">
+      <button class="tile t1" data-go="ai"><em>🤖</em><b>Gegen Computer</b><small id="tAi"></small></button>
+      <button class="tile t2" data-go="human"><em>👥</em><b>2 Spieler</b><small>An einem Handy</small></button>
+      <button class="tile t3" data-go="online"><em>🌐</em><b>Online</b><small>Mit Freunden, ohne Server</small></button>
+      <button class="tile t4" data-go="levels"><em>🏆</em><b>Herausforderungen</b><small id="tLv"></small></button>
+      <button class="tile t5" data-go="arcade"><em>⚡</em><b>Trefferserie</b><small id="tArc"></small></button>
+      <button class="tile t6" data-go="training"><em>🎯</em><b>Training</b><small>Kugeln frei setzen</small></button>
+    </div>
+    <div id="lbMsg"></div>
+    <div class="lobbyBar">
+      <button id="bResume" class="hidden">▶ Weiterspielen</button>
+      <button id="bShop">🛒 Shop</button><button id="bStats">📊 Statistik</button><button id="bSettings">⚙ Einstellungen</button><button id="bRules">📖 Regeln</button>
+    </div>
+  </div>
+</div>
+
+<div id="shop" class="overlay hidden">
+  <div class="panel shop">
+    <div class="shopHead"><h1>Shop</h1><div class="coins" id="shopCoins"></div></div>
+    <div class="tabs" id="shopTabs"><button data-tab="cues">Queues</button><button data-tab="cloths">Tücher</button></div>
+    <div id="shopGrid"></div>
+    <div id="shopMsg" class="muted"></div>
+    <div class="actions"><button id="bShopClose" class="primary">Zurück</button></div>
+  </div>
+</div>
+
+<div id="rules" class="overlay hidden">
+  <div class="panel rules">
+    <h1>Regeln</h1>
+    <h2>Steuerung</h2>
+    <ul>
+      <li>Auf den Tisch tippen oder ziehen, um zu zielen. Mit dem Rad <b>Fein</b> rechts stellst du das Ziel genau ein.</li>
+      <li>Links stellst du die <b>Kraft</b> ein. Die Linien zeigen sofort, wohin alle Kugeln bei dieser Kraft rollen.</li>
+      <li>Mit <b>Effet</b> wählst du den Treffpunkt auf der Weißen: oben = Nachläufer, unten = Rückläufer, seitlich = Seiteneffet. Doppeltippen setzt den Effet zurück.</li>
+      <li><b>Linien</b> wechselt zwischen <i>Alle</i> (komplette Vorschau aller Kugeln), <i>Einfach</i> (nur Hilfslinie) und <i>Aus</i>.</li>
+      <li>Rechts unter dem Effet: Mit dem Rad drehst du das Ziel sehr fein, ▲ und ▼ drehen in 0,01°-Schritten (gedrückt halten wiederholt).</li>
+      <li>Bei Ball in Hand hältst du die Weiße kurz gedrückt und ziehst sie dann. Normales Wischen auf dem Tisch zielt immer nur.</li>
+      <li>Unten auf dem Tisch zeigt die Vorschau, was der Stoß nach den Regeln bedeutet: gültig, Foul, Sieg oder Niederlage.</li>
+    </ul>
+    <h2>Extras</h2>
+    <ul>
+      <li><b>⟲ Replay</b> zeigt deinen letzten Stoß noch einmal in Zeitlupe. Tippen beendet die Wiederholung.</li>
+      <li><b>Online:</b> Unter Gegner „Online“ wählen. Einer erstellt das Spiel, der andere tritt bei. Ihr tauscht zwei Codes aus, danach seht ihr die Bewegungen des anderen live. Mit 💬 schickst du kurze Nachrichten.</li>
+      <li><b>Münzen und Erfahrungspunkte</b> bekommst du für Siege, Herausforderungen, die Trefferserie und den Tagesbonus. Im <b>Shop</b> schaltest du damit Queues und Tücher frei. Mit Erfahrungspunkten steigst du im Level auf und bekommst Bonus-Münzen.</li>
+      <li>In den <b>Einstellungen</b> änderst du deinen Namen, den Ton und die Vibration.</li>
+    </ul>
+    <h2>Allgemein</h2>
+    <ul>
+      <li>Nach dem Treffen einer Kugel muss eine Kugel versenkt werden oder irgendeine Kugel eine Bande berühren. Sonst ist es ein Foul.</li>
+      <li>Fouls sind: Weiße versenkt, keine Kugel getroffen, falsche Kugel zuerst getroffen, keine Bande nach dem Treffer. Nach einem Foul hat der Gegner Ball in Hand auf dem ganzen Tisch.</li>
+      <li>Ein gültiger Anstoß versenkt eine Kugel oder bringt mindestens 4 Objektkugeln an die Bande.</li>
+      <li>Wer regelgerecht versenkt, bleibt am Zug.</li>
+    </ul>
+    <h2>8-Ball</h2>
+    <ul>
+      <li>Nach dem Anstoß ist der Tisch offen. Die erste regelgerecht versenkte Kugel legt deine Gruppe fest: Volle (1–7) oder Halbe (9–15).</li>
+      <li>Du musst immer zuerst eine Kugel deiner Gruppe treffen. Bei offenem Tisch darf die 8 nicht zuerst getroffen werden.</li>
+      <li>Ist deine Gruppe abgeräumt, spielst du auf die 8. Wenn „8 ansagen“ eingeschaltet ist, tippst du dafür vorher auf eine Tasche.</li>
+      <li>Du gewinnst, wenn du die 8 regelgerecht in die angesagte Tasche versenkst. Du verlierst, wenn die 8 zu früh, mit einem Foul oder in eine andere Tasche fällt.</li>
+      <li>Fällt die 8 beim Anstoß, wird sie wieder aufgesetzt. Versenkst du beim Anstoß die Weiße, hat der Gegner Ball in Hand im Kopffeld (links von der Linie). Er darf dann keine Kugel direkt anspielen, die selbst im Kopffeld liegt, es sei denn, die Weiße verlässt vorher das Kopffeld (zum Beispiel über die Bande).</li>
+    </ul>
+    <h2>9-Ball</h2>
+    <ul>
+      <li>Du musst immer zuerst die niedrigste Kugel auf dem Tisch treffen.</li>
+      <li>Wer die 9 regelgerecht versenkt, gewinnt. Das gilt auch über eine Kombination oder beim Anstoß.</li>
+      <li>Fällt die 9 bei einem Foul, wird sie wieder aufgesetzt.</li>
+      <li>Push-Out: Direkt nach dem Anstoß darf der Spieler am Zug einen Push-Out ansagen. Dabei gelten nur die Regeln zur Weißen. Danach entscheidet der Gegner, ob er selbst spielt oder zurückgibt.</li>
+      <li>Wer dreimal in Folge foult, verliert das Spiel.</li>
+    </ul>
+    <h2>Solo</h2>
+    <ul>
+      <li><b>Herausforderungen:</b> In 20 Leveln löst du Aufgaben mit einer begrenzten Zahl an Stößen. Schaffst du es in Par, gibt es 3 Sterne. Mit jedem geschafften Level wird das nächste freigeschaltet.</li>
+      <li>Rot markierte Kugeln darfst du nicht berühren. Eine farbig markierte Tasche ist für die Kugel mit dieser Farbe vorgeschrieben. Im goldenen Kreis muss die Weiße liegen bleiben.</li>
+      <li><b>Training:</b> Du kannst alle Kugeln frei verschieben, indem du sie kurz gedrückt hältst und ziehst. Mit „↶ Zurück“ machst du den letzten Stoß rückgängig.</li>
+      <li><b>Trefferserie:</b> Du hast 3 Leben, und jeder Stoß ohne versenkte Kugel kostet eines. Jede Kugel bringt 100 Punkte, die 8 bringt 300. Pro Bandenberührung vor dem Versenken gibt es +75. Fallen mehrere Kugeln, wird multipliziert, und die Serie zählt bis ×10. Mit „Linien: Einfach“ gibt es ×1,5 Punkte, mit „Aus“ ×2. Alle 3000 Punkte bekommst du ein Extraleben.</li>
+    </ul>
+    <div class="actions"><button id="bRulesClose" class="primary">Zurück</button></div>
+  </div>
+</div>
+
+<div id="settings" class="overlay hidden">
+  <div class="panel">
+    <h1>Einstellungen</h1>
+    <div class="row"><span>Dein Name</span><input id="nameInput" class="name" maxlength="16" placeholder="Spieler 1"></div>
+    <div class="row"><span>8 ansagen</span><div class="seg" data-k="call"><button data-v="1">An</button><button data-v="0">Aus</button></div></div>
+    <div class="row"><span>Ton</span><div class="seg" data-k="sound"><button data-v="1">An</button><button data-v="0">Aus</button></div></div>
+    <div class="row"><span>Vibration</span><div class="seg" data-k="vib"><button data-v="1">An</button><button data-v="0">Aus</button></div></div>
+    <div class="actions"><button id="bSettingsClose" class="primary">Fertig</button></div>
+  </div>
+</div>
+
+<div id="stats" class="overlay hidden">
+  <div class="panel stats">
+    <h1>Statistik</h1>
+    <table id="statsTable"></table>
+    <div class="actions"><button id="bStatsReset">Zurücksetzen</button><button id="bStatsClose" class="primary">Zurück</button></div>
+  </div>
+</div>
+
+<div id="online" class="overlay hidden">
+  <div class="panel online">
+    <h1>Online spielen</h1>
+    <div id="onStep0">
+      <p>Ihr braucht keinen Server und kein Konto. Ihr tauscht einmal zwei Codes aus, zum Beispiel per WhatsApp. Danach spielt ihr direkt von Handy zu Handy.</p>
+      <div class="actions"><button id="bHost" class="primary">Spiel erstellen</button><button id="bJoin">Spiel beitreten</button></div>
+    </div>
+    <div id="onHost" class="hidden">
+      <p><b>1.</b> Schicke diesen Einladungscode an deinen Freund:</p>
+      <textarea id="hostCode" readonly placeholder="Code wird erstellt …"></textarea>
+      <div class="actions"><button id="bShareHost" class="primary">Teilen</button><button id="bCopyHost">Kopieren</button></div>
+      <p><b>2.</b> Füge hier seinen Antwortcode ein:</p>
+      <textarea id="hostAnswer" placeholder="Antwortcode hier einfügen"></textarea>
+      <div class="actions"><button id="bPasteAnswer">Einfügen</button><button id="bConnect" class="primary">Verbinden</button></div>
+    </div>
+    <div id="onJoin" class="hidden">
+      <p><b>1.</b> Füge den Einladungscode deines Freundes ein:</p>
+      <textarea id="joinCode" placeholder="Einladungscode hier einfügen"></textarea>
+      <div class="actions"><button id="bPasteJoin">Einfügen</button><button id="bMakeAnswer" class="primary">Antwortcode erstellen</button></div>
+      <div id="joinAnswerBox" class="hidden">
+        <p><b>2.</b> Schicke diesen Antwortcode zurück. Das Spiel startet, sobald dein Freund ihn eingefügt hat:</p>
+        <textarea id="joinAnswer" readonly></textarea>
+        <div class="actions"><button id="bShareJoin" class="primary">Teilen</button><button id="bCopyJoin">Kopieren</button></div>
+      </div>
+    </div>
+    <div id="onStatus"></div>
+    <div class="actions"><button id="bOnlineBack">Zurück</button></div>
+  </div>
+</div>
+
+<div id="levels" class="overlay hidden">
+  <div class="panel lvpanel">
+    <h1>Herausforderungen</h1>
+    <div class="muted lvhint">Jedes Thema beginnt mit einer Lektion. Sie zeigt dir am Tisch, wie und warum der Stoß funktioniert. Danach schaltest du die Herausforderungen frei und verdienst Münzen.</div>
+    <div id="lvMsg"></div>
+    <div id="topicList"></div>
+    <div class="actions"><button id="bLevelsBack">Zurück</button></div>
+  </div>
+</div>
+
+<div id="lessonBox" class="hidden">
+  <div class="lsHead"><span id="lsTopic"></span><button id="lsClose">✕</button></div>
+  <div id="lsStep"></div>
+  <h2 id="lsTitle"></h2>
+  <p id="lsText"></p>
+  <div class="lsBtns"><button id="lsBack">◀</button><button id="lsDemo">▶ Vorführen</button><button id="lsNext">Weiter ▶</button></div>
+</div>
+
+<div id="over" class="overlay hidden">
+  <div class="panel">
+    <h1 id="overTitle">Gewonnen!</h1>
+    <div id="overText" style="color:var(--muted);font-size:15px"></div>
+    <div id="overReward"></div>
+    <div class="actions"><button id="bNext" class="primary hidden">Nächstes Level</button><button id="bAgain" class="primary">Nochmal</button><button id="bOverMenu">Menü</button></div>
+  </div>
+</div>
+
+<script>
+'use strict';
+// ===================== Konstanten (Einheiten: cm, Sekunden) =====================
+const W = 254, H = 127, R = 2.85, TAU = Math.PI * 2;
+const CUSH = 3.2, WOOD = 7.2, BORDER = CUSH + WOOD;
+const CORNER_GAP = 8.6, SIDE_GAP = 6.5, CAP2 = 5.4 * 5.4;
+const FRIC = 24, DRAG = 0.24, STOPV = 1.2, E_BALL = 0.95, E_CUSH = 0.76, CUSH_T = 0.96, MAXV = 760;
+const SEGS = [
+  [CORNER_GAP, 0, W / 2 - SIDE_GAP, 0], [W / 2 + SIDE_GAP, 0, W - CORNER_GAP, 0],
+  [CORNER_GAP, H, W / 2 - SIDE_GAP, H], [W / 2 + SIDE_GAP, H, W - CORNER_GAP, H],
+  [0, CORNER_GAP, 0, H - CORNER_GAP], [W, CORNER_GAP, W, H - CORNER_GAP]
+];
+// Taschen: 0 oben links, 1 oben Mitte, 2 oben rechts, 3 unten links, 4 unten Mitte, 5 unten rechts
+const POCKETS = [{x: 0, y: 0}, {x: W / 2, y: -1}, {x: W, y: 0}, {x: 0, y: H}, {x: W / 2, y: H + 1}, {x: W, y: H}];
+const POCKET_DRAW = [{x: -1.6, y: -1.6, r: 7.2}, {x: W / 2, y: -2.6, r: 6.6}, {x: W + 1.6, y: -1.6, r: 7.2},
+  {x: -1.6, y: H + 1.6, r: 7.2}, {x: W / 2, y: H + 2.6, r: 6.6}, {x: W + 1.6, y: H + 1.6, r: 7.2}];
+const AIM_PTS = [{x: 0.6, y: 0.6}, {x: W / 2, y: -1.2}, {x: W - 0.6, y: 0.6}, {x: 0.6, y: H - 0.6}, {x: W / 2, y: H + 1.2}, {x: W - 0.6, y: H - 0.6}];
+const HEAD_X = W / 4, FOOT = {x: W * 0.75, y: H / 2};
+const BALL_COLORS = {1: '#f2c200', 2: '#1f4fd1', 3: '#d4231f', 4: '#5b2a8c', 5: '#f07a12', 6: '#12804a', 7: '#7a1d22', 8: '#141414'};
+const colorOf = n => n === 0 ? '#f6f3ea' : BALL_COLORS[n > 8 ? n - 8 : n];
+const groupOf = n => n >= 1 && n <= 7 ? 'solid' : n >= 9 && n <= 15 ? 'stripe' : null;
+const otherGroup = g => g === 'solid' ? 'stripe' : 'solid';
+const GROUP_NAME = {solid: 'Volle (1–7)', stripe: 'Halbe (9–15)'};
+const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
+const gauss = () => { let u = 0, v = 0; while (!u) u = Math.random(); while (!v) v = Math.random(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(TAU * v); };
+
+// ===================== Einstellungen =====================
+const CFG = {mode: 8, opp: 'ai', diff: 1, call: 1, sound: 1, lines: 'all', solo: 'levels', name: '', cloth: 'blau', vib: 1};
+try { Object.assign(CFG, JSON.parse(localStorage.getItem('billard_cfg') || '{}')); } catch (e) {}
+const saveCfg = () => { try { localStorage.setItem('billard_cfg', JSON.stringify(CFG)); } catch (e) {} };
+let TIME_SCALE = 1;
+
+// ===================== Physik =====================
+function cloneBalls(bs) { return bs.map(b => ({n: b.n, x: b.x, y: b.y, vx: b.vx, vy: b.vy, on: b.on})); }
+function getBall(bs, n) { for (const b of bs) if (b.n === n) return b; return null; }
+function onSet(bs) { const s = new Set(); for (const b of bs) if (b.on && b.n > 0) s.add(b.n); return s; }
+
+function newSim(balls, shot) {
+  const bs = cloneBalls(balls);
+  const cue = getBall(bs, 0);
+  const v = Math.max(0.02, shot.power) * MAXV;
+  cue.vx = Math.cos(shot.angle) * v; cue.vy = Math.sin(shot.angle) * v;
+  return {balls: bs, t: 0, sx: shot.sx || 0, sy: shot.sy || 0, spinUsed: false, cueTravel: 0, contact: null,
+    ev: {first: null, cueOut: false, railAfter: false, railBalls: new Set(), railCount: {}, touched: new Set(), potted: [], cuePotted: false}, paths: null, snd: null};
+}
+
+function pocketCheck(b) {
+  const x = b.x, y = b.y;
+  if (x * x + y * y < CAP2) return 0;
+  if ((W - x) * (W - x) + y * y < CAP2) return 2;
+  if (x * x + (H - y) * (H - y) < CAP2) return 3;
+  if ((W - x) * (W - x) + (H - y) * (H - y) < CAP2) return 5;
+  if (Math.abs(x - W / 2) < SIDE_GAP) { if (y < 0.8) return 1; if (y > H - 0.8) return 4; }
+  if (x < 0 || x > W || y < 0 || y > H) {
+    let best = 0, bd = Infinity;
+    for (let k = 0; k < 6; k++) { const d = (POCKETS[k].x - x) ** 2 + (POCKETS[k].y - y) ** 2; if (d < bd) { bd = d; best = k; } }
+    return best;
+  }
+  return -1;
+}
+
+function recPath(S, b, force) {
+  if (!S.paths) return;
+  const p = S.paths[b.n];
+  const l = p[p.length - 1];
+  if (force || (l[0] - b.x) ** 2 + (l[1] - b.y) ** 2 > 0.8) p.push([b.x, b.y]);
+}
+
+// Ein Simulationsschritt. Gibt false zurück, wenn alle Kugeln stehen.
+function stepSim(S) {
+  const bs = S.balls, ev = S.ev;
+  let maxv2 = 0;
+  for (const b of bs) if (b.on) { const v = b.vx * b.vx + b.vy * b.vy; if (v > maxv2) maxv2 = v; }
+  if (maxv2 === 0) return false;
+  const dt = Math.min(1 / 120, 0.8 / Math.sqrt(maxv2));
+  S.t += dt;
+  for (const b of bs) {
+    if (!b.on || (b.vx === 0 && b.vy === 0)) continue;
+    const v = Math.hypot(b.vx, b.vy);
+    let nv = v - (FRIC + DRAG * v) * dt;
+    if (nv < STOPV) nv = 0;
+    const k = nv / v; b.vx *= k; b.vy *= k;
+    b.x += b.vx * dt; b.y += b.vy * dt;
+    if (b.n === 0 && ev.first === null) { S.cueTravel += nv * dt; if (b.x > HEAD_X) ev.cueOut = true; }
+    if (nv === 0) recPath(S, b, true);
+  }
+  // Kugel gegen Kugel
+  for (let i = 0; i < bs.length; i++) {
+    const a = bs[i]; if (!a.on) continue;
+    for (let j = i + 1; j < bs.length; j++) {
+      const b = bs[j]; if (!b.on) continue;
+      if (a.vx === 0 && a.vy === 0 && b.vx === 0 && b.vy === 0) continue;
+      const dx = b.x - a.x, dy = b.y - a.y, d2 = dx * dx + dy * dy;
+      if (d2 >= 4 * R * R) continue;
+      const d = Math.sqrt(d2) || 1e-6, nx = dx / d, ny = dy / d;
+      const ov = (2 * R - d) / 2;
+      a.x -= nx * ov; a.y -= ny * ov; b.x += nx * ov; b.y += ny * ov;
+      const rv = (a.vx - b.vx) * nx + (a.vy - b.vy) * ny;
+      if (rv <= 0) continue;
+      let cue = null, other = null;
+      if (a.n === 0) { cue = a; other = b; } else if (b.n === 0) { cue = b; other = a; }
+      const pre = cue && !S.spinUsed ? {vx: cue.vx, vy: cue.vy} : null;
+      const jm = (1 + E_BALL) / 2 * rv;
+      a.vx -= jm * nx; a.vy -= jm * ny; b.vx += jm * nx; b.vy += jm * ny;
+      if (pre) {
+        // Nachläufer / Rückläufer: wirkt bei der ersten Berührung, schwächer je weiter die Weiße vorher lief
+        S.spinUsed = true;
+        const sp = Math.hypot(pre.vx, pre.vy);
+        if (sp > 0) {
+          const decay = Math.exp(-S.cueTravel / 110);
+          const eff = S.sy * 0.8 * decay + 0.29 * (1 - decay);
+          const cnx = cue === a ? nx : -nx, cny = cue === a ? ny : -ny;
+          const vn = pre.vx * cnx + pre.vy * cny;
+          cue.vx += pre.vx / sp * vn * eff; cue.vy += pre.vy / sp * vn * eff;
+        }
+      }
+      if (cue && ev.first === null) {
+        ev.first = other.n;
+        S.contact = {x: cue.x, y: cue.y, n: other.n, ox: other.x, oy: other.y, ovx: other.vx, ovy: other.vy, cvx: cue.vx, cvy: cue.vy};
+      }
+      ev.touched.add(a.n); ev.touched.add(b.n);
+      if (S.snd) S.snd.push({t: 'ball', v: rv});
+      recPath(S, a, true); recPath(S, b, true);
+    }
+  }
+  // Taschen und Banden
+  for (const b of bs) {
+    if (!b.on) continue;
+    const pk = pocketCheck(b);
+    if (pk >= 0) {
+      b.on = false; b.vx = b.vy = 0;
+      if (S.paths) S.paths[b.n].push([POCKETS[pk].x, POCKETS[pk].y]);
+      if (b.n === 0) ev.cuePotted = true; else ev.potted.push({n: b.n, pocket: pk});
+      if (S.snd) S.snd.push({t: 'pocket', v: 1});
+      continue;
+    }
+    if (b.x > R && b.x < W - R && b.y > R && b.y < H - R) { recPath(S, b, false); continue; }
+    for (const s of SEGS) {
+      const ex = s[2] - s[0], ey = s[3] - s[1];
+      let t = ((b.x - s[0]) * ex + (b.y - s[1]) * ey) / (ex * ex + ey * ey);
+      t = t < 0 ? 0 : t > 1 ? 1 : t;
+      const cx = s[0] + t * ex, cy = s[1] + t * ey, dx = b.x - cx, dy = b.y - cy, d2 = dx * dx + dy * dy;
+      if (d2 >= R * R) continue;
+      const d = Math.sqrt(d2) || 1e-6, nx = dx / d, ny = dy / d, vn = b.vx * nx + b.vy * ny;
+      b.x = cx + nx * R; b.y = cy + ny * R;
+      if (vn < 0) {
+        const tvx = b.vx - vn * nx, tvy = b.vy - vn * ny;
+        b.vx = tvx * CUSH_T - E_CUSH * vn * nx; b.vy = tvy * CUSH_T - E_CUSH * vn * ny;
+        if (b.n === 0 && S.sx !== 0) {
+          // Seiteneffet verändert den Abprallwinkel an der Bande
+          const k = -0.42 * S.sx * (-vn);
+          b.vx += k * ny; b.vy += k * -nx; S.sx *= 0.6;
+        }
+        if (ev.first !== null) ev.railAfter = true;
+        else if (b.n === 0) { ev.kick = true; if (!S.cueRail) S.cueRail = {x: b.x, y: b.y}; }
+        if (b.n > 0) { ev.railBalls.add(b.n); ev.railCount[b.n] = (ev.railCount[b.n] || 0) + 1; }
+        if (S.snd) S.snd.push({t: 'rail', v: -vn});
+        recPath(S, b, true);
+      }
+    }
+    recPath(S, b, false);
+  }
+  return true;
+}
+
+function runSim(balls, shot, withPaths) {
+  const S = newSim(balls, shot);
+  if (withPaths) { S.paths = {}; for (const b of S.balls) S.paths[b.n] = [[b.x, b.y]]; }
+  let n = 0;
+  while (stepSim(S) && S.t < 60 && n < 300000) n++;
+  if (withPaths) for (const b of S.balls) if (b.on) recPath(S, b, true);
+  return S;
+}
+
+// ===================== Aufbau =====================
+function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function rack(mode) {
+  const balls = [{n: 0, x: W * 0.2, y: H / 2, vx: 0, vy: 0, on: true}];
+  const dx = R * Math.sqrt(3) + 0.03, dy = R + 0.015;
+  const pos = [];
+  const rows = mode === 8 ? [1, 2, 3, 4, 5] : [1, 2, 3, 2, 1];
+  rows.forEach((c, r) => { for (let i = 0; i < c; i++) pos.push([FOOT.x + r * dx, FOOT.y + (i - (c - 1) / 2) * 2 * dy]); });
+  const order = new Array(pos.length);
+  if (mode === 8) {
+    const solids = shuffle([1, 2, 3, 4, 5, 6, 7]), stripes = shuffle([9, 10, 11, 12, 13, 14, 15]);
+    order[4] = 8;
+    if (Math.random() < 0.5) { order[10] = solids.pop(); order[14] = stripes.pop(); } else { order[10] = stripes.pop(); order[14] = solids.pop(); }
+    const rest = shuffle(solids.concat(stripes));
+    for (let i = 0; i < 15; i++) if (order[i] === undefined) order[i] = rest.pop();
+  } else {
+    order[0] = 1; order[4] = 9;
+    const rest = shuffle([2, 3, 4, 5, 6, 7, 8]);
+    for (let i = 0; i < 9; i++) if (order[i] === undefined) order[i] = rest.pop();
+  }
+  pos.forEach((p, i) => balls.push({n: order[i], x: p[0], y: p[1], vx: 0, vy: 0, on: true}));
+  return balls;
+}
+
+function placeOK(bs, x, y, kitchen, ex) {
+  if (x < R || x > W - R || y < R || y > H - R) return false;
+  if (kitchen && x > HEAD_X) return false;
+  ex = ex || 0;
+  for (const b of bs) if (b.on && b.n !== ex && (b.x - x) ** 2 + (b.y - y) ** 2 < (2 * R + 0.05) ** 2) return false;
+  return true;
+}
+function findFree(bs, x, y, kitchen) {
+  if (placeOK(bs, x, y, kitchen)) return {x, y};
+  for (let r = 1; r < 200; r += 1) for (let a = 0; a < TAU; a += 0.3) {
+    const px = x + Math.cos(a) * r, py = y + Math.sin(a) * r;
+    if (placeOK(bs, px, py, kitchen)) return {x: px, y: py};
+  }
+  return {x, y};
+}
+function respot(bs, n) {
+  const b = getBall(bs, n);
+  const free = (x, y) => { for (const o of bs) if (o.on && o !== b && (o.x - x) ** 2 + (o.y - y) ** 2 < (2 * R + 0.05) ** 2) return false; return true; };
+  let x = FOOT.x;
+  while (x < W - R && !free(x, FOOT.y)) x += 0.5;
+  if (x >= W - R) { x = FOOT.x; while (x > R && !free(x, FOOT.y)) x -= 0.5; }
+  b.x = x; b.y = FOOT.y; b.vx = b.vy = 0; b.on = true;
+}
+
+// ===================== Regeln =====================
+function legalTargets(mode, group, on) {
+  const arr = [...on];
+  if (mode === 0) return soloTargets(on);
+  if (mode === 9) return arr.length ? [Math.min(...arr)] : [];
+  if (!group) return arr.filter(n => n !== 8);
+  const own = arr.filter(n => groupOf(n) === group);
+  return own.length ? own : (on.has(8) ? [8] : []);
+}
+function needCall() {
+  if (G.mode !== 8 || !CFG.call || G.isBreak) return false;
+  const g = G.players[G.cur].group;
+  return !!g && legalTargets(8, g, onSet(G.balls))[0] === 8;
+}
+
+// Bewertet einen Stoß nach den Regeln, ohne den Spielstand zu verändern.
+function judge(before, ev, called, base) {
+  const me = G.cur, opp = 1 - me, P = G.players[me];
+  const r = {foul: false, reason: '', win: null, winReason: '', cont: false, assign: null, respot: [], bihKitchen: false, info: ''};
+  const pot = ev.potted.map(p => p.n);
+  const foul = why => { if (!r.foul) { r.foul = true; r.reason = why; } };
+  if (G.mode === 8) {
+    const group = P.group;
+    const onEight = !!group && ![...before].some(n => groupOf(n) === group);
+    if (ev.cuePotted) foul('Weiße versenkt');
+    if (ev.first === null) foul('Keine Kugel getroffen');
+    else if (G.isBreak) { if (!pot.length && ev.railBalls.size < 4) foul('Ungültiger Anstoß – weniger als 4 Kugeln an der Bande'); }
+    else {
+      if (!group) { if (ev.first === 8) foul('Bei offenem Tisch darf die 8 nicht zuerst getroffen werden'); }
+      else if (onEight) { if (ev.first !== 8) foul('Die 8 muss zuerst getroffen werden'); }
+      else if (groupOf(ev.first) !== group) foul('Zuerst eine Kugel der eigenen Gruppe treffen (' + GROUP_NAME[group] + ')');
+      if (!pot.length && !ev.railAfter) foul('Nach dem Treffer berührte keine Kugel eine Bande');
+      const fb = base && getBall(base, ev.first);
+      if (G.bih === 'kitchen' && fb && fb.x < HEAD_X && !ev.cueOut) foul('Aus dem Kopffeld darf keine Kugel im Kopffeld direkt angespielt werden');
+    }
+    if (G.isBreak && ev.cuePotted) r.bihKitchen = true;
+    const eight = ev.potted.find(p => p.n === 8);
+    if (eight) {
+      if (G.isBreak) { r.respot.push(8); r.info = 'Die 8 fiel beim Anstoß und wird wieder aufgesetzt.'; }
+      else if (!onEight) { r.win = opp; r.winReason = 'Die 8 wurde zu früh versenkt.'; }
+      else if (r.foul) { r.win = opp; r.winReason = 'Die 8 fiel mit einem Foul (' + r.reason + ').'; }
+      else if (CFG.call && called !== null && called !== undefined && eight.pocket !== called) { r.win = opp; r.winReason = 'Die 8 fiel in eine andere als die angesagte Tasche.'; }
+      else { r.win = me; r.winReason = 'Die 8 wurde regelgerecht versenkt.'; }
+    }
+    if (r.win === null && !r.foul) {
+      const objs = pot.filter(n => n !== 8);
+      if (G.isBreak) r.cont = objs.length > 0;
+      else if (!group) { if (objs.length) { r.assign = groupOf(objs[0]); r.cont = true; } }
+      else r.cont = objs.some(n => groupOf(n) === group);
+    }
+  } else {
+    const lowest = before.size ? Math.min(...before) : 9;
+    if (G.pushShot) {
+      if (ev.cuePotted) foul('Weiße versenkt');
+      if (pot.includes(9)) r.respot.push(9);
+    } else {
+      if (ev.cuePotted) foul('Weiße versenkt');
+      if (ev.first === null) foul('Keine Kugel getroffen');
+      else if (ev.first !== lowest) foul('Zuerst muss die niedrigste Kugel (' + lowest + ') getroffen werden');
+      if (G.isBreak) { if (ev.first !== null && !pot.length && ev.railBalls.size < 4) foul('Ungültiger Anstoß – weniger als 4 Kugeln an der Bande'); }
+      else if (ev.first !== null && !pot.length && !ev.railAfter) foul('Nach dem Treffer berührte keine Kugel eine Bande');
+      if (pot.includes(9)) {
+        if (!r.foul) { r.win = me; r.winReason = G.isBreak ? 'Die 9 fiel beim Anstoß.' : 'Die 9 wurde regelgerecht versenkt.'; }
+        else r.respot.push(9);
+      }
+      if (r.foul && r.win === null && P.fouls + 1 >= 3) { r.win = opp; r.winReason = 'Drei Fouls in Folge (' + P.name + ').'; }
+      if (!r.foul) r.cont = pot.length > 0;
+    }
+  }
+  return r;
+}
+
+// ===================== Spielzustand =====================
+let G = null;
+let breaker = 0;
+function newGame(o) {
+  o = o || {};
+  const mode = o.mode !== undefined ? o.mode : +CFG.mode;
+  const ai = !o.online && CFG.opp === 'ai';
+  const names = o.names || [myName(), ai ? 'Computer' : 'Spieler 2'];
+  G = {
+    mode, diff: +CFG.diff, online: !!o.online,
+    players: [{name: names[0], group: null, fouls: 0}, {name: names[1], group: null, fouls: 0}],
+    ai: [false, ai], cur: o.cur !== undefined ? o.cur : breaker, balls: o.balls ? cloneBalls(o.balls) : rack(mode), isBreak: true, bih: 'kitchen',
+    state: 'aim', aim: 0, power: 0.85, sx: 0, sy: 0, called: null, calledManual: false, run: 0,
+    pushAvail: false, pushShot: false, ver: 0, pred: null, predKey: '', toast: null, live: null
+  };
+  if (o.cur === undefined) breaker = 1 - breaker;
+  ['stats', 'settings', 'levels', 'pushDlg'].forEach(hide);
+  initOrient();
+  hide('over'); hide('menu');
+  startTurn();
+}
+
+function aimDefault() {
+  const cue = getBall(G.balls, 0);
+  let tx = FOOT.x, ty = FOOT.y;
+  if (!G.isBreak) {
+    const t = legalTargets(G.mode, G.players[G.cur].group, onSet(G.balls));
+    let bd = Infinity;
+    for (const n of t) { const b = getBall(G.balls, n), d = (b.x - cue.x) ** 2 + (b.y - cue.y) ** 2; if (d < bd) { bd = d; tx = b.x; ty = b.y; } }
+  }
+  G.aim = Math.atan2(ty - cue.y, tx - cue.x);
+}
+
+function startTurn() {
+  G.state = 'aim'; G.sx = 0; G.sy = 0; G.called = null; G.calledManual = false; G.pushShot = false;
+  aimDefault();
+  if (G.isBreak) G.power = 0.9; else if (G.power > 0.7 || G.power < 0.05) G.power = 0.5;
+  if (G.ai[G.cur]) startAI();
+  updateUI();
+}
+
+const isHumanTurn = () => G && G.state === 'aim' && !G.ai[G.cur] && (!G.online || G.cur === NET.me);
+
+function shoot() {
+  if (!isHumanTurn() && G.state !== 'aipreview') return;
+  if (needCall() && G.called === null) {
+    if (G.state === 'aipreview') G.called = 0;
+    else { toast('Tippe auf eine Tasche, um die 8 anzusagen.'); return; }
+  }
+  initAudio();
+  G.spinUI = false;
+  if (G.online) netSend(aimMsg('shot'));
+  G.strikeFrom = G.state; G.state = 'strike'; G.strikeT = performance.now();
+  updateUI();
+}
+const STRIKE_MS = 420;
+// Ausholen und Durchstoßen des Queues
+function strikeOffset(now) {
+  const p = clamp((now - G.strikeT) * TIME_SCALE / STRIKE_MS, 0, 1), base = 1.5 + G.power * 16;
+  if (p < 0.62) { const q = p / 0.62; return 4 * (1 - (1 - q) * (1 - q)); }
+  const q = (p - 0.62) / 0.38;
+  return 4 + (-base - 4) * q * q;
+}
+function launchShot() {
+  G.before = onSet(G.balls);
+  G.beforeBalls = cloneBalls(G.balls);
+  G.lastShot = {balls: G.beforeBalls, shot: {angle: G.aim, power: G.power, sx: G.sx, sy: G.sy}, orient: copyOrient()};
+  vibrate(10 + Math.round(G.power * 30));
+  G.shotCalled = G.called;
+  G.shotLines = CFG.lines;
+  const S = newSim(G.balls, {angle: G.aim, power: G.power, sx: G.sx, sy: G.sy});
+  S.snd = []; S.sunk = 0; S.cueSunk = false;
+  G.live = S; G.state = 'moving'; G.pred = null;
+  playSound('cue', G.power);
+  updateUI();
+}
+
+function finishShot() {
+  if (G.online && G.cur !== NET.me) {
+    // Stoß des Gegners: auf den verbindlichen Spielstand von seinem Handy warten
+    const S = G.live; G.live = null; G.balls = S.balls; G.ver++; G.state = 'waitnet';
+    if (NET.pending) { const g = NET.pending; NET.pending = null; applyNetState(g); }
+    updateUI(); return;
+  }
+  finishShotLocal();
+  if (G.online) netSend({t: 'state', g: snapshot()});
+}
+function finishShotLocal() {
+  const S = G.live; G.live = null;
+  G.balls = S.balls; G.ver++;
+  if (G.mode === 0) { soloFinish(S.ev); return; }
+  const r = judge(G.before, S.ev, G.shotCalled, G.beforeBalls);
+  const me = G.cur, opp = 1 - me, P = G.players[me];
+  if (me === localIdx() && !G.ai[me]) {
+    const n = S.ev.potted.length;
+    STATS.shots++; if (r.foul) STATS.fouls++; else STATS.pots += n;
+    G.run = r.cont ? G.run + n : 0;
+    STATS.best = Math.max(STATS.best, r.cont ? G.run : 0, r.foul ? 0 : n);
+    saveStats();
+  }
+  if (r.foul) { const c = getBall(G.balls, 0); floatText('Foul!', c.on ? c.x : W / 2, c.on ? c.y - 8 : H / 2, '#ff6655'); playSound('foul', 0); }
+  else if (S.ev.potted.length > 1) floatText(S.ev.potted.length + ' Kugeln!', W / 2, H / 2);
+  if (G.mode === 9 && !G.pushShot) { if (r.foul) P.fouls++; else P.fouls = 0; }
+  if (r.win !== null) { endGame(r.win, r.winReason); return; }
+  for (const n of r.respot) respot(G.balls, n);
+  if (r.assign) { P.group = r.assign; G.players[opp].group = otherGroup(r.assign); }
+  const wasBreak = G.isBreak, wasPush = G.pushShot;
+  G.isBreak = false;
+  const cue = getBall(G.balls, 0);
+  if (r.foul) {
+    G.bih = r.bihKitchen ? 'kitchen' : 'any';
+    if (!cue.on) { const p = findFree(G.balls, W * 0.2, H / 2, r.bihKitchen); cue.x = p.x; cue.y = p.y; cue.on = true; cue.vx = cue.vy = 0; }
+  } else G.bih = null;
+  if (!r.cont) G.cur = opp;
+  let msg = '';
+  if (r.foul) msg = 'Foul: ' + r.reason + '. Ball in Hand' + (r.bihKitchen ? ' im Kopffeld' : '') + ' für ' + G.players[G.cur].name + '.';
+  if (r.assign) msg = P.name + ' spielt ' + GROUP_NAME[r.assign] + '.';
+  if (r.info) msg = r.info + (msg ? ' ' + msg : '');
+  if (r.respot.includes(9)) msg = 'Die 9 wird wieder aufgesetzt. ' + msg;
+  if (G.mode === 9 && r.foul && G.players[me].fouls === 2) msg += ' Achtung: ' + G.players[me].name + ' hat 2 Fouls in Folge!';
+  if (msg) toast(msg, 3500);
+  if (G.mode === 9) {
+    G.pushAvail = wasBreak;
+    if (wasPush && !r.foul) { G.pushAvail = false; G.state = 'push'; G.sx = G.sy = 0; G.pushShot = false; showPushDecision(); updateUI(); return; }
+  }
+  startTurn();
+}
+
+function showPushDecision() {
+  if (G.online && G.cur !== NET.me) { toast('Warte auf die Entscheidung von ' + G.players[G.cur].name + ' …'); return; }
+  if (G.ai[G.cur]) {
+    // Computer entscheidet: selbst spielen, wenn ein vernünftiger Stoß da ist
+    const e = bestEase(G.balls, G.players[G.cur].group);
+    if (e > 0.18) { toast(G.players[G.cur].name + ' spielt selbst weiter.'); startTurn(); }
+    else { toast(G.players[G.cur].name + ' gibt zurück.'); G.cur = 1 - G.cur; startTurn(); }
+    return;
+  }
+  document.getElementById('pushTxt').textContent = G.players[1 - G.cur].name + ' hat einen Push-Out gespielt. ' + G.players[G.cur].name + ', wie geht es weiter?';
+  show('pushDlg');
+}
+
+function endGame(winner, reason) {
+  G.state = 'over'; G.winner = winner; G.winReason = reason;
+  updateUI();
+  STATS.games++;
+  const li = localIdx();
+  if (winner === li && (G.ai[1] || G.online)) STATS.wins++;
+  saveStats();
+  rewardGame(winner);
+  if (G.ai[winner] || (G.online && winner !== NET.me)) playSound('foul', 0);
+  else { confetti(); playSound('win', 0); vibrate(60); }
+  document.getElementById('overTitle').textContent = G.players[winner].name + ' gewinnt!';
+  document.getElementById('overText').textContent = reason;
+  setTimeout(() => show('over'), 600);
+}
+
+// ===================== Einzelspieler =====================
+// Hilfen für Level-Aufbau: Punkt auf der Linie von einer Tasche ins Feld
+function fromPocket(k, dx, dy, dist) { const l = Math.hypot(dx, dy); return [POCKETS[k].x + dx / l * dist, POCKETS[k].y + dy / l * dist]; }
+let EFFET_ZONE = {x: 66, y: 42.5, r: 11};
+const LEVEL_REWARDS = [40, 40, 50, 60, 60, 70, 90, 100, 120, 150, 80, 90, 100, 110, 120, 120, 140, 150, 200, 400];
+const LEVELS = (() => {
+  const l3b2 = fromPocket(3, 1, -0.5, 30), l3b1 = [l3b2[0] + 0.894 * (2 * R + 0.4), l3b2[1] - 0.447 * (2 * R + 0.4)];
+  const rack15 = []; { const dx = R * Math.sqrt(3) + 0.03, dy = R + 0.015, ord = [1, 9, 2, 10, 8, 3, 11, 4, 12, 5, 13, 6, 14, 7, 15]; let i = 0;
+    for (let r = 0; r < 5; r++) for (let j = 0; j <= r; j++) rack15.push([ord[i++], FOOT.x + r * dx, FOOT.y + (j - r / 2) * 2 * dy]); }
+  const dia = []; { const dx = R * Math.sqrt(3) + 0.03, dy = R + 0.015, rows = [1, 2, 3, 2, 1], ord = [1, 2, 3, 4, 9, 5, 6, 7, 8]; let i = 0;
+    rows.forEach((c, r) => { for (let j = 0; j < c; j++) dia.push([ord[i++], FOOT.x + r * dx, FOOT.y + (j - (c - 1) / 2) * 2 * dy]); }); }
+  return [
+    {name: 'Der erste Stoß', desc: 'Versenke die 1.', cue: [146.4, 73.2], balls: [[1, 200, 100]], shots: 2, par: 1},
+    {name: 'Der Schnitt', desc: 'Schneide die 3 in die Ecke.', cue: [150, 40], balls: [[3, 225, 22]], shots: 2, par: 1},
+    {name: 'Kombination', desc: 'Versenke die 2 – triff aber zuerst die 1.', cue: [l3b1[0] + 0.894 * 50, l3b1[1] - 0.447 * 50], balls: [[1, l3b1[0], l3b1[1]], [2, l3b2[0], l3b2[1]]], targets: [2], first: 1, shots: 2, par: 1},
+    {name: 'Über die Bande', desc: 'Versenke die 1. Die rot markierte 8 darf nicht berührt werden.', cue: [60, 63.5], balls: [[1, 215, 105], [8, 138, 84.4]], bomb: [8], shots: 3, par: 1},
+    {name: 'Der Reihe nach', desc: 'Versenke 1, 2 und 3 – immer zuerst die niedrigste treffen.', cue: [127, 63.5], balls: [[1, 180, 30], [2, 90, 100], [3, 200, 95]], order: true, shots: 5, par: 3},
+    {name: 'Seitentasche', desc: 'Die 5 muss in die obere Mitteltasche, die 4 in irgendeine Tasche.', cue: [150, 75], balls: [[5, 140, 22], [4, 200, 40]], pocket: {5: 1}, shots: 3, par: 2},
+    {name: 'Stellungsspiel', desc: 'Versenke die 1 und lass die Weiße im goldenen Kreis liegen (Rückläufer!).', cue: [146.4, 73.2], balls: [[1, 200, 100]], zone: {x: 112, y: 56, r: 12}, shots: 2, par: 1},
+    {name: 'Minenfeld', desc: 'Versenke 1 bis 4. Die rot markierten Kugeln dürfen nicht berührt werden.', cue: [127, 63.5], balls: [[1, 30, 15], [2, 127, 110], [3, 230, 20], [4, 220, 110], [8, 127, 40], [11, 70, 85], [12, 185, 70]], bomb: [8, 11, 12], shots: 7, par: 4},
+    {name: 'Aufräumen', desc: 'Räume alle sieben Kugeln ab.', cue: [127, 63.5], balls: [[1, 40, 30], [2, 90, 100], [3, 140, 30], [4, 180, 90], [5, 215, 40], [6, 60, 70], [7, 230, 105]], shots: 9, par: 7},
+    {name: 'Meisterstück', desc: 'Anstoß und dann 1 bis 9 der Reihe nach abräumen.', cue: [W * 0.2, H / 2], balls: dia, order: true, shots: 14, par: 9},
+    {name: 'Stoppball', desc: 'Versenke die 1 und stoppe die Weiße im Kreis. Tipp: etwas unter die Mitte stoßen.', cue: [146.4, 73.2], balls: [[1, 200, 100]], zone: {x: 194.9, y: 97.5, r: 5}, shots: 2, par: 1},
+    {name: 'Nachläufer', desc: 'Versenke die 2 und lass die Weiße in den Kreis nachlaufen. Tipp: Effet oben.', cue: [151.9, 56.7], balls: [[2, 200, 30]], zone: {x: 214, y: 23, r: 8}, shots: 2, par: 1},
+    {name: 'Kick-Shot', desc: 'Die Weiße muss zuerst eine Bande treffen, bevor sie die 1 berührt. Die 8 ist gesperrt.', cue: [60, 63.5], balls: [[1, 215, 22], [8, 140, 42]], bomb: [8], kick: true, shots: 3, par: 1},
+    {name: 'Bandenstoß', desc: 'Versenke die 4 – sie muss vorher eine Bande berühren.', cue: [150, 70], balls: [[4, 127, 22]], bank: true, shots: 3, par: 1},
+    {name: 'Doppelpack', desc: 'Versenke 1 und 2. Mit einem Stoß gibt es drei Sterne.', cue: fromPocket(5, -1, -0.5, 95), balls: [[1, ...fromPocket(5, -1, -0.5, 16)], [2, ...fromPocket(5, -1, -0.5, 26)]], shots: 2, par: 1},
+    {name: 'Feiner Schnitt', desc: 'Schneide die 3 dünn an der Bande entlang in die Ecke.', cue: [150, 100], balls: [[3, 248, 40]], shots: 2, par: 1},
+    {name: 'Ohne Linien', desc: 'Hier gibt es keine Hilfslinien. Ziele nur mit dem Auge auf die 1.', cue: [30, 20], balls: [[1, 201.4, 101.9]], lines: 'off', shots: 2, par: 1},
+    {name: 'Effet-Kunst', desc: 'Versenke die 1 und bring die Weiße über die Banden in den goldenen Kreis. Tipp: Probiere Seiteneffet links oder einen etwas anderen Schnittwinkel.', cue: [146.4, 73.2], balls: [[1, 200, 100]], zone: EFFET_ZONE, shots: 2, par: 1},
+    {name: '9er-Lauf', desc: 'Räume 1 bis 9 der Reihe nach ab.', cue: [127, 63.5], balls: [[1, 60, 30], [2, 110, 95], [3, 160, 40], [4, 200, 100], [5, 230, 30], [6, 90, 60], [7, 180, 70], [8, 40, 100], [9, 127, 20]], order: true, shots: 13, par: 9},
+    {name: 'Großmeister', desc: 'Anstoß auf 15 Kugeln und alles abräumen.', cue: [W * 0.2, H / 2], balls: rack15, shots: 24, par: 16}
+  ];
+})();
+const SOLO = {stars: [], hi: 0, lessons: []};
+try { Object.assign(SOLO, JSON.parse(localStorage.getItem('billard_solo') || '{}')); } catch (e) {}
+const saveSolo = () => { try { localStorage.setItem('billard_solo', JSON.stringify(SOLO)); } catch (e) {} };
+const LINES_MULT = {all: 1, guide: 1.5, off: 2};
+
+function soloTargets(on) {
+  const so = G.solo;
+  let arr = [...on];
+  if (so.type === 'training' || so.type === 'lesson') return [];
+  if (so.type === 'levels') {
+    const lv = LEVELS[so.idx];
+    if (lv.targets) arr = arr.filter(n => lv.targets.includes(n));
+    else if (lv.bomb) arr = arr.filter(n => !lv.bomb.includes(n));
+    if (lv.first && arr.length) return on.has(lv.first) ? [lv.first] : arr;
+    if (lv.order && arr.length) return [Math.min(...arr)];
+  }
+  return arr;
+}
+
+function newSolo(type, idx) {
+  const so = {type, idx: idx || 0, shots: 0, score: 0, combo: 0, lives: 3, lifeMarks: 0, best: 0};
+  let balls;
+  if (type === 'levels') {
+    const lv = LEVELS[so.idx];
+    balls = [{n: 0, x: lv.cue[0], y: lv.cue[1], vx: 0, vy: 0, on: true}].concat(lv.balls.map(b => ({n: b[0], x: b[1], y: b[2], vx: 0, vy: 0, on: true})));
+  } else if (type === 'training') {
+    balls = rack(8);
+  } else {
+    balls = [{n: 0, x: W * 0.2, y: H / 2, vx: 0, vy: 0, on: true}];
+    for (let n = 1; n <= 15; n++) balls.push({n, x: 0, y: 0, vx: 0, vy: 0, on: false});
+  }
+  G = {
+    mode: 0, solo: so, diff: 0,
+    players: [{name: 'Du', group: null, fouls: 0}, {name: '', group: null, fouls: 0}],
+    ai: [false, false], cur: 0, balls, isBreak: false, bih: type === 'training' ? 'any' : null,
+    state: 'aim', aim: 0, power: 0.5, sx: 0, sy: 0, called: null, calledManual: false,
+    pushAvail: false, pushShot: false, ver: 0, pred: null, predKey: '', toast: null, live: null
+  };
+  initOrient();
+  if (type === 'arcade') spawnBalls(5);
+  else if (LEVELS[so.idx].order && so.idx === LEVELS.length - 1) G.power = 0.9;
+  ['over', 'menu', 'levels', 'stats', 'settings'].forEach(hide);
+  if (type === 'levels') toast(LEVELS[so.idx].desc, 3500);
+  else if (type === 'training') toast('Training: Kugel kurz gedrückt halten und ziehen, um sie zu versetzen. ↶ macht den letzten Stoß rückgängig.', 4500);
+  else toast('Trefferserie: Jeder Fehlstoß kostet ein Leben. Mit weniger Linien gibt es mehr Punkte!', 3500);
+  const p = G.power;
+  startTurn();
+  G.power = p;
+}
+
+function spawnBalls(k) {
+  const on = onSet(G.balls), cue = getBall(G.balls, 0);
+  const free = shuffle([...Array(15).keys()].map(i => i + 1).filter(n => !on.has(n)));
+  for (let i = 0; i < k && free.length; i++) {
+    const b = getBall(G.balls, free.pop());
+    for (let t = 0; t < 400; t++) {
+      const x = 14 + Math.random() * (W - 28), y = 12 + Math.random() * (H - 24);
+      if (placeOK(G.balls, x, y, false) && (x - cue.x) ** 2 + (y - cue.y) ** 2 > 18 * 18) { b.x = x; b.y = y; b.vx = b.vy = 0; b.on = true; break; }
+    }
+  }
+  G.ver++;
+}
+
+function soloFinish(ev) {
+  const so = G.solo, cue = getBall(G.balls, 0);
+  const scratch = ev.cuePotted;
+  const placeCue = () => { G.bih = 'any'; if (!cue.on) { const p = findFree(G.balls, W * 0.25, H / 2, false); cue.x = p.x; cue.y = p.y; cue.on = true; cue.vx = cue.vy = 0; } };
+  if (so.type === 'lesson') { G.state = 'lessondone'; updateUI(); return; }
+  G.bih = null;
+  if (so.type === 'training') {
+    so.shots++; so.pots = (so.pots || 0) + ev.potted.length;
+    if (ev.potted.length) floatText(ev.potted.length > 1 ? ev.potted.length + ' versenkt!' : 'Drin!', W / 2, H / 2, '#7dffb0');
+    G.bih = 'any';
+    if (scratch) placeCue();
+    if (!onSet(G.balls).size) toast('Tisch abgeräumt! In der Lobby baust du über „Training“ neu auf.', 3500);
+    return startTurn();
+  }
+  if (so.type === 'levels') {
+    const lv = LEVELS[so.idx];
+    so.shots++;
+    let fail = null;
+    for (const b of lv.bomb || []) if (ev.touched.has(b)) fail = 'Die Sperrkugel ' + b + ' wurde berührt.';
+    if (lv.pocket) for (const p of ev.potted) if (lv.pocket[p.n] !== undefined && lv.pocket[p.n] !== p.pocket) fail = 'Die ' + p.n + ' fiel in die falsche Tasche.';
+    const need = soloTargets(G.before);
+    if (!fail && ev.first !== null && (lv.order || lv.first) && need.length && ev.first !== need[0]) fail = 'Zuerst muss die ' + need[0] + ' getroffen werden.';
+    if (!fail && lv.kick && ev.first !== null && !ev.kick) fail = 'Die Weiße hat nicht zuerst eine Bande berührt.';
+    if (!fail && lv.bank) for (const p of ev.potted) if (need.includes(p.n) && !(ev.railCount[p.n] > 0)) fail = 'Die ' + p.n + ' ist ohne Bande gefallen.';
+    const left = soloTargets(onSet(G.balls));
+    if (fail) return endSolo(false, fail);
+    if (!left.length) {
+      if (lv.zone && (scratch || (cue.x - lv.zone.x) ** 2 + (cue.y - lv.zone.y) ** 2 > lv.zone.r ** 2)) return endSolo(false, 'Die Weiße liegt nicht im goldenen Kreis.');
+      if (scratch) return endSolo(false, 'Die Weiße ist mit dem letzten Stoß gefallen.');
+      const stars = so.shots <= lv.par ? 3 : so.shots <= lv.par + 1 ? 2 : 1;
+      return endSolo(true, 'Geschafft mit ' + so.shots + (so.shots === 1 ? ' Stoß' : ' Stößen') + ' (Par ' + lv.par + ').', stars);
+    }
+    if (so.shots >= lv.shots) return endSolo(false, 'Keine Stöße mehr übrig.');
+    if (scratch) { placeCue(); toast('Weiße versenkt – Ball in Hand. Der Stoß zählt trotzdem.'); }
+    return startTurn();
+  }
+  // Trefferserie
+  const pots = ev.potted;
+  let msg = '';
+  if (scratch || !pots.length) {
+    so.lives--; so.combo = 0;
+    msg = scratch ? 'Weiße versenkt – ein Leben weniger.' : 'Daneben – ein Leben weniger.';
+    if (scratch) placeCue();
+  } else {
+    so.combo = Math.min(so.combo + 1, 10);
+    let base = 0, banks = 0;
+    for (const p of pots) { const rails = ev.railCount[p.n] || 0; banks += rails; base += (p.n === 8 ? 300 : 100) + 75 * rails; }
+    const mult = LINES_MULT[G.shotLines] || 1;
+    const pts = Math.round(base * pots.length * so.combo * mult);
+    so.score += pts;
+    const lp = POCKETS[pots[pots.length - 1].pocket];
+    floatText('+' + pts, lp.x, lp.y + (lp.y < H / 2 ? 14 : -10));
+    msg = '+' + pts;
+    const extras = [];
+    if (pots.length > 1) extras.push(pots.length + 'er-Treffer');
+    if (banks) extras.push('Bande');
+    if (pots.some(p => p.n === 8)) extras.push('Schwarze 8 ×3');
+    if (so.combo > 1) extras.push('Serie ×' + so.combo);
+    if (mult > 1) extras.push('Linien-Bonus ×' + mult);
+    if (extras.length) msg += ' · ' + extras.join(' · ');
+    const marks = Math.floor(so.score / 3000);
+    if (marks > so.lifeMarks) { so.lifeMarks = marks; if (so.lives < 5) { so.lives++; msg += ' · Extraleben!'; } }
+  }
+  if (so.lives <= 0) {
+    const rec = so.score > SOLO.hi;
+    if (rec) { SOLO.hi = so.score; saveSolo(); }
+    return endSolo(false, so.score + ' Punkte' + (rec ? ' – neuer Rekord!' : ' (Rekord: ' + SOLO.hi + ')'));
+  }
+  const n = onSet(G.balls).size;
+  spawnBalls(n < 3 ? 4 - n : n < 9 ? 1 : 0);
+  toast(msg, 2600);
+  startTurn();
+}
+
+function endSolo(win, text, stars) {
+  const so = G.solo;
+  G.state = 'over';
+  updateUI();
+  let title;
+  showReward(0, 0);
+  if (so.type === 'arcade') { const c = Math.min(400, Math.floor(so.score / 40)), xp = Math.floor(so.score / 120); showReward(gain(c, xp), xp); }
+  if (so.type === 'levels') {
+    if (win) {
+      const prev = SOLO.stars[so.idx] || 0;
+      const coins = (prev ? 0 : LEVEL_REWARDS[so.idx]) + Math.max(0, stars - prev) * 20, xp = 10 + stars * 10;
+      showReward(gain(coins, xp), xp);
+      if (!prev) text += ' Erstmals geschafft – Belohnung freigeschaltet!';
+      confetti(); playSound('win', 0); SOLO.stars[so.idx] = Math.max(prev, stars); saveSolo(); title = '★'.repeat(stars) + '☆'.repeat(3 - stars) + ' Geschafft!'; }
+    else title = 'Nicht geschafft';
+  } else title = 'Spiel vorbei';
+  $('overTitle').textContent = title;
+  $('overText').textContent = text;
+  const nx = so.type === 'levels' && win ? nextLevelInTopic(so.idx) : -1;
+  $('bNext').classList.toggle('hidden', !(nx >= 0 && levelUnlocked(nx)));
+  G.nextLevel = nx;
+  setTimeout(() => show('over'), 600);
+}
+
+function showLevels(focus) {
+  const box = $('topicList');
+  box.innerHTML = '';
+  $('lvMsg').textContent = '';
+  TOPICS.forEach((tp, t) => {
+    const done = lessonDone(t);
+    const stars = tp.levels.reduce((a, i) => a + (SOLO.stars[i] || 0), 0);
+    const card = document.createElement('div');
+    card.className = 'topic' + (focus === t ? ' focus' : '');
+    const head = document.createElement('div'); head.className = 'thead';
+    head.innerHTML = '<span class="ticon">' + tp.icon + '</span><div class="tname"><b>' + tp.name + '</b><small>★ ' + stars + ' / ' + tp.levels.length * 3 + '</small></div>';
+    const lb = document.createElement('button');
+    lb.className = 'lessonBtn' + (done ? ' done' : '');
+    lb.textContent = done ? '✓ Lektion' : '📖 Lektion starten';
+    lb.onclick = () => { initAudio(); newLesson(t); };
+    head.appendChild(lb); card.appendChild(head);
+    const row = document.createElement('div'); row.className = 'tlevels';
+    for (const i of tp.levels) {
+      const b = document.createElement('button'), un = levelUnlocked(i), st = SOLO.stars[i] || 0;
+      b.className = 'lvl' + (un ? '' : ' locked');
+      b.innerHTML = '<b>' + (i + 1) + '</b><span>' + LEVELS[i].name + '</span><i>' + (un ? '★'.repeat(st) + '☆'.repeat(3 - st) : '🔒') + '</i><small>' +
+        (st ? '✓ erledigt' : !done ? 'erst Lektion' : '🪙 ' + LEVEL_REWARDS[i]) + '</small>';
+      if (un) b.onclick = () => { initAudio(); newSolo('levels', i); };
+      else b.onclick = () => { $('lvMsg').textContent = done ? 'Schaffe zuerst die Herausforderung davor in diesem Thema.' : 'Schau dir zuerst die Lektion „' + tp.name + '“ an – danach kannst du hier spielen.'; };
+      row.appendChild(b);
+    }
+    card.appendChild(row); box.appendChild(card);
+  });
+  hide('menu'); show('levels');
+  if (focus !== undefined) setTimeout(() => { const el = box.children[focus]; if (el) el.scrollIntoView({block: 'nearest'}); }, 50);
+}
+
+function drawSoloTable() {
+  const px = 1 / L.s, so = G.solo;
+  if (so.type !== 'levels') return;
+  const lv = LEVELS[so.idx];
+  if (lv.zone) {
+    ctx.setLineDash([2.5 * px, 2.5 * px]); ctx.strokeStyle = '#f2b632'; ctx.lineWidth = 2 * px;
+    ctx.fillStyle = 'rgba(242,182,50,.12)';
+    ctx.beginPath(); ctx.arc(lv.zone.x, lv.zone.y, lv.zone.r, 0, TAU); ctx.fill(); ctx.stroke(); ctx.setLineDash([]);
+  }
+  if (lv.pocket) for (const n in lv.pocket) {
+    const d = POCKET_DRAW[lv.pocket[n]];
+    ctx.beginPath(); ctx.arc(d.x, d.y, d.r + 1.4, 0, TAU); ctx.strokeStyle = lineCol(+n, 1); ctx.lineWidth = 3 * px; ctx.stroke();
+    if (getBall(G.balls, +n).on) miniBallTable(+n, d.x, d.y, R * 0.8);
+  }
+}
+function drawSoloOverlay(S) {
+  const so = G.solo, px = 1 / L.s;
+  if (so.type !== 'levels') return;
+  const lv = LEVELS[so.idx];
+  for (const n of lv.bomb || []) {
+    const b = getBall(G.balls, n); if (!b.on) continue;
+    ctx.beginPath(); ctx.arc(b.x, b.y, R + 1.6, 0, TAU); ctx.strokeStyle = '#ff3b30'; ctx.lineWidth = 1.8 * px; ctx.stroke();
+    if (S && S.ev.touched.has(n) && CFG.lines !== 'off') {
+      ctx.strokeStyle = '#ff3b30'; ctx.lineWidth = 2.4 * px; const r = R + 3;
+      ctx.beginPath(); ctx.moveTo(b.x - r, b.y - r); ctx.lineTo(b.x + r, b.y + r); ctx.moveTo(b.x + r, b.y - r); ctx.lineTo(b.x - r, b.y + r); ctx.stroke();
+    }
+  }
+}
+function miniBallTable(n, x, y, r) {
+  const rpx = r * L.s * DPR, s = ballSprite('mt' + n + '_' + Math.round(rpx), n, IDENT3, 'm', rpx);
+  const hs = s.size / 2 / (L.s * DPR);
+  ctx.drawImage(s.cv, x - hs, y - hs, hs * 2, hs * 2);
+}
+
+// ===================== Lern-Modus =====================
+// Themen: erst die Lektion ansehen, dann werden die Herausforderungen freigeschaltet.
+const TOPICS = [
+  {icon: '🎯', name: 'Zielen & Geisterkugel', levels: [0, 1, 15, 16, 5]},
+  {icon: '🔗', name: 'Kombinationen', levels: [2, 14]},
+  {icon: '↗️', name: 'Banden', levels: [3, 12, 13]},
+  {icon: '⬆️', name: 'Effet: Stopp, Nachlauf, Rücklauf', levels: [10, 11, 6]},
+  {icon: '↪️', name: 'Seiteneffet', levels: [17]},
+  {icon: '🧠', name: 'Stellungsspiel & Abräumen', levels: [4, 7, 8, 9, 18, 19]}
+];
+const topicOf = i => TOPICS.findIndex(t => t.levels.includes(i));
+const lessonDone = t => !!(SOLO.lessons && SOLO.lessons[t]);
+function levelUnlocked(i) {
+  if ((SOLO.stars[i] || 0) > 0) return true;
+  const t = topicOf(i);
+  if (!lessonDone(t)) return false;
+  const pos = TOPICS[t].levels.indexOf(i);
+  return pos === 0 || (SOLO.stars[TOPICS[t].levels[pos - 1]] || 0) > 0;
+}
+function nextLevelInTopic(i) {
+  const t = TOPICS[topicOf(i)], pos = t.levels.indexOf(i);
+  return pos >= 0 && pos < t.levels.length - 1 ? t.levels[pos + 1] : -1;
+}
+// Stoß-Daten der Vorführungen (vorab mit der Physik geprüft)
+const DEMO = {
+  l1: {angle: 0.464121, power: 0.5, sx: 0, sy: 0},
+  l2: {angle: -0.203941, power: 0.45, sx: 0, sy: 0},
+  combo: {angle: 2.694753, power: 0.55, sx: 0, sy: 0},
+  bank4: {angle: 0.187623, power: 0.5, sx: 0, sy: 0},
+  kick: {angle: 0.687223, power: 0.6, sx: 0, sy: 0},
+  bank14: {angle: 0.602139, power: 0.6, sx: 0, sy: 0},
+  stop: {angle: 0.464121, power: 0.15, sx: 0, sy: -0.4},
+  follow: {angle: -0.509647, power: 0.35, sx: 0, sy: 0.6},
+  draw: {angle: 0.464121, power: 0.45, sx: 0, sy: -0.8},
+  effet: {angle: 0.457621, power: 0.8, sx: -0.7, sy: 0.3},
+  noeffet: {angle: 0.457621, power: 0.8, sx: 0, sy: 0.3},
+  position: {angle: -1.122127, power: 0.4, sx: 0, sy: -0.4},
+  brk: {angle: 0, power: 0.95, sx: 0, sy: -0.25}
+};
+const LESSONS = [
+  [ // Zielen
+    {level: 0, title: 'Die Geisterkugel', text: 'Jeder Stoß beginnt mit einer Frage: Wo muss die Weiße genau in dem Moment liegen, in dem sie die Objektkugel berührt? Diese gedachte Position heißt Geisterkugel. Sie liegt direkt hinter der Objektkugel, auf der Linie von der Tasche durch die Kugelmitte (gelb gestrichelt).',
+      marks: [{t: 'pocketLine', n: 1, k: 5}, {t: 'ghost', n: 1, k: 5}]},
+    {title: 'Ziele auf die Geisterkugel', text: 'Ziele nicht auf die Objektkugel selbst, sondern lass die Mitte der Weißen genau zur Geisterkugel rollen (weiße Linie). Beim Treffen schiebt die Weiße die Objektkugel entlang der Verbindungslinie der beiden Kugelmitten – und die zeigt genau zur Tasche. Der rote Punkt ist die Stelle, an der sich die Kugeln berühren.',
+      marks: [{t: 'pocketLine', n: 1, k: 5}, {t: 'ghost', n: 1, k: 5}, {t: 'aimLine', n: 1, k: 5}, {t: 'contact', n: 1, k: 5}]},
+    {title: 'Vorführung: gerader Stoß', text: 'So sieht der Stoß aus. Mittlere Kraft reicht: Zu viel Kraft verzeiht weniger, wenn die Kugel die Tasche nicht ganz mittig trifft.', demo: 'l1',
+      marks: [{t: 'ghost', n: 1, k: 5}]},
+    {level: 1, title: 'Der Schnitt', text: 'Liegt die Kugel nicht auf einer Linie mit Weißer und Tasche, wird sie „geschnitten“. Die Geisterkugel bleibt dein Ziel – sie liegt jetzt seitlich versetzt. Je dünner der Schnitt, desto kleiner ist der Teil der Objektkugel, den du triffst, und desto genauer musst du zielen. Nutze dafür das Feinrad und die 0,01°-Pfeile.',
+      marks: [{t: 'pocketLine', n: 3, k: 2}, {t: 'ghost', n: 3, k: 2}, {t: 'aimLine', n: 3, k: 2}, {t: 'contact', n: 3, k: 2}], demo: 'l2'},
+    {title: 'Ohne Hilfslinien zielen', text: 'Ohne Linien hilft ein Trick: Suche auf der Objektkugel den Punkt, der am weitesten von der Tasche entfernt ist (roter Punkt). Genau dort muss der Rand der Weißen auftreffen. Die Mitte der Weißen zielt dann eine halbe Kugelbreite daneben – auf die Geisterkugel.',
+      level: 0, marks: [{t: 'contact', n: 1, k: 5, label: 'Hier treffen'}, {t: 'ghost', n: 1, k: 5}]}
+  ],
+  [ // Kombinationen
+    {level: 2, title: 'Was ist eine Kombination?', text: 'Bei einer Kombination trifft die Weiße zuerst Kugel A (hier die 1). Kugel A trifft dann Kugel B (die 2), und B fällt. So erreichst du Kugeln, die du direkt nicht spielen darfst oder kannst.',
+      marks: [{t: 'pocketLine', n: 2, k: 3}]},
+    {title: 'Von hinten nach vorne denken', text: 'Plane rückwärts: Zuerst bestimmst du die Geisterkugel für die 2 (wohin die 1 rollen muss). Dann bestimmst du die Geisterkugel für die 1 – dorthin zielt die Weiße. Jeder Fehler vergrößert sich von Kugel zu Kugel, darum zielst du hier besonders genau.',
+      marks: [{t: 'pocketLine', n: 2, k: 3}, {t: 'ghost', n: 2, k: 3, label: 'Ziel für die 1'}, {t: 'comboGhost', a: 1, b: 2, k: 3}]},
+    {title: 'Vorführung', text: 'Die Weiße trifft die 1, die 1 schiebt die 2 in die Ecke. Liegen beide Kugeln dicht beieinander und zeigen zur Tasche, ist die Kombination fast sicher.', demo: 'combo',
+      marks: [{t: 'comboGhost', a: 1, b: 2, k: 3}]}
+  ],
+  [ // Banden
+    {level: 3, title: 'Einfallswinkel = Ausfallswinkel', text: 'Eine Kugel prallt von der Bande ungefähr im gleichen Winkel ab, in dem sie ankommt – wie Licht an einem Spiegel. Hier ist der direkte Weg zur 1 durch die gesperrte 8 versperrt, also nutzt du die Bande.',
+      marks: [{t: 'block', from: 0, to: 1, via: 8}]},
+    {title: 'Der Spiegel-Trick', text: 'Stell dir die Bande als Spiegel vor: Spiegele das Ziel an der Bande und ziele auf das Spiegelbild. Die Linie zum Spiegelbild schneidet die Bande genau am richtigen Punkt. Die Vorschau-Linie zeigt dir dann, ob es passt.', demo: 'bank4', marks: [{t: 'demoPath', label: 'gleicher Winkel'}]},
+    {level: 12, title: 'Kick-Shot', text: 'Beim Kick-Shot trifft die Weiße zuerst die Bande und erst danach die Kugel. Wichtig: Je fester du stößt, desto „flacher“ kommt die Kugel von der Bande zurück, weil das Gummi nachgibt. Mittlere Kraft ist am berechenbarsten.', demo: 'kick', marks: [{t: 'demoPath', label: 'erst Bande'}]},
+    {level: 13, title: 'Bandenstoß', text: 'Beim Bandenstoß geht die Objektkugel über die Bande in die Tasche. Hier: Die 4 läuft an die obere Bande und kommt schräg zurück in die untere Mitteltasche. Auch hier gilt der Spiegel-Trick – nur eben für die Objektkugel.', demo: 'bank14', marks: [{t: 'demoPath', n: 4, label: 'Bande'}]}
+  ],
+  [ // Effet
+    {level: 10, title: 'Wo du die Weiße triffst', text: 'Der Treffpunkt auf der Weißen bestimmt, was sie nach dem Zusammenstoß macht. Mitte oder knapp darunter: Die Weiße bleibt stehen (Stoppball). Oben: Sie läuft hinterher (Nachläufer). Unten: Sie kommt zurück (Rückläufer). Einstellen kannst du das mit der Effet-Kugel rechts oben.',
+      marks: [{t: 'spin', sx: 0, sy: -0.4, label: 'Stopp'}, {t: 'zone'}]},
+    {title: 'Stoppball', text: 'Mit wenig Kraft und etwas Effet unter der Mitte rutscht die Weiße ohne Drehung in die Objektkugel. Dann gibt sie ihre ganze Geschwindigkeit ab und bleibt genau an der Stelle der Geisterkugel liegen.', demo: 'stop', marks: [{t: 'zone'}, {t: 'spin', sx: 0, sy: -0.4, label: 'leicht unten'}]},
+    {level: 11, title: 'Nachläufer', text: 'Triffst du die Weiße oberhalb der Mitte, dreht sie sich vorwärts. Nach dem Treffer läuft sie der Objektkugel hinterher. So bringst du die Weiße nach vorne in Position – aber Vorsicht, dass sie nicht mit in die Tasche rollt.', demo: 'follow', marks: [{t: 'zone'}, {t: 'spin', sx: 0, sy: 0.6, label: 'oben'}]},
+    {level: 6, title: 'Rückläufer', text: 'Triffst du die Weiße weit unten, dreht sie sich rückwärts. Nach dem Treffer kommt sie zurück. Je weiter die Weiße vorher rollt, desto mehr Rückdrehung verliert sie – bei langen Stößen brauchst du deshalb mehr Kraft.', demo: 'draw', marks: [{t: 'zone'}, {t: 'spin', sx: 0, sy: -0.8, label: 'weit unten'}]}
+  ],
+  [ // Seiteneffet
+    {level: 17, title: 'Seiteneffet wirkt an der Bande', text: 'Seiteneffet verändert vor allem, wie die Weiße von der Bande abprallt. Auf dem Tisch siehst du zwei Bahnen desselben Stoßes: gestrichelt grau ohne Seiteneffet, blau mit Linkseffet. Mit Linkseffet springt die Weiße anders von der Bande ab und erreicht den goldenen Kreis.',
+      marks: [{t: 'zone'}, {t: 'comparePath', a: 'noeffet', b: 'effet'}, {t: 'spin', sx: -0.7, sy: 0.3, label: 'links + oben'}]},
+    {title: 'Vorführung', text: 'Merke dir: Rechtseffet schickt die Weiße nach der Bande weiter nach rechts (aus deiner Sicht), Linkseffet nach links. Starker Seiteneffet macht Stöße ungenauer – nutze ihn nur, wenn du ihn wirklich brauchst.', demo: 'effet', marks: [{t: 'zone'}]}
+  ],
+  [ // Stellungsspiel
+    {level: 8, title: 'Einen Stoß vorausdenken', text: 'Gute Spieler versenken nicht nur – sie legen sich die Weiße für den nächsten Stoß zurecht. Bevor du stößt, frag dich: Welche Kugel kommt als nächstes, und wo sollte die Weiße dafür liegen?',
+      marks: []},
+    {title: 'Die Endposition nutzen', text: 'Die gestrichelte Kugel in der Vorschau zeigt, wo die Weiße liegen bleibt. Hier wird die 3 mit leichtem Rückläufer versenkt – die Weiße bleibt so liegen, dass der nächste Stoß einfach ist. Probiere vor jedem Stoß verschiedene Kräfte und Effets aus und schau, wo die Weiße endet.', demo: 'position', marks: [{t: 'ghost', n: 3, k: 3}]},
+    {title: 'Reihenfolge planen', text: 'Spiele zuerst Kugeln, die später schwierig werden könnten (an Banden oder in Gruppen), solange noch Platz ist. Leichte Kugeln an den Taschen hebst du dir als „Sprungbrett“ auf. Bei Reihenfolge-Aufgaben musst du immer die niedrigste Nummer zuerst treffen – plane die Weiße deshalb immer zur nächsten Nummer.', marks: []},
+    {level: 9, title: 'Der Anstoß', text: 'Beim Anstoß triffst du die vordere Kugel voll und mit viel Kraft. Ein wenig Effet unter der Mitte sorgt dafür, dass die Weiße nach dem Treffer in der Tischmitte stehen bleibt statt wild herumzurollen.', demo: 'brk', marks: []}
+  ]
+];
+function lessonBalls(level) {
+  const lv = LEVELS[level];
+  return [{n: 0, x: lv.cue[0], y: lv.cue[1], vx: 0, vy: 0, on: true}].concat(lv.balls.map(b => ({n: b[0], x: b[1], y: b[2], vx: 0, vy: 0, on: true})));
+}
+function newLesson(t) {
+  G = {
+    mode: 0, solo: {type: 'lesson', topic: t, step: 0, level: LESSONS[t][0].level}, diff: 0,
+    players: [{name: 'Du', group: null, fouls: 0}, {name: '', group: null, fouls: 0}],
+    ai: [false, false], cur: 0, balls: lessonBalls(LESSONS[t][0].level), isBreak: false, bih: null,
+    state: 'lesson', aim: 0, power: 0.5, sx: 0, sy: 0, called: null, calledManual: false,
+    pushAvail: false, pushShot: false, ver: 0, pred: null, predKey: '', toast: null, live: null
+  };
+  initOrient();
+  ['over', 'menu', 'levels', 'stats', 'settings'].forEach(hide);
+  show('lessonBox');
+  layout();
+  lessonStep(0);
+}
+function lessonStep(i) {
+  const so = G.solo, steps = LESSONS[so.topic], st = steps[i];
+  so.step = i;
+  if (st.level !== undefined) so.level = st.level;
+  G.live = null; G.replay = null; SINKING = [];
+  G.balls = lessonBalls(so.level); G.ver++;
+  for (const b of G.balls) { const o = G.orient[b.n]; if (o) { o.lx = b.x; o.ly = b.y; o.ver++; } else G.orient[b.n] = {M: IDENT3.slice(), ver: 1, lx: b.x, ly: b.y, k: 0}; }
+  const d = st.demo && DEMO[st.demo];
+  if (st.demo === 'brk') { const c = getBall(G.balls, 0); G.aim = Math.atan2(FOOT.y - c.y, FOOT.x - c.x); G.power = d.power; G.sx = d.sx; G.sy = d.sy; }
+  else if (d) { G.aim = d.angle; G.power = d.power; G.sx = d.sx; G.sy = d.sy; }
+  G.state = d ? 'lessonaim' : 'lesson';
+  $('lsTopic').textContent = TOPICS[so.topic].icon + ' ' + TOPICS[so.topic].name;
+  $('lsStep').textContent = 'Schritt ' + (i + 1) + ' von ' + steps.length;
+  $('lsTitle').textContent = st.title;
+  $('lsText').textContent = st.text;
+  $('lsBack').disabled = i === 0;
+  $('lsDemo').classList.toggle('hidden', !d);
+  $('lsDemo').textContent = '▶ Vorführen';
+  const last = i === steps.length - 1;
+  $('lsNext').textContent = last ? '✓ Lektion abschließen' : 'Weiter ▶';
+  $('lsNext').classList.toggle('done', last);
+  updateUI();
+}
+function lessonDemo() {
+  const so = G.solo, st = LESSONS[so.topic][so.step];
+  if (!st.demo) return;
+  if (G.state !== 'lessonaim') lessonStep(so.step);
+  initAudio();
+  G.state = 'strike'; G.strikeT = performance.now();
+  $('lsDemo').textContent = '↻ Nochmal zeigen';
+}
+function lessonFinish() {
+  const t = G.solo.topic;
+  SOLO.lessons = SOLO.lessons || [];
+  const first = !SOLO.lessons[t];
+  SOLO.lessons[t] = true; saveSolo();
+  hide('lessonBox');
+  G = null; layout();
+  showLevels(t);
+  if (first) {
+    const c = gain(30, 20);
+    $('lvMsg').textContent = '🎓 Lektion abgeschlossen! +' + c + ' 🪙 · Die Herausforderungen zu „' + TOPICS[t].name + '“ sind jetzt freigeschaltet.';
+    confetti(); playSound('win', 0);
+  } else $('lvMsg').textContent = 'Lektion wiederholt. Viel Erfolg bei den Herausforderungen!';
+}
+function lessonExit() { hide('lessonBox'); G = null; layout(); showLevels(); }
+
+// Markierungen der Lektion auf dem Tisch
+function lessonLabel(text, x, y, col) {
+  const px = 1 / L.s;
+  ctx.font = 'bold ' + (11 * px).toFixed(2) + 'px system-ui,sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  const w = ctx.measureText(text).width + 8 * px;
+  ctx.fillStyle = 'rgba(8,14,12,.85)'; roundRect(x - w / 2, y - 7 * px, w, 14 * px, 7 * px); ctx.fill();
+  ctx.fillStyle = col || '#ffd75a'; ctx.fillText(text, x, y);
+}
+function ghostOf(n, k) {
+  const b = getBall(G.balls, n), ap = AIM_PTS[k];
+  let ux = ap.x - b.x, uy = ap.y - b.y; const d = Math.hypot(ux, uy); ux /= d; uy /= d;
+  return {b, ap, ux, uy, gx: b.x - ux * 2 * R, gy: b.y - uy * 2 * R};
+}
+function arrowLine(x1, y1, x2, y2, col, w, dash) {
+  const px = 1 / L.s;
+  ctx.strokeStyle = col; ctx.lineWidth = w * px; ctx.lineCap = 'round';
+  ctx.setLineDash(dash ? [5 * px, 4 * px] : []);
+  ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); ctx.setLineDash([]);
+  const a = Math.atan2(y2 - y1, x2 - x1), s = 3;
+  ctx.fillStyle = col; ctx.beginPath(); ctx.moveTo(x2, y2);
+  ctx.lineTo(x2 - Math.cos(a - 0.45) * s, y2 - Math.sin(a - 0.45) * s); ctx.lineTo(x2 - Math.cos(a + 0.45) * s, y2 - Math.sin(a + 0.45) * s); ctx.closePath(); ctx.fill();
+}
+let lessonPathCache = {};
+function demoPathOf(key, n) {
+  const id = key + ':' + G.solo.level + ':' + n;
+  if (!lessonPathCache[id]) {
+    const d = DEMO[key], c = getBall(G.balls, 0);
+    const shot = key === 'brk' ? {angle: Math.atan2(FOOT.y - c.y, FOOT.x - c.x), power: d.power, sx: d.sx, sy: d.sy} : d;
+    lessonPathCache[id] = runSim(lessonBalls(G.solo.level), shot, true).paths[n || 0];
+  }
+  return lessonPathCache[id];
+}
+function drawLesson(now) {
+  const so = G.solo, st = LESSONS[so.topic][so.step], px = 1 / L.s, pulse = 0.5 + 0.5 * Math.sin(now / 300);
+  if (G.state === 'moving' || G.state === 'strike') return;
+  const lv = LEVELS[so.level];
+  for (const m of st.marks || []) {
+    if (m.t === 'pocketLine') {
+      const g = ghostOf(m.n, m.k);
+      arrowLine(g.gx - g.ux * 6, g.gy - g.uy * 6, g.ap.x, g.ap.y, 'rgba(255,215,90,.9)', 1.6, true);
+      lessonLabel('Linie zur Tasche', (g.b.x + g.ap.x) / 2, (g.b.y + g.ap.y) / 2 - 6);
+    } else if (m.t === 'ghost') {
+      const g = ghostOf(m.n, m.k);
+      ctx.beginPath(); ctx.arc(g.gx, g.gy, R, 0, TAU); ctx.fillStyle = 'rgba(255,255,255,' + (0.15 + 0.2 * pulse) + ')'; ctx.fill();
+      ctx.setLineDash([2 * px, 2 * px]); ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5 * px; ctx.stroke(); ctx.setLineDash([]);
+      lessonLabel(m.label || 'Geisterkugel', g.gx - g.ux * 9, g.gy - g.uy * 9 + 7, '#fff');
+    } else if (m.t === 'aimLine') {
+      const g = ghostOf(m.n, m.k), c = getBall(G.balls, 0);
+      arrowLine(c.x, c.y, g.gx, g.gy, 'rgba(255,255,255,.95)', 1.8, false);
+      lessonLabel('Ziel der Weißen', (c.x + g.gx) / 2, (c.y + g.gy) / 2 - 6, '#fff');
+    } else if (m.t === 'contact') {
+      const g = ghostOf(m.n, m.k);
+      ctx.beginPath(); ctx.arc(g.b.x - g.ux * R, g.b.y - g.uy * R, 0.9 + 0.5 * pulse, 0, TAU); ctx.fillStyle = '#ff4d3d'; ctx.fill();
+      if (m.label) lessonLabel(m.label, g.b.x - g.ux * R, g.b.y - g.uy * R + 9, '#ff8a7a');
+    } else if (m.t === 'comboGhost') {
+      const g2 = ghostOf(m.b, m.k), a = getBall(G.balls, m.a), c = getBall(G.balls, 0);
+      let vx = g2.gx - a.x, vy = g2.gy - a.y; const d = Math.hypot(vx, vy); vx /= d; vy /= d;
+      const gx = a.x - vx * 2 * R, gy = a.y - vy * 2 * R;
+      arrowLine(a.x, a.y, g2.gx, g2.gy, 'rgba(255,215,90,.9)', 1.4, true);
+      ctx.beginPath(); ctx.arc(gx, gy, R, 0, TAU); ctx.fillStyle = 'rgba(255,255,255,' + (0.15 + 0.2 * pulse) + ')'; ctx.fill();
+      ctx.setLineDash([2 * px, 2 * px]); ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5 * px; ctx.stroke(); ctx.setLineDash([]);
+      arrowLine(c.x, c.y, gx, gy, 'rgba(255,255,255,.95)', 1.6, false);
+      lessonLabel('Ziel der Weißen', gx + 4, gy - 9, '#fff');
+    } else if (m.t === 'block') {
+      const a = getBall(G.balls, m.from), b = getBall(G.balls, m.to), v = getBall(G.balls, m.via);
+      arrowLine(a.x, a.y, b.x, b.y, 'rgba(255,77,61,.85)', 1.6, true);
+      ctx.strokeStyle = '#ff4d3d'; ctx.lineWidth = 2.4 * px; const r = R + 3;
+      ctx.beginPath(); ctx.moveTo(v.x - r, v.y - r); ctx.lineTo(v.x + r, v.y + r); ctx.moveTo(v.x + r, v.y - r); ctx.lineTo(v.x - r, v.y + r); ctx.stroke();
+      lessonLabel('direkter Weg versperrt', v.x, v.y - 10, '#ff8a7a');
+    } else if (m.t === 'demoPath' && G.state === 'lessonaim') {
+      const p = demoPathOf(st.demo, m.n || 0);
+      // stärkster Knick = Abprallpunkt an der Bande
+      let bi = -1, bang = 0;
+      for (let i = 2; i < p.length - 2; i++) {
+        const a1 = Math.atan2(p[i][1] - p[i - 2][1], p[i][0] - p[i - 2][0]), a2 = Math.atan2(p[i + 2][1] - p[i][1], p[i + 2][0] - p[i][0]);
+        let da = Math.abs(a2 - a1); if (da > Math.PI) da = TAU - da;
+        if (da > bang && (p[i][0] < R + 0.5 || p[i][0] > W - R - 0.5 || p[i][1] < R + 0.5 || p[i][1] > H - R - 0.5)) { bang = da; bi = i; }
+      }
+      if (bi > 0) {
+        ctx.beginPath(); ctx.arc(p[bi][0], p[bi][1], 2.5 + pulse, 0, TAU); ctx.strokeStyle = '#ffd75a'; ctx.lineWidth = 2 * px; ctx.stroke();
+        lessonLabel(m.label || 'Bande', p[bi][0] + (p[bi][0] < W / 2 ? 18 : -18), p[bi][1] + (p[bi][1] < H / 2 ? 8 : -8));
+      }
+    } else if (m.t === 'comparePath') {
+      const pa = demoPathOf(m.a, 0), pb = demoPathOf(m.b, 0);
+      ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+      ctx.setLineDash([4 * px, 4 * px]); polyline(pa); ctx.strokeStyle = 'rgba(200,200,200,.8)'; ctx.lineWidth = 2 * px; ctx.stroke(); ctx.setLineDash([]);
+      glowLine(pb, a => 'rgba(90,170,255,' + a + ')', 2.2 * px);
+      const ea = pa[pa.length - 1], eb = pb[pb.length - 1];
+      lessonLabel('ohne Effet', ea[0], ea[1] - 8, '#ddd'); lessonLabel('mit Linkseffet', eb[0], eb[1] - 8, '#8cc8ff');
+    } else if (m.t === 'zone' && lv.zone) {
+      ctx.setLineDash([2.5 * px, 2.5 * px]); ctx.strokeStyle = '#f2b632'; ctx.lineWidth = 2 * px;
+      ctx.fillStyle = 'rgba(242,182,50,' + (0.1 + 0.08 * pulse) + ')';
+      ctx.beginPath(); ctx.arc(lv.zone.x, lv.zone.y, lv.zone.r, 0, TAU); ctx.fill(); ctx.stroke(); ctx.setLineDash([]);
+      lessonLabel('Ziel der Weißen', lv.zone.x, lv.zone.y - lv.zone.r - 6);
+    } else if (m.t === 'spin') {
+      // kleine Effet-Kugel neben der Weißen
+      const c = getBall(G.balls, 0), r = 6, x = clamp(c.x - 24, 10, W - 10), y = clamp(c.y - 22, 9, H - 16);
+      miniBallTable(-1, x, y, r);
+      ctx.strokeStyle = 'rgba(0,0,0,.25)'; ctx.lineWidth = 0.8 * px;
+      ctx.beginPath(); ctx.moveTo(x - r, y); ctx.lineTo(x + r, y); ctx.moveTo(x, y - r); ctx.lineTo(x, y + r); ctx.stroke();
+      ctx.beginPath(); ctx.arc(x + m.sx * r, y - m.sy * r, 1.6, 0, TAU); ctx.fillStyle = 'rgba(40,90,175,.9)'; ctx.fill();
+      lessonLabel('Effet: ' + m.label, x, y + r + 6, '#8cc8ff');
+    }
+  }
+}
+
+// ===================== Computer =====================
+function pathClear(bs, x1, y1, x2, y2, ex1, ex2) {
+  const ex = x2 - x1, ey = y2 - y1, l2 = ex * ex + ey * ey || 1e-9;
+  for (const b of bs) {
+    if (!b.on || b.n === ex1 || b.n === ex2) continue;
+    let t = ((b.x - x1) * ex + (b.y - y1) * ey) / l2; t = clamp(t, 0, 1);
+    if ((x1 + t * ex - b.x) ** 2 + (y1 + t * ey - b.y) ** 2 < (2 * R - 0.2) ** 2) return false;
+  }
+  return true;
+}
+function ease(cx, cy, gx, gy, ux, uy, d2) {
+  const ax = gx - cx, ay = gy - cy, d1 = Math.hypot(ax, ay);
+  const c = d1 < 0.5 ? 1 : (ax * ux + ay * uy) / d1;
+  if (c < 0.25) return 0;
+  return c * c * 70 / (40 + d1 + d2 * 1.4);
+}
+// Liste möglicher direkter Stöße (Zielkugel -> Tasche)
+function combos(bs, targets, cue, bih, kitchen) {
+  const out = [];
+  for (const t of targets) {
+    const tb = getBall(bs, t); if (!tb) continue;
+    for (let k = 0; k < 6; k++) {
+      const ap = AIM_PTS[k];
+      let ux = ap.x - tb.x, uy = ap.y - tb.y; const dd = Math.hypot(ux, uy); ux /= dd; uy /= dd;
+      if ((k === 1 || k === 4) && Math.abs(uy) < 0.4) continue;
+      if (!pathClear(bs, tb.x, tb.y, ap.x, ap.y, 0, t)) continue;
+      const gx = tb.x - ux * 2 * R, gy = tb.y - uy * 2 * R;
+      if (bih) {
+        for (const D of [16, 30, 48]) for (const off of [0, 0.3, -0.3]) {
+          const a = Math.atan2(uy, ux) + off, px = gx - Math.cos(a) * D, py = gy - Math.sin(a) * D;
+          if (!placeOK(bs, px, py, kitchen) || !pathClear(bs, px, py, gx, gy, 0, t)) continue;
+          out.push({t, k, place: {x: px, y: py}, gx, gy, e: ease(px, py, gx, gy, ux, uy, dd)});
+        }
+      } else {
+        if (!pathClear(bs, cue.x, cue.y, gx, gy, 0, t)) continue;
+        const e = ease(cue.x, cue.y, gx, gy, ux, uy, dd);
+        if (e > 0) out.push({t, k, place: null, gx, gy, e});
+      }
+    }
+  }
+  return out;
+}
+function bestEase(bs, group) {
+  const cue = getBall(bs, 0);
+  if (!cue.on) return 1;
+  let best = 0;
+  for (const c of combos(bs, legalTargets(G.mode, group, onSet(bs)), cue, false, false)) if (c.e > best) best = c.e;
+  return best;
+}
+function evalShot(base, place, shot, called) {
+  let bs = base;
+  if (place) { bs = cloneBalls(base); const c = getBall(bs, 0); c.x = place.x; c.y = place.y; c.on = true; }
+  const S = runSim(bs, shot, false);
+  if (called === null) { const e = S.ev.potted.find(p => p.n === 8); called = e ? e.pocket : null; }
+  const r = judge(onSet(base), S.ev, called, base);
+  const me = G.cur;
+  if (r.win === me) return {score: 1e5, called};
+  if (r.win !== null) return {score: -1e5, called};
+  if (r.foul) return {score: -3000, called};
+  if (r.cont) return {score: 1000 + bestEase(S.balls, r.assign || G.players[me].group) * 800, called};
+  const og = r.assign ? otherGroup(r.assign) : G.players[1 - me].group;
+  return {score: 200 - bestEase(S.balls, og) * 800, called};
+}
+function* aiThink() {
+  const me = G.cur, diff = G.diff, base = G.balls;
+  if (G.isBreak) {
+    const pos = findFree(base, W * 0.2, H / 2 + (Math.random() - 0.5) * H * 0.5, true);
+    return {place: pos, angle: Math.atan2(FOOT.y - pos.y, FOOT.x - pos.x) + gauss() * 0.004, power: 0.95, sx: 0, sy: 0, called: null};
+  }
+  const cue = getBall(base, 0), kitchen = G.bih === 'kitchen';
+  const list = combos(base, legalTargets(G.mode, G.players[me].group, onSet(base)), cue, !!G.bih, kitchen).sort((a, b) => b.e - a.e);
+  const powers = [[0.42], [0.32, 0.55], [0.26, 0.4, 0.58, 0.8]][diff];
+  const spins = diff === 2 ? [0, -0.6, 0.5] : [0];
+  let best = null;
+  const consider = c => { if (!best || c.score > best.score) best = c; };
+  for (const cb of list.slice(0, [3, 6, 10][diff])) {
+    const px = cb.place ? cb.place.x : cue.x, py = cb.place ? cb.place.y : cue.y;
+    const angle = Math.atan2(cb.gy - py, cb.gx - px);
+    for (const power of powers) for (const sy of spins) {
+      const res = evalShot(base, cb.place, {angle, power, sx: 0, sy}, cb.k);
+      consider({place: cb.place, angle, power, sx: 0, sy, called: res.called, score: res.score});
+      yield;
+    }
+  }
+  if (!best || best.score < 500) {
+    // Kein sicherer Stoß: Winkel absuchen (Sicherheitsstoß, Bandenstoß)
+    const place = G.bih ? (best && best.place) || findFree(base, W * 0.22, H / 2, kitchen) : null;
+    const step = [6, 4, 3][diff] * Math.PI / 180;
+    for (let a = 0; a < TAU; a += step) for (const power of diff ? [0.3, 0.55] : [0.45]) {
+      const res = evalShot(base, place, {angle: a, power, sx: 0, sy: 0}, null);
+      consider({place, angle: a, power, sx: 0, sy: 0, called: res.called, score: res.score});
+      if (Math.floor(a / step) % 4 === 0) yield;
+    }
+  }
+  best.angle += gauss() * [0.02, 0.007, 0.0022][diff];
+  best.power = clamp(best.power * (1 + gauss() * [0.08, 0.04, 0.015][diff]), 0.05, 1);
+  return best;
+}
+function startAI() { G.state = 'ai'; G.aiGen = aiThink(); G.aiStart = performance.now(); }
+function runAI() {
+  const t0 = performance.now();
+  while (performance.now() - t0 < 14) {
+    const r = G.aiGen.next();
+    if (r.done) {
+      const c = r.value;
+      if (c.place) { const cue = getBall(G.balls, 0); cue.x = c.place.x; cue.y = c.place.y; cue.on = true; }
+      G.aim = c.angle; G.power = c.power; G.sx = c.sx; G.sy = c.sy;
+      G.called = c.called; G.ver++;
+      G.state = 'aipreview'; G.aiT = performance.now();
+      return;
+    }
+  }
+}
+
+// ===================== Ton =====================
+let AC = null, NOISE = null, MASTER = null;
+function initAudio() {
+  if (AC || !CFG.sound) return;
+  try {
+    AC = new (window.AudioContext || window.webkitAudioContext)();
+    MASTER = AC.createGain(); MASTER.gain.value = 0.9; MASTER.connect(AC.destination);
+    const len = Math.floor(AC.sampleRate * 0.5);
+    NOISE = AC.createBuffer(1, len, AC.sampleRate);
+    const d = NOISE.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+  } catch (e) { AC = null; }
+}
+function tone(freq, t0, dur, vol, type, freqEnd) {
+  const o = AC.createOscillator(), g = AC.createGain();
+  o.type = type || 'sine'; o.frequency.setValueAtTime(freq, t0);
+  if (freqEnd) o.frequency.exponentialRampToValueAtTime(freqEnd, t0 + dur);
+  g.gain.setValueAtTime(vol, t0); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  o.connect(g); g.connect(MASTER); o.start(t0); o.stop(t0 + dur + 0.02);
+}
+function noise(t0, dur, vol, ftype, freq, q) {
+  const s = AC.createBufferSource(), f = AC.createBiquadFilter(), g = AC.createGain();
+  s.buffer = NOISE; f.type = ftype; f.frequency.value = freq; f.Q.value = q || 1;
+  g.gain.setValueAtTime(vol, t0); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  s.connect(f); f.connect(g); g.connect(MASTER); s.start(t0, Math.random() * 0.4); s.stop(t0 + dur + 0.02);
+}
+function playSound(type, v) {
+  if (!AC || !CFG.sound || TIME_SCALE > 1) return;
+  try {
+    if (AC.state === 'suspended') AC.resume();
+    const t = AC.currentTime;
+    if (type === 'ball') {
+      const vol = Math.min(1, v / 320); if (vol < 0.03) return;
+      noise(t, 0.03, vol * 0.8, 'bandpass', 3600, 1.3); tone(2400 + Math.random() * 600, t, 0.035, vol * 0.3);
+    } else if (type === 'rail') {
+      const vol = Math.min(0.7, v / 450); if (vol < 0.03) return;
+      noise(t, 0.09, vol * 0.7, 'lowpass', 450, 0.8); tone(150, t, 0.11, vol * 0.45, 'sine', 70);
+    } else if (type === 'pocket') {
+      tone(105, t, 0.28, 0.5, 'sine', 50); noise(t, 0.12, 0.3, 'lowpass', 700);
+      for (let i = 1; i < 4; i++) noise(t + 0.07 * i + Math.random() * 0.03, 0.03, 0.2 / i, 'bandpass', 2000, 2);
+    } else if (type === 'cue') {
+      noise(t, 0.04, 0.25 + v * 0.45, 'bandpass', 1400, 1.5); tone(780, t, 0.05, 0.12 + v * 0.2, 'triangle', 380);
+    } else if (type === 'win') {
+      [523, 659, 784, 1047].forEach((f, i) => tone(f, t + i * 0.12, 0.4, 0.16, 'triangle'));
+    } else if (type === 'foul') {
+      tone(240, t, 0.32, 0.16, 'sawtooth', 140);
+    } else if (type === 'chat') {
+      tone(880, t, 0.09, 0.12, 'sine'); tone(1320, t + 0.08, 0.12, 0.1, 'sine');
+    }
+  } catch (e) {}
+}
+function vibrate(ms) { if (CFG.vib && navigator.vibrate) { try { navigator.vibrate(ms); } catch (e) {} } }
+
+// ===================== Effekte =====================
+let FLOATS = [], CONFETTI = [], SHAKE = 0;
+// Schwebender Text im Tisch-Koordinatensystem
+function floatText(text, x, y, color) { FLOATS.push({text, x: clamp(x, 14, W - 14), y: clamp(y, 8, H - 4), t0: performance.now(), color: color || '#ffd75a'}); }
+function drawFloats(now) {
+  FLOATS = FLOATS.filter(f => now - f.t0 < 1500);
+  const px = 1 / L.s;
+  for (const f of FLOATS) {
+    const t = (now - f.t0) / 1500;
+    ctx.globalAlpha = t < 0.15 ? t / 0.15 : 1 - Math.max(0, t - 0.6) / 0.4;
+    ctx.font = 'bold ' + (15 * px * (1 + 0.15 * Math.sin(Math.min(1, t * 4) * Math.PI))).toFixed(2) + 'px system-ui,sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.lineWidth = 3 * px; ctx.strokeStyle = 'rgba(0,0,0,.7)'; ctx.strokeText(f.text, f.x, f.y - t * 10);
+    ctx.fillStyle = f.color; ctx.fillText(f.text, f.x, f.y - t * 10);
+  }
+  ctx.globalAlpha = 1;
+}
+function confetti() {
+  const cols = ['#f2b632', '#e0412f', '#3fb68b', '#1f4fd1', '#ffffff', '#b04fd1'];
+  for (let i = 0; i < 160; i++) {
+    CONFETTI.push({x: VW * (0.2 + Math.random() * 0.6), y: VH * 0.45, vx: (Math.random() - 0.5) * 520, vy: -250 - Math.random() * 420,
+      rot: Math.random() * TAU, vr: (Math.random() - 0.5) * 14, c: cols[i % cols.length], w: 4 + Math.random() * 5, t0: performance.now()});
+  }
+}
+function drawConfetti(dt) {
+  if (!CONFETTI.length) return;
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  const now = performance.now();
+  CONFETTI = CONFETTI.filter(p => now - p.t0 < 3500 && p.y < VH + 20);
+  for (const p of CONFETTI) {
+    p.vy += 600 * dt; p.vx *= 0.99; p.x += p.vx * dt; p.y += p.vy * dt; p.rot += p.vr * dt;
+    ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot); ctx.fillStyle = p.c;
+    ctx.fillRect(-p.w / 2, -p.w * 0.3, p.w, p.w * 0.6 * Math.abs(Math.cos(p.rot * 1.7)) + 1); ctx.restore();
+  }
+}
+function applyShake() {
+  if (SHAKE < 0.2) { if (cv.style.transform) cv.style.transform = ''; SHAKE = 0; return; }
+  cv.style.transform = 'translate(' + ((Math.random() - 0.5) * SHAKE).toFixed(1) + 'px,' + ((Math.random() - 0.5) * SHAKE).toFixed(1) + 'px)';
+  SHAKE *= 0.86;
+}
+
+// ===================== Statistik =====================
+const STATS = {games: 0, wins: 0, shots: 0, pots: 0, fouls: 0, best: 0};
+try { Object.assign(STATS, JSON.parse(localStorage.getItem('billard_stats') || '{}')); } catch (e) {}
+const saveStats = () => { try { localStorage.setItem('billard_stats', JSON.stringify(STATS)); } catch (e) {} };
+const localIdx = () => G && G.online ? NET.me : 0;
+function showStats() {
+  const pct = (a, b) => b ? Math.round(a / b * 100) + ' %' : '–';
+  const stars = SOLO.stars.reduce((a, b) => a + (b || 0), 0);
+  const rows = [['Gespielte Partien', STATS.games], ['Siege (gegen Computer/online)', STATS.wins], ['Siegquote', pct(STATS.wins, STATS.games)],
+    ['Stöße', STATS.shots], ['Versenkte Kugeln', STATS.pots], ['Treffer pro Stoß', pct(STATS.pots, STATS.shots)], ['Fouls', STATS.fouls],
+    ['Beste Serie (Kugeln am Stück)', STATS.best], ['Rekord Trefferserie', SOLO.hi], ['Sterne in Herausforderungen', stars + ' / ' + LEVELS.length * 3]];
+  $('statsTable').innerHTML = rows.map(r => '<tr><td>' + r[0] + '</td><td>' + r[1] + '</td></tr>').join('');
+  show('stats');
+}
+
+// ===================== Online (direkt Handy zu Handy) =====================
+// WebRTC-Datenkanal ohne eigenen Server: Die Verbindungsdaten werden einmal als
+// Code ausgetauscht. Öffentliche STUN-Server helfen nur, die eigene Adresse zu finden.
+const NET = {on: false, pc: null, dc: null, role: null, me: 0, pending: null, lastAim: 0, aimKey: '', peerName: ''};
+const ICE_SERVERS = [{urls: ['stun:stun.l.google.com:19302', 'stun:stun1.l.google.com:19302']}, {urls: 'stun:stun.cloudflare.com:3478'}];
+async function packCode(desc) {
+  const json = JSON.stringify({t: desc.type, s: desc.sdp});
+  try {
+    if (window.CompressionStream) {
+      const st = new Blob([json]).stream().pipeThrough(new CompressionStream('deflate-raw'));
+      const buf = new Uint8Array(await new Response(st).arrayBuffer());
+      let bin = ''; for (let i = 0; i < buf.length; i++) bin += String.fromCharCode(buf[i]);
+      return 'BL1' + btoa(bin);
+    }
+  } catch (e) {}
+  return 'BL0' + btoa(unescape(encodeURIComponent(json)));
+}
+async function unpackCode(code) {
+  code = (code || '').replace(/\s+/g, '');
+  const i = code.indexOf('BL');
+  if (i < 0) throw new Error('Das ist kein gültiger Code.');
+  code = code.slice(i);
+  const kind = code.slice(0, 3), b64 = code.slice(3).replace(/[^A-Za-z0-9+/=]/g, '');
+  let json;
+  if (kind === 'BL1') {
+    const bin = atob(b64), buf = new Uint8Array(bin.length);
+    for (let k = 0; k < bin.length; k++) buf[k] = bin.charCodeAt(k);
+    const st = new Blob([buf]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+    json = await new Response(st).text();
+  } else json = decodeURIComponent(escape(atob(b64)));
+  const o = JSON.parse(json);
+  return {type: o.t, sdp: o.s};
+}
+function waitIce(pc) {
+  return new Promise(res => {
+    if (pc.iceGatheringState === 'complete') return res();
+    pc.addEventListener('icegatheringstatechange', () => { if (pc.iceGatheringState === 'complete') res(); });
+    setTimeout(res, 4000);
+  });
+}
+function netReset() {
+  try { if (NET.dc) NET.dc.close(); if (NET.pc) NET.pc.close(); } catch (e) {}
+  Object.assign(NET, {on: false, pc: null, dc: null, pending: null, aimKey: ''});
+}
+function newPeer() {
+  const pc = new RTCPeerConnection({iceServers: ICE_SERVERS});
+  pc.onconnectionstatechange = () => {
+    const s = pc.connectionState;
+    if (s === 'connecting') onlineStatus('Verbinde …');
+    if (s === 'failed') onlineStatus('Verbindung fehlgeschlagen. Versucht es im selben WLAN oder über einen Handy-Hotspot.');
+    if (s === 'disconnected' || s === 'closed' || s === 'failed') netLost();
+  };
+  return pc;
+}
+async function netHost() {
+  netReset(); NET.role = 'host'; NET.me = 0;
+  const pc = NET.pc = newPeer();
+  setupChannel(pc.createDataChannel('billard', {ordered: true}));
+  await pc.setLocalDescription(await pc.createOffer());
+  await waitIce(pc);
+  return packCode(pc.localDescription);
+}
+async function netHostAccept(code) { await NET.pc.setRemoteDescription(await unpackCode(code)); }
+async function netJoin(code) {
+  netReset(); NET.role = 'guest'; NET.me = 1;
+  const pc = NET.pc = newPeer();
+  pc.ondatachannel = e => setupChannel(e.channel);
+  await pc.setRemoteDescription(await unpackCode(code));
+  await pc.setLocalDescription(await pc.createAnswer());
+  await waitIce(pc);
+  return packCode(pc.localDescription);
+}
+function setupChannel(dc) {
+  NET.dc = dc;
+  dc.onopen = () => { NET.on = true; onlineStatus('Verbunden!'); netSend({t: 'hello', name: myName(), mode: +CFG.mode, cue: PROFILE.cue}); };
+  dc.onclose = () => netLost();
+  dc.onmessage = e => { let m; try { m = JSON.parse(e.data); } catch (err) { return; } onNetMsg(m); };
+}
+function netSend(o) { if (NET.dc && NET.dc.readyState === 'open') NET.dc.send(JSON.stringify(o)); }
+function netLost() {
+  if (!NET.on) return;
+  NET.on = false;
+  if (G && G.online) { G.online = false; toast('Verbindung zum Mitspieler getrennt. Ihr könnt an diesem Handy weiterspielen.', 5000); updateUI(); }
+}
+function myName() { return (CFG.name || '').trim() || 'Spieler 1'; }
+function netStartGame() {
+  const mode = NET.mode === 9 ? 9 : 8, cur = Math.random() < 0.5 ? 0 : 1;
+  const d = {mode, balls: rack(mode), cur, names: [myName(), NET.peerName || 'Gast']};
+  netSend({t: 'start', d});
+  startOnline(d);
+}
+function startOnline(d) {
+  hide('online'); hide('menu'); hide('over'); hide('pushDlg');
+  newGame({mode: d.mode, balls: d.balls, cur: d.cur, names: d.names, online: true});
+  toast(G.players[G.cur].name + ' hat den Anstoß. ' + (G.cur === NET.me ? 'Du bist dran!' : 'Warte auf den Anstoß.'), 3500);
+}
+function snapshot() {
+  return {balls: G.balls.map(b => [b.n, b.x, b.y, b.on ? 1 : 0]), players: G.players.map(p => ({group: p.group, fouls: p.fouls})),
+    cur: G.cur, isBreak: G.isBreak, bih: G.bih, pushAvail: G.pushAvail, state: G.state, winner: G.winner, winReason: G.winReason,
+    msg: G.toast && performance.now() < G.toast.until ? G.toast.text : ''};
+}
+function applyNetState(g) {
+  for (const [n, x, y, on] of g.balls) { const b = getBall(G.balls, n); b.x = x; b.y = y; b.on = !!on; b.vx = b.vy = 0; }
+  g.players.forEach((p, i) => { G.players[i].group = p.group; G.players[i].fouls = p.fouls; });
+  G.cur = g.cur; G.isBreak = g.isBreak; G.bih = g.bih; G.pushAvail = g.pushAvail; G.ver++;
+  if (g.msg) toast(g.msg, 3500);
+  if (g.state === 'over') { endGame(g.winner, g.winReason); return; }
+  if (g.state === 'push') { G.state = 'push'; G.pushShot = false; showPushDecision(); updateUI(); return; }
+  startTurn();
+}
+function aimMsg(t) { const c = getBall(G.balls, 0); return {t, aim: G.aim, power: G.power, sx: G.sx, sy: G.sy, cx: c.x, cy: c.y, called: G.called, push: !!G.pushShot}; }
+function applyAim(m) {
+  G.aim = m.aim; G.power = m.power; G.sx = m.sx; G.sy = m.sy; G.called = m.called; G.calledManual = true;
+  const c = getBall(G.balls, 0);
+  if (c.x !== m.cx || c.y !== m.cy) { c.x = m.cx; c.y = m.cy; c.on = true; G.ver++; }
+}
+function onNetMsg(m) {
+  if (m.t === 'hello') {
+    NET.peerName = (m.name || 'Gast').slice(0, 16);
+    NET.peerCue = CUES[m.cue] ? m.cue : 'klassik';
+    if (NET.role === 'host') netStartGame();
+  } else if (m.t === 'start') startOnline(m.d);
+  else if (!G || !G.online) return;
+  else if (m.t === 'aim') { if (G.state === 'aim' && G.cur !== NET.me) applyAim(m); }
+  else if (m.t === 'shot') {
+    if (G.state === 'replay') endReplay();
+    applyAim(m); G.pushShot = m.push; G.spinUI = false;
+    G.state = 'strike'; G.strikeT = performance.now(); updateUI();
+  } else if (m.t === 'state') {
+    if (G.state === 'strike' || G.state === 'moving') NET.pending = m.g; else applyNetState(m.g);
+  } else if (m.t === 'push') {
+    hide('pushDlg');
+    if (!m.take) G.cur = 1 - G.cur;
+    toast(m.take ? G.players[1 - NET.me].name + ' spielt selbst weiter.' : G.players[1 - NET.me].name + ' gibt zurück.');
+    startTurn();
+  } else if (m.t === 'chat') { toast(NET.peerName + ': ' + String(m.text).slice(0, 40), 3000); playSound('chat', 0); }
+  else if (m.t === 'rematch') { if (NET.role === 'host') netStartGame(); else toast(NET.peerName + ' möchte eine Revanche!'); }
+}
+// Live-Übertragung der Zielbewegung an den Gegner
+function netTick(now) {
+  if (!G || !G.online || !NET.on || !isHumanTurn()) return;
+  const c = getBall(G.balls, 0);
+  const key = [G.aim, G.power, G.sx, G.sy, c.x, c.y, G.called].join('|');
+  if (key !== NET.aimKey && now - NET.lastAim > 70) { NET.aimKey = key; NET.lastAim = now; netSend(aimMsg('aim')); }
+}
+// Teilen / Kopieren / Einfügen (in der App über die Android-Brücke)
+function shareText(t) {
+  if (window.AndroidBridge) AndroidBridge.share(t);
+  else if (navigator.share) navigator.share({text: t}).catch(() => copyText(t));
+  else copyText(t);
+}
+function copyText(t) {
+  if (window.AndroidBridge) AndroidBridge.copy(t);
+  else { try { navigator.clipboard.writeText(t); } catch (e) {} }
+  onlineStatus('Code kopiert.');
+}
+async function pasteText() {
+  if (window.AndroidBridge) return AndroidBridge.paste() || '';
+  try { return await navigator.clipboard.readText(); } catch (e) { return ''; }
+}
+function onlineStatus(t) { $('onStatus').textContent = t; }
+
+// ===================== Profil, Münzen und Belohnungen =====================
+const PROFILE = {coins: 150, xp: 0, cue: 'klassik', cues: ['klassik'], cloths: ['blau', 'gruen'], daily: {last: '', streak: 0}};
+try { Object.assign(PROFILE, JSON.parse(localStorage.getItem('billard_profile') || '{}')); } catch (e) {}
+const saveProfile = () => { try { localStorage.setItem('billard_profile', JSON.stringify(PROFILE)); } catch (e) {} };
+const CLOTH_SHOP = {blau: ['Turnierblau', 0], gruen: ['Klassisch Grün', 0], rot: ['Weinrot', 250], grau: ['Stahlgrau', 250], lila: ['Königslila', 400], schwarz: ['Mitternacht', 800]};
+if (!PROFILE.cloths.includes(CFG.cloth)) CFG.cloth = 'blau';
+if (!PROFILE.cues.includes(PROFILE.cue)) PROFILE.cue = 'klassik';
+const levelOf = xp => Math.floor(Math.sqrt(xp / 60)) + 1;
+const levelXp = l => (l - 1) * (l - 1) * 60;
+const fmt = n => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+// Münzen und Erfahrung gutschreiben; gibt die Münzen inkl. Level-Bonus zurück
+function gain(coins, xp) {
+  const before = levelOf(PROFILE.xp);
+  PROFILE.coins += coins; PROFILE.xp += xp;
+  const after = levelOf(PROFILE.xp);
+  let bonus = 0;
+  if (after > before) { bonus = 75 * (after - before); PROFILE.coins += bonus; toast('⭐ Level ' + after + ' erreicht! Bonus: ' + bonus + ' 🪙', 4000); }
+  saveProfile();
+  return coins + bonus;
+}
+function showReward(coins, xp) {
+  $('overReward').innerHTML = coins || xp ? '<span>+' + fmt(coins) + ' 🪙</span><span>+' + xp + ' EP</span>' : '';
+}
+const dayKey = d => d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+const dailyAvail = () => PROFILE.daily.last !== dayKey(new Date());
+function claimDaily() {
+  if (!dailyAvail()) return;
+  const yesterday = dayKey(new Date(Date.now() - 864e5));
+  PROFILE.daily.streak = PROFILE.daily.last === yesterday ? PROFILE.daily.streak + 1 : 1;
+  PROFILE.daily.last = dayKey(new Date());
+  const c = 50 + 25 * Math.min(PROFILE.daily.streak - 1, 6);
+  gain(c, 10);
+  $('lbMsg').textContent = '🎁 Tag ' + PROFILE.daily.streak + ' in Folge: +' + c + ' Münzen! Morgen gibt es mehr.';
+  confetti(); playSound('win', 0);
+  renderLobby();
+}
+function renderLobby() {
+  const name = myName(), lvl = levelOf(PROFILE.xp), a = levelXp(lvl), b = levelXp(lvl + 1);
+  $('lbName').textContent = name;
+  $('lbAvatar').textContent = name.trim().charAt(0).toUpperCase() || 'S';
+  $('lbLevel').textContent = 'Level ' + lvl + ' · ' + (PROFILE.xp - a) + ' / ' + (b - a) + ' EP';
+  $('lbXp').style.width = Math.round((PROFILE.xp - a) / (b - a) * 100) + '%';
+  $('lbCoins').textContent = '🪙 ' + fmt(PROFILE.coins);
+  const d = dailyAvail();
+  $('bDaily').textContent = d ? '🎁 Tagesbonus abholen' : '🎁 Morgen wieder';
+  $('bDaily').classList.toggle('ready', d); $('bDaily').disabled = !d;
+  $('tAi').textContent = 'Sieg: ' + [30, 60, 120][+CFG.diff] + ' 🪙';
+  const stars = SOLO.stars.reduce((x, y) => x + (y || 0), 0);
+  $('tLv').textContent = '★ ' + stars + ' / ' + LEVELS.length * 3;
+  $('tArc').textContent = 'Rekord: ' + fmt(SOLO.hi);
+}
+// Belohnung für eine beendete Partie (8-Ball / 9-Ball)
+function rewardGame(winner) {
+  const li = localIdx(), won = winner === li;
+  let c, x;
+  if (G.online) { c = won ? 80 : 10; x = won ? 60 : 20; }
+  else if (G.ai[1]) { c = won ? [30, 60, 120][G.diff] : 5; x = won ? [30, 45, 70][G.diff] : 15; }
+  else { c = 10; x = 15; }
+  showReward(gain(c, x), x);
+}
+
+// ===================== Shop =====================
+let shopTab = 'cues';
+function showShop() { renderShop(); hide('menu'); show('shop'); }
+function renderShop() {
+  $('shopCoins').textContent = '🪙 ' + fmt(PROFILE.coins);
+  document.querySelectorAll('#shopTabs button').forEach(b => b.classList.toggle('sel', b.dataset.tab === shopTab));
+  const grid = $('shopGrid'); grid.innerHTML = '';
+  const items = shopTab === 'cues'
+    ? Object.keys(CUES).map(id => ({id, name: CUES[id].name, price: CUES[id].price, owned: PROFILE.cues.includes(id), active: PROFILE.cue === id}))
+    : Object.keys(CLOTH_SHOP).map(id => ({id, name: CLOTH_SHOP[id][0], price: CLOTH_SHOP[id][1], owned: PROFILE.cloths.includes(id), active: CFG.cloth === id}));
+  for (const it of items) {
+    const card = document.createElement('div');
+    card.className = 'card' + (it.active ? ' active' : '');
+    const prev = document.createElement('canvas');
+    prev.className = 'prev';
+    card.appendChild(prev);
+    const t = document.createElement('div'); t.className = 'cname'; t.textContent = it.name; card.appendChild(t);
+    const btn = document.createElement('button');
+    if (it.active) { btn.textContent = '✓ Ausgerüstet'; btn.disabled = true; }
+    else if (it.owned) { btn.textContent = 'Ausrüsten'; btn.className = 'eq'; }
+    else { btn.textContent = '🪙 ' + fmt(it.price); btn.className = 'buy'; if (PROFILE.coins < it.price) btn.classList.add('poor'); }
+    btn.onclick = () => shopAction(it);
+    card.appendChild(btn);
+    grid.appendChild(card);
+    requestAnimationFrame(() => paintPreview(prev, it.id));
+  }
+}
+function paintPreview(c, id) {
+  const w = c.clientWidth || 150, h = c.clientHeight || 40;
+  c.width = w * DPR; c.height = h * DPR;
+  const g = c.getContext('2d');
+  if (shopTab === 'cues') {
+    g.setTransform(DPR * w / 160, 0, 0, DPR * w / 160, 0, DPR * h / 2);
+    paintCueShape(g, 6, 146, CUES[id], 1.1, 2.6);
+  } else {
+    const cl = CLOTHS[id], gr = g.createRadialGradient(w * DPR / 2, h * DPR / 2, 4, w * DPR / 2, h * DPR / 2, w * DPR * 0.6);
+    gr.addColorStop(0, cl.cush[0]); gr.addColorStop(0.5, cl.main); gr.addColorStop(1, cl.band);
+    g.fillStyle = '#4a250f'; g.fillRect(0, 0, c.width, c.height);
+    g.fillStyle = gr; g.fillRect(5 * DPR, 5 * DPR, c.width - 10 * DPR, c.height - 10 * DPR);
+  }
+}
+function shopAction(it) {
+  if (!it.owned) {
+    if (PROFILE.coins < it.price) { $('shopMsg').textContent = 'Dir fehlen noch ' + fmt(it.price - PROFILE.coins) + ' Münzen. Gewinne Partien und Herausforderungen!'; return; }
+    PROFILE.coins -= it.price;
+    (shopTab === 'cues' ? PROFILE.cues : PROFILE.cloths).push(it.id);
+    $('shopMsg').textContent = '🎉 ' + it.name + ' gekauft!';
+    playSound('win', 0);
+  }
+  if (shopTab === 'cues') PROFILE.cue = it.id;
+  else { CFG.cloth = it.id; saveCfg(); applyCloth(); }
+  saveProfile(); renderShop();
+}
+
+// ===================== 3D-Lobby =====================
+// Perspektivische Tischszene mit rollenden Kugeln hinter dem Lobby-Menü.
+const LB = {cv: null, ctx: null, balls: [], dust: [], t: 0, nextShot: 0, w: 0, h: 0, dpr: 1};
+const LB_TW = 1.27, LB_TL = 2.54, LB_R = 0.0286; // halbe Tischbreite, Tischlänge, Kugelradius (m)
+function lbProject(x, y, z) {
+  // Kamera über der vorderen Kante, leicht nach unten geneigt
+  const camY = 1.05, camZ = -0.55, pitch = 0.62, f = LB.h * 1.15;
+  const X = x, Y = y - camY, Z = z - camZ;
+  const c = Math.cos(pitch), s = Math.sin(pitch);
+  const y2 = Y * c + Z * s, z2 = -Y * s + Z * c;
+  return {x: LB.w / 2 + f * X / z2, y: LB.h * 0.42 - f * y2 / z2, k: f / z2};
+}
+function initLobbyBg() {
+  LB.cv = $('lobbyBg'); LB.ctx = LB.cv.getContext('2d');
+  const nums = [0, 1, 9, 8, 3, 11, 6, 14, 5];
+  LB.balls = nums.map((n, i) => ({n, x: (Math.random() - 0.5) * 1.8, z: 0.5 + Math.random() * 1.8, vx: 0, vz: 0,
+    M: mul3(rotAxis(1, 0, 0, Math.random() * 6), rotAxis(0, 1, 0, Math.random() * 6)), ver: i * 1000, sx: 0, sy: 0}));
+  LB.dust = Array.from({length: 46}, () => ({x: Math.random(), y: Math.random(), v: 0.004 + Math.random() * 0.012, a: Math.random() * TAU}));
+  LB.nextShot = performance.now() + 900;
+}
+function lobbyResize() {
+  if (!LB.cv) return;
+  LB.dpr = Math.min(window.devicePixelRatio || 1, 2);
+  LB.w = innerWidth; LB.h = innerHeight;
+  LB.cv.width = Math.round(LB.w * LB.dpr); LB.cv.height = Math.round(LB.h * LB.dpr);
+}
+function lobbyStep(dt, now) {
+  const bs = LB.balls;
+  // Regelmäßig wird eine Kugel angestoßen
+  if (now > LB.nextShot) {
+    const a = bs[Math.floor(Math.random() * bs.length)], b = bs[Math.floor(Math.random() * bs.length)];
+    let dx = b.x - a.x, dz = b.z - a.z; const d = Math.hypot(dx, dz) || 1;
+    if (a === b) { dx = Math.random() - 0.5; dz = Math.random() - 0.5; }
+    const sp = 1.1 + Math.random() * 1.4;
+    a.vx += dx / d * sp; a.vz += dz / d * sp;
+    LB.nextShot = now + 2200 + Math.random() * 2600;
+  }
+  const steps = 4, h = dt / steps;
+  for (let k = 0; k < steps; k++) {
+    for (const b of bs) {
+      const v = Math.hypot(b.vx, b.vz);
+      if (v > 0) { const nv = Math.max(0, v - (0.22 + 0.25 * v) * h); b.vx *= nv / v; b.vz *= nv / v; }
+      b.x += b.vx * h; b.z += b.vz * h;
+      const lim = LB_TW - LB_R;
+      if (b.x < -lim) { b.x = -lim; b.vx = Math.abs(b.vx) * 0.8; } if (b.x > lim) { b.x = lim; b.vx = -Math.abs(b.vx) * 0.8; }
+      if (b.z < LB_R + 0.05) { b.z = LB_R + 0.05; b.vz = Math.abs(b.vz) * 0.8; } if (b.z > LB_TL - LB_R) { b.z = LB_TL - LB_R; b.vz = -Math.abs(b.vz) * 0.8; }
+    }
+    for (let i = 0; i < bs.length; i++) for (let j = i + 1; j < bs.length; j++) {
+      const a = bs[i], b = bs[j], dx = b.x - a.x, dz = b.z - a.z, d = Math.hypot(dx, dz);
+      if (d >= 2 * LB_R || d === 0) continue;
+      const nx = dx / d, nz = dz / d, ov = (2 * LB_R - d) / 2;
+      a.x -= nx * ov; a.z -= nz * ov; b.x += nx * ov; b.z += nz * ov;
+      const rv = (a.vx - b.vx) * nx + (a.vz - b.vz) * nz;
+      if (rv > 0) { const j2 = rv * 0.97; a.vx -= j2 * nx; a.vz -= j2 * nz; b.vx += j2 * nx; b.vz += j2 * nz; }
+    }
+  }
+}
+function drawLobbyBg(now, dt) {
+  if (!LB.cv) return;
+  if (LB.w !== innerWidth || LB.h !== innerHeight) lobbyResize();
+  lobbyStep(Math.min(dt, 0.05), now);
+  const c = LB.ctx, d = LB.dpr, W2 = LB.w, H2 = LB.h;
+  c.setTransform(d, 0, 0, d, 0, 0);
+  // Raum
+  const bg = c.createRadialGradient(W2 / 2, H2 * 0.2, 10, W2 / 2, H2 * 0.5, Math.max(W2, H2));
+  bg.addColorStop(0, '#2a2118'); bg.addColorStop(0.5, '#120e0a'); bg.addColorStop(1, '#030202');
+  c.fillStyle = bg; c.fillRect(0, 0, W2, H2);
+  const P = (x, z, y) => lbProject(x, y || 0, z);
+  const poly = pts => { c.beginPath(); pts.forEach((p, i) => i ? c.lineTo(p.x, p.y) : c.moveTo(p.x, p.y)); c.closePath(); };
+  const rw = 0.17, rh = 0.05;
+  // Holzrahmen (Oberseite und vordere Kante)
+  const o = [P(-LB_TW - rw, -rw, rh), P(LB_TW + rw, -rw, rh), P(LB_TW + rw, LB_TL + rw, rh), P(-LB_TW - rw, LB_TL + rw, rh)];
+  const of = [P(-LB_TW - rw, -rw, rh), P(LB_TW + rw, -rw, rh), P(LB_TW + rw, -rw, -0.12), P(-LB_TW - rw, -rw, -0.12)];
+  c.save(); c.shadowColor = 'rgba(0,0,0,.8)'; c.shadowBlur = 40; c.shadowOffsetY = 20; poly(o); c.fillStyle = '#000'; c.fill(); c.restore();
+  let g = c.createLinearGradient(0, of[0].y, 0, of[2].y); g.addColorStop(0, '#5a2d12'); g.addColorStop(1, '#1d0d04');
+  poly(of); c.fillStyle = g; c.fill();
+  g = c.createLinearGradient(0, o[2].y, 0, o[0].y); g.addColorStop(0, '#3a1c09'); g.addColorStop(1, '#7a421c');
+  poly(o); c.fillStyle = g; c.fill();
+  // Tuch mit Lampenlicht
+  const cl = cloth();
+  const t = [P(-LB_TW, 0, 0.001), P(LB_TW, 0, 0.001), P(LB_TW, LB_TL, 0.001), P(-LB_TW, LB_TL, 0.001)];
+  poly(t); c.fillStyle = cl.band; c.fill();
+  const tc = P(0, LB_TL * 0.45), lr = (t[1].x - t[0].x) * 0.8;
+  g = c.createRadialGradient(tc.x, tc.y, 5, tc.x, tc.y, lr);
+  g.addColorStop(0, cl.cush[0]); g.addColorStop(0.45, cl.main); g.addColorStop(1, cl.band);
+  c.save(); poly(t); c.clip(); c.fillStyle = g; c.fillRect(0, 0, W2, H2);
+  // Banden-Schatten
+  c.globalAlpha = 0.35; c.strokeStyle = '#000'; c.lineWidth = 6; poly(t); c.stroke(); c.globalAlpha = 1;
+  c.restore();
+  // Taschen
+  for (const [px, pz] of [[-LB_TW, 0], [LB_TW, 0], [-LB_TW, LB_TL / 2], [LB_TW, LB_TL / 2], [-LB_TW, LB_TL], [LB_TW, LB_TL]]) {
+    const p = P(px, pz, 0.002), r = 0.065 * p.k;
+    c.beginPath(); c.ellipse(p.x, p.y, r, r * 0.62, 0, 0, TAU); c.fillStyle = '#050403'; c.fill();
+    c.strokeStyle = 'rgba(160,140,110,.35)'; c.lineWidth = 1.5; c.stroke();
+  }
+  // Kugeln (hinten zuerst), mit Schatten und Rollen
+  const order = LB.balls.slice().sort((a, b) => b.z - a.z);
+  for (const b of order) {
+    const p = P(b.x, b.z, LB_R), r = LB_R * p.k;
+    const sp = P(b.x + 0.012, b.z + 0.02, 0.001);
+    c.beginPath(); c.ellipse(sp.x, sp.y, r * 1.05, r * 0.55, 0, 0, TAU); c.fillStyle = 'rgba(0,0,0,.45)'; c.fill();
+    const dxs = p.x - (b.sx || p.x), dys = p.y - (b.sy || p.y), dd = Math.hypot(dxs, dys);
+    if (dd > 0.01 && b.sx) { b.M = mul3(rotAxis(-dys / dd, dxs / dd, 0, dd / r), b.M); b.ver++; if (b.ver % 40 === 0) b.M = orthonorm(b.M); }
+    b.sx = p.x; b.sy = p.y;
+    const rpx = Math.max(3, r * d), s = ballSprite('lb' + b.n, b.n, b.M, b.ver + '@' + Math.round(rpx), rpx);
+    const hs = s.size / 2 / d;
+    c.drawImage(s.cv, p.x - hs, p.y - hs, hs * 2, hs * 2);
+  }
+  // Lampe und Lichtkegel mit Staub
+  const lx = W2 / 2, ly = -10;
+  g = c.createLinearGradient(0, 0, 0, H2 * 0.8);
+  g.addColorStop(0, 'rgba(255,236,190,.16)'); g.addColorStop(1, 'rgba(255,236,190,0)');
+  c.beginPath(); c.moveTo(lx - W2 * 0.12, ly); c.lineTo(lx + W2 * 0.12, ly); c.lineTo(lx + W2 * 0.42, H2 * 0.8); c.lineTo(lx - W2 * 0.42, H2 * 0.8); c.closePath();
+  c.fillStyle = g; c.fill();
+  for (const q of LB.dust) {
+    q.y -= q.v * dt * 0.6; q.a += dt; if (q.y < 0) { q.y = 1; q.x = Math.random(); }
+    const x = lx + (q.x - 0.5) * W2 * 0.5 * (0.4 + q.y) + Math.sin(q.a) * 6, y = q.y * H2 * 0.8;
+    c.fillStyle = 'rgba(255,240,200,' + (0.25 * (1 - q.y)) + ')'; c.fillRect(x, y, 1.6, 1.6);
+  }
+  // Vignette
+  g = c.createRadialGradient(W2 / 2, H2 / 2, Math.min(W2, H2) * 0.35, W2 / 2, H2 / 2, Math.max(W2, H2) * 0.75);
+  g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,.7)');
+  c.fillStyle = g; c.fillRect(0, 0, W2, H2);
+}
+
+// ===================== 3D-Kugel als Symbol (Logo, Ladebildschirm) =====================
+const HERO = {M: mul3(rotAxis(1, 0, 0, 0.35), rotAxis(0, 1, 0, -0.5)), ver: 0};
+function drawHeroBall(canvas, n, dt, speed) {
+  const w = canvas.clientWidth, d = Math.min(window.devicePixelRatio || 1, 2);
+  if (!w) return;
+  if (canvas.width !== Math.round(w * d)) { canvas.width = canvas.height = Math.round(w * d); }
+  HERO.M = mul3(rotAxis(0.25, 1, 0.1, dt * (speed || 0.8)), HERO.M); HERO.ver++;
+  if (HERO.ver % 50 === 0) HERO.M = orthonorm(HERO.M);
+  const rpx = canvas.width / 2 - 2, s = ballSprite('hero' + canvas.id, n, HERO.M, HERO.ver, rpx);
+  const c = canvas.getContext('2d');
+  c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, canvas.width, canvas.height);
+  c.drawImage(s.cv, (canvas.width - s.size) / 2, (canvas.height - s.size) / 2);
+}
+
+// ===================== Ladebildschirm =====================
+const TIPS = [
+  'Tipp: Ziele immer auf die Geisterkugel – nicht auf die Kugel selbst.',
+  'Tipp: Mit ▲ und ▼ drehst du das Ziel in 0,01°-Schritten.',
+  'Tipp: Effet unten bringt die Weiße zurück, oben läuft sie nach.',
+  'Tipp: In den Lektionen lernst du jeden Stoß Schritt für Schritt.',
+  'Tipp: Hol dir jeden Tag deinen Tagesbonus in der Lobby.',
+  'Tipp: Mit „Linien: Aus“ gibt es in der Trefferserie doppelte Punkte.',
+  'Tipp: Online spielst du direkt von Handy zu Handy – ohne Server.'
+];
+function startLoading() {
+  const tasks = [
+    ['Kugeln werden poliert …', () => { for (let n = 1; n <= 15; n++) glyph(n); }],
+    ['Tisch wird aufgebaut …', () => { layout(); drawTableBase(); }],
+    ['Licht wird eingestellt …', () => { for (let n = 0; n <= 15; n++) ballSprite('ti' + n, n, IDENT3, 'i' + R * L.s * DPR, R * L.s * DPR); }],
+    ['Queue wird gekreidet …', () => { initLobbyBg(); lobbyResize(); }],
+    ['Fertig!', () => {}]
+  ];
+  let i = 0, shown = 0;
+  const t0 = performance.now();
+  $('ldTip').textContent = TIPS[Math.floor(Math.random() * TIPS.length)];
+  const tick = now => {
+    const target = (i / tasks.length) * 100;
+    shown += (target - shown) * 0.18 + 0.4;
+    shown = Math.min(shown, target);
+    $('ldBar').style.width = shown.toFixed(1) + '%';
+    $('ldPct').textContent = Math.round(shown) + ' %';
+    drawHeroBall($('ldBall'), 8, 1 / 60, 2.2);
+    if (i < tasks.length && shown >= target - 1) {
+      $('ldText').textContent = tasks[i][0];
+      try { tasks[i][1](); } catch (e) {}
+      i++;
+    }
+    if (i >= tasks.length && shown >= 99 && now - t0 > 1800) {
+      $('loader').classList.add('fade');
+      setTimeout(() => hide('loader'), 600);
+      return;
+    }
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}
+
+// Im Browser: Querformat und Vollbild anbieten
+function tryFullscreen() {
+  if (window.AndroidBridge) return;
+  const el = document.documentElement;
+  try {
+    if (!document.fullscreenElement && el.requestFullscreen) el.requestFullscreen().then(() => { try { screen.orientation.lock('landscape').catch(() => {}); } catch (e) {} }).catch(() => {});
+  } catch (e) {}
+}
+
+// ===================== Wiederholung =====================
+function copyOrient(src) {
+  const o = {}; src = src || G.orient;
+  if (src) for (const n in src) { const q = src[n]; o[n] = {M: q.M.slice(), ver: Math.floor(Math.random() * 1e9), lx: q.lx, ly: q.ly, k: q.k}; }
+  return o;
+}
+function startReplay() {
+  if (!isHumanTurn() || !G.lastShot) return;
+  const S = newSim(G.lastShot.balls, G.lastShot.shot);
+  S.snd = []; S.sunk = 0; S.cueSunk = false;
+  G.replay = {S, saved: G.orient, end: 0};
+  G.orient = copyOrient(G.lastShot.orient);
+  G.state = 'replay'; SINKING = [];
+  updateUI();
+}
+function endReplay() {
+  if (!G.replay) return;
+  G.orient = G.replay.saved;
+  for (const n in G.orient) G.orient[n].ver += 7919;
+  G.replay = null; G.state = 'aim'; SINKING = [];
+  updateUI();
+}
+// Gefallene Kugeln für die Animation und den Ton erfassen
+function trackSinking(S, now) {
+  while (S.sunk < S.ev.potted.length) {
+    const q = S.ev.potted[S.sunk++], b = getBall(S.balls, q.n);
+    SINKING.push({n: q.n, x: b.x, y: b.y, k: q.pocket, t0: now}); vibrate(18);
+  }
+  if (S.ev.cuePotted && !S.cueSunk) {
+    S.cueSunk = true; const b = getBall(S.balls, 0), k = pocketCheck(b);
+    SINKING.push({n: 0, x: b.x, y: b.y, k: k < 0 ? 0 : k, t0: now});
+  }
+  if (S.snd.length) {
+    let n = 0;
+    for (const e of S.snd) { if (e.t === 'ball' && e.v > 420) SHAKE = Math.max(SHAKE, Math.min(7, e.v / 110)); if (n++ < 5) playSound(e.t, e.v); }
+    S.snd.length = 0;
+  }
+}
+
+// ===================== Layout & Zeichnen =====================
+const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+let VW = 0, VH = 0, DPR = 1, L = null;
+function layout() {
+  DPR = Math.min(window.devicePixelRatio || 1, 3); VW = innerWidth; VH = innerHeight;
+  cv.width = Math.round(VW * DPR); cv.height = Math.round(VH * DPR);
+  const lesson = !!(G && G.mode === 0 && G.solo && G.solo.type === 'lesson');
+  const left = lesson ? 6 : 58, right = lesson ? Math.min(290, Math.round(VW * 0.33)) : 104, pad = 4;
+  $('lessonBox').style.width = (right - 14) + 'px';
+  const aw = VW - left - right - pad * 2, ah = VH - pad * 2;
+  const tw = W + 2 * BORDER, th = H + 2 * BORDER;
+  const s = Math.max(0.5, Math.min(aw / tw, ah / th));
+  L = {s, left, rx: VW - right, right, lesson,
+    ox: left + pad + (aw - tw * s) / 2 + BORDER * s, oy: pad + (ah - th * s) / 2 + BORDER * s};
+  L.power = {x: 12, y: 30, w: 34, h: VH - 48};
+  const bx = L.rx + 6, bw = right - 12;
+  place('bMenu', bx, 6, bw, 32);
+  L.spin = {cx: L.rx + right / 2, cy: 6 + 32 + 14 + 32, r: 30};
+  const shootTop = VH - 6 - 58;
+  place('bShoot', bx, shootTop, bw, 58);
+  place('bLines', bx, shootTop - 8 - 32, bw, 32);
+  L.row = {x: bx, y: shootTop - 8 - 32 - 6 - 32, w: bw, half: (bw - 6) / 2};
+  L.bx = bx; L.bw = bw;
+  place('bPush', bx + L.row.half + 6, L.row.y, L.row.half, 32);
+  place('bUndo', bx + L.row.half + 6, L.row.y, L.row.half, 32);
+  place('bReplay', bx, L.row.y, bw, 32);
+  $('chatDlg').style.right = (right + 4) + 'px';
+  const wTop = L.spin.cy + L.spin.r + 22;
+  const wBot = shootTop - 8 - 32 - 6 - 32 - 8;
+  const wH = Math.max(90, wBot - wTop);
+  L.nudgeUp = {x: bx + 10, y: wTop, w: bw - 20, h: 26};
+  L.wheel = {x: bx + 18, y: wTop + 30, w: bw - 36, h: wH - 60};
+  L.nudgeDown = {x: bx + 10, y: wTop + wH - 26, w: bw - 20, h: 26};
+  L.bigSpin = {cx: VW / 2, cy: VH / 2 + 4, r: Math.min(VH * 0.33, VW * 0.22)};
+}
+function place(id, x, y, w, h) { const e = document.getElementById(id).style; e.left = x + 'px'; e.top = y + 'px'; e.width = w + 'px'; e.height = h + 'px'; }
+
+function tableTransform() { ctx.setTransform(DPR * L.s, 0, 0, DPR * L.s, DPR * L.ox, DPR * L.oy); }
+function roundRect(x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
+
+const CLOTHS = {
+  blau: {main: '#156479', band: '#0d4a5c', cush: ['#2a8aa3', '#1b7189', '#125a6d', '#0a3f4d'], rgb: [24, 104, 128]},
+  gruen: {main: '#1b6d3c', band: '#114f2a', cush: ['#2f9a57', '#1f7d44', '#166235', '#0d4524'], rgb: [30, 112, 62]},
+  rot: {main: '#7c2128', band: '#59161b', cush: ['#a8363d', '#8a282e', '#6c1e23', '#4c1418'], rgb: [128, 36, 42]},
+  grau: {main: '#4b545a', band: '#353c41', cush: ['#6d777e', '#596168', '#474e54', '#31363b'], rgb: [80, 88, 94]},
+  schwarz: {main: '#23282c', band: '#16191c', cush: ['#3d444b', '#2e343a', '#23282d', '#16191c'], rgb: [42, 46, 50]},
+  lila: {main: '#4c2a6e', band: '#371e51', cush: ['#6f479a', '#5b397f', '#482d66', '#33204a'], rgb: [80, 46, 116]}
+};
+const cloth = () => CLOTHS[CFG.cloth] || CLOTHS.blau;
+function applyCloth() { tableCacheKey = ''; CLOTH_RGB = cloth().rgb; for (const k in SPR) delete SPR[k]; }
+let tableCache = null, tableCacheKey = '';
+function drawTableBase() {
+  const key = VW + 'x' + VH + '@' + DPR + CFG.cloth + (L.lesson ? 'L' : '');
+  if (tableCacheKey !== key) {
+    tableCacheKey = key;
+    tableCache = document.createElement('canvas');
+    tableCache.width = cv.width; tableCache.height = cv.height;
+    paintTable(tableCache.getContext('2d'));
+  }
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.drawImage(tableCache, 0, 0);
+}
+function rrPath(c, x, y, w, h, r) { c.beginPath(); c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r); c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath(); }
+// Feine Tuchstruktur als Kachel
+function noiseTile() {
+  const s = 128, c = document.createElement('canvas'); c.width = c.height = s;
+  const g = c.getContext('2d'), img = g.createImageData(s, s), d = img.data;
+  for (let i = 0; i < s * s; i++) {
+    const light = Math.random() < 0.5, a = Math.random() * 26;
+    d[i * 4] = d[i * 4 + 1] = d[i * 4 + 2] = light ? 255 : 0; d[i * 4 + 3] = a;
+  }
+  g.putImageData(img, 0, 0);
+  return c;
+}
+function paintTable(c) {
+  // Raum um den Tisch
+  c.setTransform(1, 0, 0, 1, 0, 0);
+  const cx = DPR * (L.ox + W * L.s / 2), cy = DPR * (L.oy + H * L.s / 2);
+  const rg = c.createRadialGradient(cx, cy, 10, cx, cy, Math.max(cv.width, cv.height) * 0.75);
+  rg.addColorStop(0, '#2b2620'); rg.addColorStop(0.45, '#17130f'); rg.addColorStop(1, '#050404');
+  c.fillStyle = rg; c.fillRect(0, 0, cv.width, cv.height);
+  c.setTransform(DPR * L.s, 0, 0, DPR * L.s, DPR * L.ox, DPR * L.oy);
+  const ox = -BORDER, oy = -BORDER, ow = W + 2 * BORDER, oh = H + 2 * BORDER;
+  // Schatten des Tisches auf dem Boden
+  c.save(); c.shadowColor = 'rgba(0,0,0,.85)'; c.shadowBlur = 28 * DPR; c.shadowOffsetY = 10 * DPR;
+  c.fillStyle = '#000'; rrPath(c, ox, oy, ow, oh, 4); c.fill(); c.restore();
+  // Holzrahmen mit Maserung
+  const wg = c.createLinearGradient(0, oy, 0, oy + oh);
+  wg.addColorStop(0, '#5e3015'); wg.addColorStop(0.5, '#40200c'); wg.addColorStop(1, '#5e3015');
+  c.fillStyle = wg; rrPath(c, ox, oy, ow, oh, 4); c.fill();
+  c.save(); rrPath(c, ox, oy, ow, oh, 4); c.clip();
+  let seed = 11; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  c.lineWidth = 0.16;
+  const grain = (horiz, base) => {
+    for (let i = 0; i < 46; i++) {
+      const o0 = base + rnd() * WOOD, ph = rnd() * 9, amp = 0.15 + rnd() * 0.45, fr = 0.02 + rnd() * 0.05;
+      c.strokeStyle = rnd() < 0.55 ? 'rgba(18,7,2,' + (0.18 + rnd() * 0.3) + ')' : 'rgba(150,80,35,' + (0.1 + rnd() * 0.2) + ')';
+      c.beginPath();
+      if (horiz) { for (let x = ox; x <= ox + ow + 4; x += 4) { const y = o0 + Math.sin(x * fr + ph) * amp; x === ox ? c.moveTo(x, y) : c.lineTo(x, y); } }
+      else { for (let y = oy; y <= oy + oh + 4; y += 4) { const x = o0 + Math.sin(y * fr + ph) * amp; y === oy ? c.moveTo(x, y) : c.lineTo(x, y); } }
+      c.stroke();
+    }
+  };
+  // Längsbanden waagerecht, Kopfbanden senkrecht gemasert (mit Gehrung in den Ecken)
+  c.save(); c.beginPath(); c.moveTo(ox, oy); c.lineTo(ox + ow, oy); c.lineTo(W + CUSH, -CUSH); c.lineTo(-CUSH, -CUSH); c.closePath(); c.clip(); grain(true, oy); c.restore();
+  c.save(); c.beginPath(); c.moveTo(ox, oy + oh); c.lineTo(ox + ow, oy + oh); c.lineTo(W + CUSH, H + CUSH); c.lineTo(-CUSH, H + CUSH); c.closePath(); c.clip(); grain(true, H + CUSH); c.restore();
+  c.save(); c.beginPath(); c.moveTo(ox, oy); c.lineTo(-CUSH, -CUSH); c.lineTo(-CUSH, H + CUSH); c.lineTo(ox, oy + oh); c.closePath(); c.clip(); grain(false, ox); c.restore();
+  c.save(); c.beginPath(); c.moveTo(ox + ow, oy); c.lineTo(W + CUSH, -CUSH); c.lineTo(W + CUSH, H + CUSH); c.lineTo(ox + ow, oy + oh); c.closePath(); c.clip(); grain(false, W + CUSH); c.restore();
+  c.strokeStyle = 'rgba(0,0,0,.35)'; c.lineWidth = 0.15;
+  [[ox, oy, -CUSH, -CUSH], [ox + ow, oy, W + CUSH, -CUSH], [ox, oy + oh, -CUSH, H + CUSH], [ox + ow, oy + oh, W + CUSH, H + CUSH]].forEach(m => { c.beginPath(); c.moveTo(m[0], m[1]); c.lineTo(m[2], m[3]); c.stroke(); });
+  c.restore();
+  // Lackglanz: gewölbte Oberkante der Bande
+  const varnish = (x0, y0, x1, y1, x, y, w, h) => {
+    const g = c.createLinearGradient(x0, y0, x1, y1);
+    g.addColorStop(0, 'rgba(0,0,0,.35)'); g.addColorStop(0.15, 'rgba(255,215,170,.10)'); g.addColorStop(0.45, 'rgba(255,225,190,.20)');
+    g.addColorStop(0.7, 'rgba(255,215,170,.04)'); g.addColorStop(1, 'rgba(0,0,0,.45)');
+    c.fillStyle = g; c.fillRect(x, y, w, h);
+  };
+  varnish(0, oy, 0, -CUSH, ox, oy, ow, WOOD); varnish(0, H + BORDER, 0, H + CUSH, ox, H + CUSH, ow, WOOD);
+  varnish(ox, 0, -CUSH, 0, ox, oy, WOOD, oh); varnish(W + BORDER, 0, W + CUSH, 0, W + CUSH, oy, WOOD, oh);
+  c.strokeStyle = 'rgba(255,215,170,.28)'; c.lineWidth = 0.3; rrPath(c, ox + 0.25, oy + 0.25, ow - 0.5, oh - 0.5, 3.8); c.stroke();
+  // Diamanten aus Perlmutt
+  const dm = (x, y, vert) => {
+    const g = c.createRadialGradient(x - 0.2, y - 0.3, 0.05, x, y, 1.1);
+    g.addColorStop(0, '#ffffff'); g.addColorStop(0.5, '#e4ddd0'); g.addColorStop(1, '#9d9384');
+    c.fillStyle = g; c.beginPath();
+    const a = vert ? 0.6 : 1.0, b = vert ? 1.0 : 0.6;
+    c.moveTo(x, y - b); c.lineTo(x + a, y); c.lineTo(x, y + b); c.lineTo(x - a, y); c.closePath(); c.fill();
+    c.strokeStyle = 'rgba(0,0,0,.4)'; c.lineWidth = 0.08; c.stroke();
+  };
+  for (let i = 1; i < 8; i++) if (i !== 4) { dm(W * i / 8, -CUSH - WOOD / 2, true); dm(W * i / 8, H + CUSH + WOOD / 2, true); }
+  for (let i = 1; i < 4; i++) { dm(-CUSH - WOOD / 2, H * i / 4, false); dm(W + CUSH + WOOD / 2, H * i / 4, false); }
+  // Tuch
+  const CL = cloth();
+  c.fillStyle = CL.band; c.fillRect(-CUSH, -CUSH, W + 2 * CUSH, H + 2 * CUSH);
+  c.fillStyle = CL.main; c.fillRect(0, 0, W, H);
+  // Licht von drei Lampen über dem Tisch
+  for (const lx of [W / 6, W / 2, W * 5 / 6]) {
+    const g = c.createRadialGradient(lx, H / 2, 2, lx, H / 2, 78);
+    g.addColorStop(0, 'rgba(255,248,225,.16)'); g.addColorStop(0.6, 'rgba(255,248,225,.05)'); g.addColorStop(1, 'rgba(255,248,225,0)');
+    c.fillStyle = g; c.fillRect(-CUSH, -CUSH, W + 2 * CUSH, H + 2 * CUSH);
+  }
+  const vg = c.createRadialGradient(W / 2, H / 2, H * 0.4, W / 2, H / 2, W * 0.62);
+  vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,.32)');
+  c.fillStyle = vg; c.fillRect(-CUSH, -CUSH, W + 2 * CUSH, H + 2 * CUSH);
+  // Tuchstruktur
+  c.save(); c.beginPath(); c.rect(-CUSH, -CUSH, W + 2 * CUSH, H + 2 * CUSH); c.clip();
+  c.setTransform(1, 0, 0, 1, 0, 0); c.fillStyle = c.createPattern(noiseTile(), 'repeat'); c.fillRect(0, 0, cv.width, cv.height);
+  c.restore();
+  c.setTransform(DPR * L.s, 0, 0, DPR * L.s, DPR * L.ox, DPR * L.oy);
+  // Schatten der Banden auf dem Tuch
+  const shadowStrip = (x0, y0, x1, y1, x, y, w, h) => {
+    const g = c.createLinearGradient(x0, y0, x1, y1); g.addColorStop(0, 'rgba(0,0,0,.38)'); g.addColorStop(1, 'rgba(0,0,0,0)');
+    c.fillStyle = g; c.fillRect(x, y, w, h);
+  };
+  shadowStrip(0, 0, 0, 3, 0, 0, W, 3); shadowStrip(0, H, 0, H - 2, 0, H - 2, W, 2);
+  shadowStrip(0, 0, 2.5, 0, 0, 0, 2.5, H); shadowStrip(W, 0, W - 2, 0, W - 2, 0, 2, H);
+  // Taschen
+  for (const p of POCKET_DRAW) {
+    const g = c.createRadialGradient(p.x + 0.8, p.y + 0.8, 0.5, p.x, p.y, p.r);
+    g.addColorStop(0, '#000'); g.addColorStop(0.75, '#060606'); g.addColorStop(1, '#1d1d1d');
+    c.beginPath(); c.arc(p.x, p.y, p.r, 0, TAU); c.fillStyle = g; c.fill();
+    const lg = c.createLinearGradient(p.x - p.r, p.y - p.r, p.x + p.r, p.y + p.r);
+    lg.addColorStop(0, '#6b6257'); lg.addColorStop(0.5, '#25211d'); lg.addColorStop(1, '#0c0b0a');
+    c.beginPath(); c.arc(p.x, p.y, p.r + 0.45, 0, TAU); c.strokeStyle = lg; c.lineWidth = 0.9; c.stroke();
+  }
+  // Banden (Gummi) mit Wölbung
+  const cush = (ax, ay, bx, by, ox2, oy2) => {
+    const len = Math.hypot(bx - ax, by - ay), tx = (bx - ax) / len, ty = (by - ay) / len, b = CUSH * 0.66;
+    c.beginPath(); c.moveTo(ax, ay); c.lineTo(bx, by);
+    c.lineTo(bx + ox2 * CUSH - tx * b, by + oy2 * CUSH - ty * b);
+    c.lineTo(ax + ox2 * CUSH + tx * b, ay + oy2 * CUSH + ty * b); c.closePath();
+    const g = c.createLinearGradient(ax, ay, ax + ox2 * CUSH, ay + oy2 * CUSH);
+    g.addColorStop(0, CL.cush[0]); g.addColorStop(0.18, CL.cush[1]); g.addColorStop(0.6, CL.cush[2]); g.addColorStop(1, CL.cush[3]);
+    c.fillStyle = g; c.fill();
+    c.strokeStyle = 'rgba(0,0,0,.35)'; c.lineWidth = 0.12; c.stroke();
+  };
+  cush(SEGS[0][0], 0, SEGS[0][2], 0, 0, -1); cush(SEGS[1][0], 0, SEGS[1][2], 0, 0, -1);
+  cush(SEGS[2][0], H, SEGS[2][2], H, 0, 1); cush(SEGS[3][0], H, SEGS[3][2], H, 0, 1);
+  cush(0, SEGS[4][1], 0, SEGS[4][3], -1, 0); cush(W, SEGS[5][1], W, SEGS[5][3], 1, 0);
+  // Kopflinie und Punkte
+  c.strokeStyle = 'rgba(255,255,255,.07)'; c.lineWidth = 0.3;
+  c.beginPath(); c.moveTo(HEAD_X, 0); c.lineTo(HEAD_X, H); c.stroke();
+  c.fillStyle = 'rgba(255,255,255,.3)';
+  for (const q of [FOOT, {x: HEAD_X, y: H / 2}, {x: W / 2, y: H / 2}]) { c.beginPath(); c.arc(q.x, q.y, 0.55, 0, TAU); c.fill(); }
+}
+
+// ===================== 3D-Kugeln =====================
+const BALL_RGB = {0: [248, 245, 237], 1: [250, 188, 14], 2: [20, 64, 196], 3: [212, 30, 26], 4: [90, 36, 150], 5: [248, 106, 16], 6: [10, 120, 62], 7: [126, 24, 32], 8: [16, 16, 18]};
+const BALL_WHITE = [248, 245, 237];
+const norm3 = (x, y, z) => { const l = Math.hypot(x, y, z); return [x / l, y / l, z / l]; };
+const LIGHT1 = norm3(-0.35, -0.5, 0.8), LIGHT2 = norm3(0.5, 0.25, 0.83);
+const HALF1 = norm3(LIGHT1[0], LIGHT1[1], LIGHT1[2] + 1), HALF2 = norm3(LIGHT2[0], LIGHT2[1], LIGHT2[2] + 1);
+let CLOTH_RGB = cloth().rgb;
+const GLYPHS = {};
+function glyph(n) {
+  if (GLYPHS[n]) return GLYPHS[n];
+  const c = document.createElement('canvas'); c.width = c.height = 64;
+  const g = c.getContext('2d');
+  g.fillStyle = '#000'; g.font = 'bold ' + (n > 9 ? 36 : 44) + 'px Arial,Helvetica,sans-serif';
+  g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(String(n), 32, 35);
+  const d = g.getImageData(0, 0, 64, 64).data, a = new Float32Array(64 * 64);
+  for (let i = 0; i < a.length; i++) a[i] = d[i * 4 + 3] / 255;
+  return (GLYPHS[n] = a);
+}
+// Zeichnet eine glänzende Kugel pixelweise; M dreht Kugel-Koordinaten in die Ansicht.
+function renderSphere(img, size, rpx, n, M) {
+  const d = img.data, c = size / 2;
+  const base = n > 0 ? BALL_RGB[n > 8 ? n - 8 : n] : BALL_WHITE, stripe = n > 8, gl = n > 0 ? glyph(n) : null;
+  const cosA = Math.cos(0.45), sinA = Math.sin(0.45);
+  for (let y = 0; y < size; y++) {
+    const dy = (y + 0.5 - c) / rpx;
+    for (let x = 0; x < size; x++) {
+      const i = (y * size + x) * 4, dx = (x + 0.5 - c) / rpx, d2 = dx * dx + dy * dy;
+      const dist = Math.sqrt(d2);
+      let a = (1 - dist) * rpx + 0.5;
+      if (a <= 0) { d[i + 3] = 0; continue; }
+      if (a > 1) a = 1;
+      const nz = d2 < 1 ? Math.sqrt(1 - d2) : 0;
+      const bx = M[0] * dx + M[3] * dy + M[6] * nz, by = M[1] * dx + M[4] * dy + M[7] * nz, bz = M[2] * dx + M[5] * dy + M[8] * nz;
+      let r = base[0], g = base[1], b = base[2];
+      if (n === 0) {
+        if (Math.abs(bx) > 0.993 || Math.abs(by) > 0.993 || Math.abs(bz) > 0.993) { r = 190; g = 28; b = 30; }
+      } else if (n > 0) {
+        if (stripe && Math.abs(bx) > 0.5) { r = BALL_WHITE[0]; g = BALL_WHITE[1]; b = BALL_WHITE[2]; }
+        if (bz > cosA || bz < -cosA) {
+          const u = (bz > 0 ? bx : -bx) / sinA, v = by / sinA;
+          r = BALL_WHITE[0]; g = BALL_WHITE[1]; b = BALL_WHITE[2];
+          const gx = (u * 0.5 + 0.5) * 63.99 | 0, gy = (v * 0.5 + 0.5) * 63.99 | 0;
+          const t = gl[gy * 64 + gx];
+          if (t > 0) { r += (22 - r) * t; g += (20 - g) * t; b += (20 - b) * t; }
+        }
+      }
+      const l1 = dx * LIGHT1[0] + dy * LIGHT1[1] + nz * LIGHT1[2], l2 = dx * LIGHT2[0] + dy * LIGHT2[1] + nz * LIGHT2[2];
+      const dif = 0.2 + 0.72 * (l1 > 0 ? l1 : 0) + 0.2 * (l2 > 0 ? l2 : 0);
+      const h1 = dx * HALF1[0] + dy * HALF1[1] + nz * HALF1[2], h2 = dx * HALF2[0] + dy * HALF2[1] + nz * HALF2[2];
+      let sp = 0;
+      if (h1 > 0) { const p = h1 * h1, p4 = p * p, p16 = p4 * p4 * p4 * p4; sp += p16 * p16 * p16 * 1.25 + p4 * p4 * 0.07; }
+      if (h2 > 0) { const p = h2 * h2, p4 = p * p, p16 = p4 * p4 * p4 * p4; sp += p16 * p16 * 0.4; }
+      const rim = (1 - nz) * (1 - nz) * (1 - nz);
+      const k = dif * (1 - rim * 0.45);
+      r = r * k + CLOTH_RGB[0] * rim * 0.4 + 255 * sp;
+      g = g * k + CLOTH_RGB[1] * rim * 0.4 + 255 * sp;
+      b = b * k + CLOTH_RGB[2] * rim * 0.4 + 255 * sp;
+      d[i] = r > 255 ? 255 : r; d[i + 1] = g > 255 ? 255 : g; d[i + 2] = b > 255 ? 255 : b; d[i + 3] = a * 255;
+    }
+  }
+}
+const IDENT3 = [1, 0, 0, 0, 1, 0, 0, 0, 1];
+function rotAxis(kx, ky, kz, a) {
+  const c = Math.cos(a), s = Math.sin(a), t = 1 - c;
+  return [t * kx * kx + c, t * kx * ky - s * kz, t * kx * kz + s * ky,
+    t * kx * ky + s * kz, t * ky * ky + c, t * ky * kz - s * kx,
+    t * kx * kz - s * ky, t * ky * kz + s * kx, t * kz * kz + c];
+}
+function mul3(A, B) {
+  const C = new Array(9);
+  for (let r = 0; r < 3; r++) for (let k = 0; k < 3; k++) C[r * 3 + k] = A[r * 3] * B[k] + A[r * 3 + 1] * B[3 + k] + A[r * 3 + 2] * B[6 + k];
+  return C;
+}
+function orthonorm(M) {
+  const a = norm3(M[0], M[3], M[6]);
+  let b = [M[1], M[4], M[7]];
+  const dp = a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+  b = norm3(b[0] - dp * a[0], b[1] - dp * a[1], b[2] - dp * a[2]);
+  const cc = [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+  return [a[0], b[0], cc[0], a[1], b[1], cc[1], a[2], b[2], cc[2]];
+}
+// Ausrichtung jeder Kugel (für die Rollanimation)
+function initOrient() {
+  G.orient = {};
+  for (const b of G.balls) {
+    const t = Math.random() * TAU;
+    const M = mul3(rotAxis(Math.cos(t), Math.sin(t), 0, Math.random() * 0.5), rotAxis(0, 0, 1, (Math.random() - 0.5) * 1.4));
+    G.orient[b.n] = {M, ver: 1, lx: b.x, ly: b.y, k: 0};
+  }
+  SINKING = [];
+}
+function updateOrient(balls) {
+  if (!G.orient) return;
+  for (const b of balls) {
+    if (!b.on) continue;
+    let o = G.orient[b.n];
+    if (!o) o = G.orient[b.n] = {M: IDENT3.slice(), ver: 1, lx: b.x, ly: b.y, k: 0};
+    const dx = b.x - o.lx, dy = b.y - o.ly, dd = Math.hypot(dx, dy);
+    if (dd < 1e-3) continue;
+    if (dd < 25) { o.M = mul3(rotAxis(-dy / dd, dx / dd, 0, dd / R), o.M); if (++o.k % 24 === 0) o.M = orthonorm(o.M); }
+    o.lx = b.x; o.ly = b.y; o.ver++;
+  }
+}
+const SPR = {};
+function ballSprite(id, n, M, ver, rpx) {
+  let s = SPR[id];
+  const size = Math.ceil(rpx * 2) + 2;
+  if (!s || s.size !== size) {
+    const c = document.createElement('canvas'); c.width = c.height = size;
+    const x = c.getContext('2d');
+    s = SPR[id] = {cv: c, ctx: x, img: x.createImageData(size, size), size, ver: null};
+  }
+  if (s.ver !== ver) { renderSphere(s.img, size, rpx, n, M); s.ctx.putImageData(s.img, 0, 0); s.ver = ver; }
+  return s;
+}
+// Kugel im Tisch-Koordinatensystem zeichnen
+function drawBall(n, x, y, scale, alpha) {
+  const o = G && G.orient && G.orient[n];
+  const rpx = R * L.s * DPR;
+  const s = o ? ballSprite('t' + n, n, o.M, o.ver + '@' + rpx, rpx) : ballSprite('ti' + n, n, IDENT3, 'i' + rpx, rpx);
+  const hs = s.size / 2 / (L.s * DPR) * (scale || 1);
+  if (alpha !== undefined) ctx.globalAlpha = alpha;
+  ctx.drawImage(s.cv, x - hs, y - hs, hs * 2, hs * 2);
+  ctx.globalAlpha = 1;
+}
+let shadowSpr = null;
+function drawShadows(balls) {
+  if (!shadowSpr) {
+    shadowSpr = document.createElement('canvas'); shadowSpr.width = shadowSpr.height = 64;
+    const g = shadowSpr.getContext('2d'), rg = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+    rg.addColorStop(0, 'rgba(0,0,0,1)'); rg.addColorStop(0.45, 'rgba(0,0,0,.75)'); rg.addColorStop(1, 'rgba(0,0,0,0)');
+    g.fillStyle = rg; g.fillRect(0, 0, 64, 64);
+  }
+  for (const b of balls) {
+    if (!b.on) continue;
+    if (G.dragging && b.n === G.dragN) { ctx.globalAlpha = 0.32; ctx.drawImage(shadowSpr, b.x + 1.3 * R - 1.7 * R, b.y + 1.8 * R - 1.7 * R, 3.4 * R, 3.4 * R); continue; }
+    ctx.globalAlpha = 0.42; ctx.drawImage(shadowSpr, b.x + 0.55 * R - 1.5 * R, b.y + 0.8 * R - 1.5 * R, 3 * R, 3 * R);
+    ctx.globalAlpha = 0.18; ctx.drawImage(shadowSpr, b.x - 0.6 * R - 1.4 * R, b.y + 0.4 * R - 1.4 * R, 2.8 * R, 2.8 * R);
+    ctx.globalAlpha = 0.5; ctx.drawImage(shadowSpr, b.x - 0.95 * R, b.y - 0.85 * R, 1.9 * R, 1.9 * R);
+  }
+  ctx.globalAlpha = 1;
+}
+// Kugeln, die der Spieler am Zug treffen darf
+function currentTargets() {
+  if (!G || G.state === 'over') return [];
+  const on = onSet(G.balls);
+  if (G.mode === 0) return soloTargets(on);
+  if (G.isBreak) return [];
+  return legalTargets(G.mode, G.players[G.cur].group, on);
+}
+function drawTargetGlow(now, under) {
+  const px = 1 / L.s, pulse = 0.5 + 0.5 * Math.sin(now / 260);
+  for (const n of currentTargets()) {
+    const b = getBall(G.balls, n); if (!b || !b.on) continue;
+    if (under) {
+      const g = ctx.createRadialGradient(b.x, b.y, R * 0.8, b.x, b.y, R * 2.4);
+      g.addColorStop(0, 'rgba(255,215,90,' + (0.35 + 0.25 * pulse) + ')'); g.addColorStop(1, 'rgba(255,215,90,0)');
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(b.x, b.y, R * 2.4, 0, TAU); ctx.fill();
+    } else {
+      ctx.beginPath(); ctx.arc(b.x, b.y, R + 0.9 + pulse * 0.9, 0, TAU);
+      ctx.strokeStyle = 'rgba(255,215,90,' + (0.55 + 0.4 * pulse) + ')'; ctx.lineWidth = 1.6 * px; ctx.stroke();
+    }
+  }
+}
+// Animierte Markierung: die Weiße darf verschoben werden
+function drawBallInHand(cue, now) {
+  const px = 1 / L.s;
+  if (G.bih === 'kitchen') {
+    ctx.fillStyle = 'rgba(255,215,90,' + (0.05 + 0.04 * Math.sin(now / 300)) + ')'; ctx.fillRect(0, 0, HEAD_X, H);
+    ctx.setLineDash([3 * px, 3 * px]); ctx.lineDashOffset = -now / 40;
+    ctx.strokeStyle = 'rgba(255,215,90,.6)'; ctx.lineWidth = 1.5 * px;
+    ctx.beginPath(); ctx.moveTo(HEAD_X, 0); ctx.lineTo(HEAD_X, H); ctx.stroke();
+    ctx.setLineDash([]); ctx.lineDashOffset = 0;
+  }
+  if (G.dragging) {
+    if (now - (G.badPlaceT || 0) < 350) {
+      ctx.beginPath(); ctx.arc(cue.x, cue.y, R * 1.6, 0, TAU);
+      ctx.strokeStyle = 'rgba(255,60,50,' + (1 - (now - G.badPlaceT) / 350) + ')'; ctx.lineWidth = 2.5 * px; ctx.stroke();
+    }
+    return;
+  }
+  // drehender Ring
+  ctx.setLineDash([3.2 * px, 2.6 * px]); ctx.lineDashOffset = -now / 25;
+  ctx.strokeStyle = '#ffd75a'; ctx.lineWidth = 1.8 * px;
+  ctx.beginPath(); ctx.arc(cue.x, cue.y, R + 2.2, 0, TAU); ctx.stroke();
+  ctx.setLineDash([]); ctx.lineDashOffset = 0;
+  // vier Pfeile, die nach außen pulsieren
+  const d = R + 4 + 1.4 * (0.5 + 0.5 * Math.sin(now / 220));
+  ctx.fillStyle = 'rgba(255,215,90,.95)';
+  for (let k = 0; k < 4; k++) {
+    const a = k * Math.PI / 2, ca = Math.cos(a), sa = Math.sin(a);
+    const tx = cue.x + ca * (d + 1.8), ty = cue.y + sa * (d + 1.8);
+    ctx.beginPath(); ctx.moveTo(tx, ty);
+    ctx.lineTo(cue.x + ca * d - sa * 1.4, cue.y + sa * d + ca * 1.4);
+    ctx.lineTo(cue.x + ca * d + sa * 1.4, cue.y + sa * d - ca * 1.4); ctx.closePath(); ctx.fill();
+  }
+  ctx.font = 'bold ' + (11 * px).toFixed(2) + 'px system-ui,sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  const ty = cue.y + (cue.y > H - 16 ? -(R + 10) : R + 10);
+  const label = 'Ball in Hand – halten & ziehen';
+  const w = ctx.measureText(label).width + 6 * px;
+  ctx.fillStyle = 'rgba(8,14,12,.8)'; ctx.fillRect(cue.x - w / 2, ty - 7 * px, w, 14 * px);
+  ctx.fillStyle = '#ffd75a'; ctx.fillText(label, cue.x, ty);
+}
+
+// Kugeln, die gerade in eine Tasche fallen
+let SINKING = [];
+function drawSinking(now) {
+  const dur = 420 / TIME_SCALE;
+  SINKING = SINKING.filter(s => now - s.t0 < dur);
+  for (const s of SINKING) {
+    const t = (now - s.t0) / dur, e = t * t * (3 - 2 * t), d = POCKET_DRAW[s.k];
+    ctx.beginPath(); ctx.arc(d.x, d.y, d.r + 0.6 + t * 2.5, 0, TAU);
+    ctx.strokeStyle = 'rgba(255,215,90,' + (0.8 * (1 - t)) + ')'; ctx.lineWidth = 1.6 / L.s; ctx.stroke();
+    drawBall(s.n, s.x + (d.x - s.x) * e * 0.85, s.y + (d.y - s.y) * e * 0.85, 1 - 0.4 * e, 1 - e * 0.9);
+  }
+}
+
+function lineCol(n, a) {
+  if (n === 0) return 'rgba(255,255,255,' + a + ')';
+  if (n === 8) return 'rgba(200,200,200,' + a + ')';
+  const c = colorOf(n), r = parseInt(c.slice(1, 3), 16), g = parseInt(c.slice(3, 5), 16), b = parseInt(c.slice(5, 7), 16);
+  const m = v => Math.min(255, Math.round(v + (255 - v) * 0.35));
+  return 'rgba(' + m(r) + ',' + m(g) + ',' + m(b) + ',' + a + ')';
+}
+
+// Linienmodus (manche Herausforderungen schreiben ihn vor)
+function linesMode() {
+  if (G && G.mode === 0 && G.solo.type === 'lesson') return 'all';
+  if (G && G.mode === 0 && G.solo.type === 'levels' && LEVELS[G.solo.idx].lines) return LEVELS[G.solo.idx].lines;
+  return CFG.lines;
+}
+function getPrediction() {
+  const cue = getBall(G.balls, 0);
+  const key = [G.aim, G.power, G.sx, G.sy, cue.x, cue.y, G.ver, G.called].join('|');
+  if (key !== G.predKey) {
+    G.predKey = key;
+    G.pred = runSim(G.balls, {angle: G.aim, power: G.power, sx: G.sx, sy: G.sy}, true);
+    G.predInfo = predictVerdict(G.pred);
+  }
+  return G.pred;
+}
+// Was würde dieser Stoß nach den Regeln bedeuten?
+function predictVerdict(S) {
+  if (!G || G.isBreak && G.mode !== 0) return null;
+  if (G.mode === 0) {
+    if (G.solo.type !== 'levels') return S.ev.cuePotted ? {t: 'Weiße fällt!', c: 'bad'} : S.ev.potted.length ? {t: '✓ ' + S.ev.potted.length + ' versenkt', c: 'good'} : null;
+    const lv = LEVELS[G.solo.idx], need = soloTargets(onSet(G.balls));
+    if ((lv.bomb || []).some(b => S.ev.touched.has(b))) return {t: '✗ Sperrkugel wird berührt', c: 'bad'};
+    if (lv.kick && S.ev.first !== null && !S.ev.kick) return {t: '✗ Weiße muss zuerst an die Bande', c: 'bad'};
+    if ((lv.order || lv.first) && S.ev.first !== null && need.length && S.ev.first !== need[0]) return {t: '✗ Zuerst die ' + need[0] + ' treffen', c: 'bad'};
+    if (S.ev.cuePotted) return {t: '✗ Weiße fällt', c: 'bad'};
+    const pots = S.ev.potted.filter(p => need.includes(p.n) || (lv.targets ? lv.targets.includes(p.n) : !(lv.bomb || []).includes(p.n)));
+    if (lv.pocket && S.ev.potted.some(p => lv.pocket[p.n] !== undefined && lv.pocket[p.n] !== p.pocket)) return {t: '✗ Falsche Tasche', c: 'bad'};
+    if (lv.bank && pots.some(p => !(S.ev.railCount[p.n] > 0))) return {t: '✗ Kugel muss über die Bande', c: 'bad'};
+    return pots.length ? {t: '✓ ' + pots.length + ' Ziel' + (pots.length > 1 ? 'kugeln' : 'kugel') + ' fällt', c: 'good'} : null;
+  }
+  const r = judge(onSet(G.balls), S.ev, G.called, G.balls), me = G.cur;
+  if (r.win === me) return {t: '🏆 Dieser Stoß gewinnt!', c: 'win'};
+  if (r.win !== null) return {t: '✗ Damit verlierst du: ' + r.winReason, c: 'bad'};
+  if (r.foul) return {t: '⚠ Foul: ' + r.reason, c: 'bad'};
+  if (r.cont) return {t: '✓ Kugel fällt – du bleibst dran', c: 'good'};
+  return null;
+}
+function polyline(p) { ctx.beginPath(); ctx.moveTo(p[0][0], p[0][1]); for (let i = 1; i < p.length; i++) ctx.lineTo(p[i][0], p[i][1]); }
+// Linie mit Leuchtrand
+function glowLine(p, col, w) {
+  if (p.length < 2) return;
+  ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+  polyline(p);
+  ctx.strokeStyle = col(0.16); ctx.lineWidth = w * 3.6; ctx.stroke();
+  ctx.strokeStyle = col(0.3); ctx.lineWidth = w * 2; ctx.stroke();
+  ctx.strokeStyle = col(1); ctx.lineWidth = w; ctx.stroke();
+}
+function trimPath(p, maxLen) {
+  const out = [p[0]]; let len = 0;
+  for (let i = 1; i < p.length; i++) {
+    const d = Math.hypot(p[i][0] - p[i - 1][0], p[i][1] - p[i - 1][1]);
+    if (len + d >= maxLen) { const t = (maxLen - len) / d; out.push([p[i - 1][0] + (p[i][0] - p[i - 1][0]) * t, p[i - 1][1] + (p[i][1] - p[i - 1][1]) * t]); return out; }
+    len += d; out.push(p[i]);
+  }
+  return out;
+}
+// Richtungspfeile entlang einer Bahn
+function pathArrows(p, color, px, step) {
+  let acc = step * 0.55;
+  ctx.fillStyle = color;
+  for (let i = 1; i < p.length; i++) {
+    const dx = p[i][0] - p[i - 1][0], dy = p[i][1] - p[i - 1][1], d = Math.hypot(dx, dy);
+    if (d < 1e-6) continue;
+    while (acc <= d) {
+      const t = acc / d, x = p[i - 1][0] + dx * t, y = p[i - 1][1] + dy * t, ux = dx / d, uy = dy / d, s = 2.4;
+      ctx.beginPath(); ctx.moveTo(x + ux * s, y + uy * s);
+      ctx.lineTo(x - ux * s - uy * s * 0.8, y - uy * s + ux * s * 0.8);
+      ctx.lineTo(x - ux * s * 0.35, y - uy * s * 0.35);
+      ctx.lineTo(x - ux * s + uy * s * 0.8, y - uy * s - ux * s * 0.8); ctx.closePath(); ctx.fill();
+      acc += step;
+    }
+    acc -= d;
+  }
+  void px;
+}
+function movedPath(S, n) {
+  const p = S.paths[n];
+  if (!p || p.length < 2) return false;
+  for (const q of p) if (Math.abs(q[0] - p[0][0]) > 0.3 || Math.abs(q[1] - p[0][1]) > 0.3) return true;
+  return false;
+}
+function drawPrediction(S) {
+  const mode = linesMode();
+  if (mode === 'off') return;
+  const px = 1 / L.s, C = S.contact, now = performance.now();
+  // Endpositionen aller bewegten Kugeln als Geisterkugeln
+  if (mode === 'all') for (const b of S.balls) if (b.on && b.n !== 0 && movedPath(S, b.n)) drawBall(b.n, b.x, b.y, 1, 0.42);
+  // Bahnen der Objektkugeln
+  const objs = mode === 'all' ? Object.keys(S.paths).map(Number).filter(n => n !== 0 && movedPath(S, n)) : C ? [C.n] : [];
+  for (const n of objs) {
+    let p = S.paths[n];
+    if (mode === 'guide') p = trimPath(p, 55);
+    glowLine(p, a => lineCol(n, a), 2.1 * px);
+    pathArrows(p, 'rgba(255,255,255,.85)', px, 22);
+  }
+  // Bahn der Weißen (laufende Striche)
+  let cp = S.paths[0];
+  if (mode === 'guide') {
+    // bis zur getroffenen Kugel bzw. zur ersten Bande, danach ein kurzes Stück der neuen Richtung
+    const stop = C || S.cueRail;
+    if (stop) {
+      let i = cp.findIndex(q => Math.abs(q[0] - stop.x) < 0.01 && Math.abs(q[1] - stop.y) < 0.01);
+      if (i < 0) i = cp.length - 1;
+      cp = cp.slice(0, i + 1).concat(trimPath(cp.slice(i), 24).slice(1));
+    }
+  }
+  if (cp.length > 1) {
+    ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+    polyline(cp); ctx.strokeStyle = 'rgba(255,255,255,.18)'; ctx.lineWidth = 6 * px; ctx.stroke();
+    ctx.setLineDash([6 * px, 4.5 * px]); ctx.lineDashOffset = -(now / 25) * px;
+    polyline(cp); ctx.strokeStyle = 'rgba(255,255,255,.98)'; ctx.lineWidth = 2 * px; ctx.stroke();
+    ctx.setLineDash([]); ctx.lineDashOffset = 0;
+  }
+  // Geisterkugel am Treffpunkt und Treffpunkt auf der Objektkugel
+  if (C) {
+    ctx.beginPath(); ctx.arc(C.x, C.y, R, 0, TAU);
+    ctx.fillStyle = 'rgba(255,255,255,.22)'; ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,.95)'; ctx.lineWidth = 1.4 * px; ctx.stroke();
+    ctx.beginPath(); ctx.arc((C.x + C.ox) / 2, (C.y + C.oy) / 2, 0.7, 0, TAU); ctx.fillStyle = '#ff4d3d'; ctx.fill();
+  }
+  // Endposition der Weißen
+  const cf = getBall(S.balls, 0);
+  if (cf.on && mode === 'all') {
+    ctx.setLineDash([2 * px, 2 * px]); ctx.beginPath(); ctx.arc(cf.x, cf.y, R, 0, TAU);
+    ctx.strokeStyle = 'rgba(255,255,255,.85)'; ctx.lineWidth = 1.3 * px; ctx.stroke(); ctx.setLineDash([]);
+  }
+  if (mode !== 'all') return;
+  // Taschen, in die etwas fällt
+  for (const p of S.ev.potted) {
+    const d = POCKET_DRAW[p.pocket], pulse = 0.5 + 0.5 * Math.sin(now / 180);
+    ctx.beginPath(); ctx.arc(d.x, d.y, d.r - 0.6, 0, TAU); ctx.strokeStyle = lineCol(p.n, 1); ctx.lineWidth = (2.2 + pulse) * px; ctx.stroke();
+    miniBallTable(p.n, d.x, d.y, R * 0.75);
+  }
+  if (S.ev.cuePotted) {
+    const p = S.paths[0][S.paths[0].length - 1];
+    ctx.strokeStyle = '#ff4d3d'; ctx.lineWidth = 2.6 * px; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(p[0] - 3, p[1] - 3); ctx.lineTo(p[0] + 3, p[1] + 3); ctx.moveTo(p[0] + 3, p[1] - 3); ctx.lineTo(p[0] - 3, p[1] + 3); ctx.stroke();
+  }
+}
+// ===================== Queues =====================
+function cueStops(o) {
+  return [[0, o.tip], [0.006, o.tip], [0.0065, '#f3f0e6'], [0.022, '#ece6d6'], [0.023, o.s1], [0.5, o.s2], [0.501, o.ring], [0.507, '#5a5a5a'],
+    [0.513, o.ring], [0.514, o.f1], [0.74, o.f2], [0.741, o.ring], [0.747, o.ring], [0.748, o.wrap], [0.92, o.wrap], [0.921, o.ring],
+    [0.927, o.ring], [0.928, o.b1], [0.985, o.b2], [0.986, '#111'], [1, '#111']];
+}
+const CUES = {
+  klassik: {name: 'Klassik', price: 0, s1: '#ead39f', s2: '#d5b175', ring: '#d8d8d8', f1: '#4a200c', f2: '#3a170a', wrap: '#1b1b1b', b1: '#5a2a10', b2: '#3a1907', inlay: '#efe4c8', tip: '#3567a8'},
+  ebenholz: {name: 'Ebenholz', price: 300, s1: '#ead39f', s2: '#d5b175', ring: '#ededed', f1: '#161616', f2: '#080808', wrap: '#2b2b2b', b1: '#1a1a1a', b2: '#050505', inlay: '#f4f4f4', tip: '#3567a8'},
+  carbon: {name: 'Carbon', price: 600, s1: '#43474d', s2: '#25272b', ring: '#9aa3ad', f1: '#2a2d31', f2: '#16181b', wrap: '#0e0f11', b1: '#2a2d31', b2: '#111214', inlay: '#4fc3ff', tip: '#222'},
+  eis: {name: 'Eiskristall', price: 900, s1: '#f0f6ff', s2: '#d8e8f8', ring: '#bfe6ff', f1: '#7fc8f0', f2: '#3a8cc8', wrap: '#eaf6ff', b1: '#bfe6ff', b2: '#5aa6dc', inlay: '#ffffff', tip: '#6fb6e8'},
+  neon: {name: 'Neon', price: 1100, s1: '#e8f7ff', s2: '#c8ecff', ring: '#00f0ff', f1: '#ff2bd6', f2: '#7a00ff', wrap: '#111', b1: '#00f0ff', b2: '#ff2bd6', inlay: '#00f0ff', tip: '#ff2bd6', glow: '#00f0ff'},
+  gold: {name: 'Goldstück', price: 1500, s1: '#f2e2b8', s2: '#e1c58c', ring: '#ffd54a', f1: '#f6efe0', f2: '#e4d6b8', wrap: '#1b1b1b', b1: '#d4a017', b2: '#8a6408', inlay: '#ffd54a', tip: '#3567a8'},
+  lava: {name: 'Lava', price: 2000, s1: '#ead39f', s2: '#d5b175', ring: '#ffb347', f1: '#ff5a1f', f2: '#a3120a', wrap: '#1b0b05', b1: '#e2380f', b2: '#5a0802', inlay: '#ffd23a', tip: '#a3120a', glow: '#ff5a1f'},
+  royal: {name: 'Royal', price: 3000, s1: '#efe2c4', s2: '#dcc597', ring: '#ffd54a', f1: '#4b1a7a', f2: '#2a0c4a', wrap: '#14061f', b1: '#5b2196', b2: '#1f0838', inlay: '#ffd54a', tip: '#5b2196', glow: '#b06cff'}
+};
+// Zeichnet den Queue liegend ab x0 (Spitze) nach rechts in den Kontext c
+function paintCueShape(c, x0, len, design, r0, r1) {
+  const x1 = x0 + len;
+  const shape = () => {
+    c.beginPath(); c.moveTo(x0, -r0); c.lineTo(x1, -r1); c.arc(x1, 0, r1, -Math.PI / 2, Math.PI / 2);
+    c.lineTo(x0, r0); c.arc(x0, 0, r0, Math.PI / 2, Math.PI * 1.5); c.closePath();
+  };
+  if (design.glow) { c.save(); c.shadowColor = design.glow; c.shadowBlur = 10 * DPR; shape(); c.fillStyle = design.glow; c.globalAlpha = 0.5; c.fill(); c.restore(); }
+  c.save(); shape(); c.clip();
+  const g = c.createLinearGradient(x0 - r0, 0, x1 + r1, 0);
+  for (const s of cueStops(design)) g.addColorStop(s[0], s[1]);
+  c.fillStyle = g; c.fillRect(x0 - 1, -r1 - 1, len + r1 + 3, r1 * 2 + 2);
+  c.fillStyle = design.inlay;
+  const k = r1 / 1.5;
+  for (const yy of [-0.55, 0.55]) { c.beginPath(); c.moveTo(x0 + len * 0.515, yy * 1.6 * k); c.lineTo(x0 + len * 0.6, yy * 0.3 * k); c.lineTo(x0 + len * 0.515, yy * 0.2 * k); c.closePath(); c.fill(); }
+  c.beginPath(); c.moveTo(x0 + len * 0.515, -0.35 * k); c.lineTo(x0 + len * 0.63, 0); c.lineTo(x0 + len * 0.515, 0.35 * k); c.closePath(); c.fill();
+  c.strokeStyle = 'rgba(255,255,255,.07)'; c.lineWidth = 0.12 * k;
+  for (let x = x0 + len * 0.75; x < x0 + len * 0.92; x += 0.55 * k) { c.beginPath(); c.moveTo(x, -r1); c.lineTo(x + 0.8 * k, r1); c.stroke(); }
+  const sh = c.createLinearGradient(0, -r1, 0, r1);
+  sh.addColorStop(0, 'rgba(0,0,0,.5)'); sh.addColorStop(0.28, 'rgba(255,255,255,.38)'); sh.addColorStop(0.42, 'rgba(255,255,255,.1)');
+  sh.addColorStop(0.75, 'rgba(0,0,0,.15)'); sh.addColorStop(1, 'rgba(0,0,0,.6)');
+  c.fillStyle = sh; c.fillRect(x0 - 1, -r1 - 1, len + r1 + 3, r1 * 2 + 2);
+  c.restore();
+}
+function drawCue(cue, extra) {
+  const pull = 1.5 + G.power * 16 + (extra || 0);
+  const off = G.sx * R * 0.55, len = 147, x0 = R + pull;
+  const design = CUES[cueFor(G.cur)] || CUES.klassik;
+  ctx.save(); ctx.translate(cue.x + 2.2, cue.y + 3.2); ctx.rotate(G.aim + Math.PI); ctx.translate(0, -off);
+  ctx.globalAlpha = 0.28; ctx.fillStyle = '#000';
+  ctx.beginPath(); ctx.moveTo(x0, -0.62); ctx.lineTo(x0 + len, -1.5); ctx.lineTo(x0 + len, 1.5); ctx.lineTo(x0, 0.62); ctx.closePath(); ctx.fill();
+  ctx.restore();
+  ctx.save(); ctx.translate(cue.x, cue.y); ctx.rotate(G.aim + Math.PI); ctx.translate(0, -off);
+  paintCueShape(ctx, x0, len, design, 0.62, 1.5);
+  ctx.restore();
+}
+// Welcher Queue gehört zum Spieler am Zug?
+function cueFor(i) {
+  if (!G || G.mode === 0) return PROFILE.cue;
+  if (G.ai[i]) return ['klassik', 'carbon', 'gold'][G.diff] || 'klassik';
+  if (G.online) return i === NET.me ? PROFILE.cue : (NET.peerCue || 'klassik');
+  return i === 0 ? PROFILE.cue : 'klassik';
+}
+
+function drawHUD() {
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  // Spieler-Anzeige auf der oberen Holzbande
+  const s = L.s, top = L.oy - BORDER * s, railH = WOOD * s;
+  const fs = Math.max(10, Math.min(14, railH * 0.62));
+  const midY = top + railH / 2 + 1;
+  ctx.textBaseline = 'middle';
+  if (G.mode === 0) {
+    const so = G.solo, lv = LEVELS[so.type === 'lesson' ? so.level : so.idx];
+    const left = so.type === 'lesson' ? '🎓 Lern-Modus' : so.type === 'levels' ? 'Level ' + (so.idx + 1) + ': ' + lv.name : so.type === 'training' ? 'Training' : 'Punkte: ' + so.score;
+    const right = so.type === 'lesson' ? TOPICS[so.topic].name : so.type === 'levels' ? 'Stöße: ' + so.shots + ' / ' + lv.shots + ' · Par ' + lv.par
+      : so.type === 'training' ? 'Stöße: ' + so.shots + ' · Versenkt: ' + (so.pots || 0)
+      : '❤'.repeat(so.lives) + '  · Serie ×' + Math.max(1, so.combo);
+    ctx.font = 'bold ' + fs + 'px system-ui,sans-serif';
+    [[left, L.ox + 4, 'left'], [right, L.ox + W * s - 4, 'right']].forEach(([t, x, al]) => {
+      const w = ctx.measureText(t).width;
+      ctx.fillStyle = 'rgba(40,20,8,.92)'; roundRect(al === 'left' ? x - 4 : x - w - 4, midY - fs * 0.7, w + 8, fs * 1.4, fs * 0.7); ctx.fill();
+      ctx.textAlign = al; ctx.fillStyle = '#ffd76a'; ctx.fillText(t, x, midY);
+    });
+  }
+  for (let i = 0; i < 2 && G.mode !== 0; i++) {
+    const P = G.players[i], active = G.cur === i && G.state !== 'over';
+    const x = i === 0 ? L.ox + 4 : L.ox + W * s - 4;
+    ctx.font = (active ? 'bold ' : '') + fs + 'px system-ui,sans-serif';
+    ctx.textAlign = i === 0 ? 'left' : 'right';
+    ctx.fillStyle = active ? '#ffd76a' : 'rgba(255,255,255,.7)';
+    const label = (active ? '▶ ' : '') + P.name;
+    const lw0 = ctx.measureText(label).width;
+    ctx.save(); ctx.fillStyle = 'rgba(40,20,8,.92)'; roundRect(i === 0 ? x - 4 : x - lw0 - 4, midY - fs * 0.7, lw0 + 8, fs * 1.4, fs * 0.7); ctx.fill(); ctx.restore();
+    ctx.fillText(label, x, midY);
+    const lw = ctx.measureText(label).width;
+    // Restkugeln der Gruppe bzw. Fouls
+    const br = Math.max(3, railH * 0.26);
+    let bxs = i === 0 ? x + lw + 8 + br : x - lw - 8 - br;
+    const dir = i === 0 ? 1 : -1;
+    if (G.mode === 8 && P.group) {
+      const on = onSet(G.balls);
+      const list = (P.group === 'solid' ? [1, 2, 3, 4, 5, 6, 7] : [9, 10, 11, 12, 13, 14, 15]).filter(n => on.has(n));
+      if (!list.length) list.push(8);
+      for (const n of list) { miniBall(n, bxs, midY, br); bxs += dir * (br * 2 + 2); }
+    } else if (G.mode === 9 && P.fouls > 0) {
+      ctx.fillStyle = '#ff6655'; ctx.font = 'bold ' + (fs - 1) + 'px system-ui,sans-serif';
+      ctx.fillText('Fouls: ' + P.fouls, bxs - dir * br, midY);
+    }
+  }
+  // Zielkugeln mittig auf der oberen Bande
+  if (G.state !== 'over') {
+    const tg = currentTargets().sort((a, b) => a - b);
+    const br = Math.max(3.5, railH * 0.3), cxm = L.ox + W * s / 2;
+    let label = 'Ziel:', list = tg;
+    if (G.isBreak) { label = 'Anstoß'; list = []; }
+    else if (G.mode === 0 && G.solo.type === 'training') { label = 'Freies Spiel'; list = []; }
+    else if (G.mode === 0 && G.solo.type === 'lesson') { label = 'Lektion ' + (G.solo.step + 1) + ' / ' + LESSONS[G.solo.topic].length; list = []; }
+    else if (G.mode === 8 && !G.players[G.cur].group) { label = 'Ziel: Volle oder Halbe (nicht die 8)'; list = []; }
+    else if (list.length > 7) list = list.slice(0, 7);
+    ctx.font = 'bold ' + fs + 'px system-ui,sans-serif';
+    const lw = ctx.measureText(label).width, tw = lw + (list.length ? 6 + list.length * (br * 2 + 3) : 0) + 14;
+    ctx.fillStyle = 'rgba(40,20,8,.92)'; roundRect(cxm - tw / 2, midY - Math.max(fs * 0.7, br + 2), tw, Math.max(fs * 1.4, br * 2 + 4), Math.max(fs * 0.7, br + 2)); ctx.fill();
+    ctx.textAlign = 'left'; ctx.fillStyle = '#ffd76a'; ctx.fillText(label, cxm - tw / 2 + 7, midY);
+    let bx2 = cxm - tw / 2 + 7 + lw + 6 + br;
+    for (const n of list) { miniBall(n, bx2, midY, br); bx2 += br * 2 + 3; }
+  }
+  // Statuszeile auf der unteren Holzbande
+  const by = L.oy + (H + CUSH) * s + railH / 2 + 1;
+  ctx.textAlign = 'center'; ctx.font = fs + 'px system-ui,sans-serif';
+  // Beim Zielen zeigt die Statuszeile, was der Stoß nach den Regeln bedeutet
+  const v = G.state === 'aim' && isHumanTurn() && !G.dragging && linesMode() === 'all' ? G.predInfo : null;
+  const st = v ? v.t : statusText(), sw = ctx.measureText(st).width + 16;
+  ctx.fillStyle = 'rgba(40,20,8,.92)'; roundRect(L.ox + W * s / 2 - sw / 2, by - fs * 0.7, sw, fs * 1.4, fs * 0.7); ctx.fill();
+  if (v) { ctx.strokeStyle = v.c === 'good' ? '#3fd68b' : v.c === 'win' ? '#ffd75a' : '#ff6655'; ctx.lineWidth = 1.2; ctx.stroke(); }
+  ctx.fillStyle = v ? (v.c === 'good' ? '#3fd68b' : v.c === 'win' ? '#ffd75a' : '#ff8a7a') : 'rgba(255,255,255,.88)';
+  ctx.fillText(st, L.ox + W * s / 2, by);
+  // Toast
+  if (G.toast && performance.now() < G.toast.until) {
+    const a = Math.min(1, (G.toast.until - performance.now()) / 400);
+    ctx.font = 'bold ' + Math.max(12, fs) + 'px system-ui,sans-serif';
+    const lines = wrap(G.toast.text, W * s * 0.8);
+    const lh = Math.max(12, fs) + 4, bw = Math.min(W * s * 0.86, Math.max(...lines.map(l => ctx.measureText(l).width)) + 24), bh = lines.length * lh + 14;
+    const x = L.ox + W * s / 2 - bw / 2, y = L.oy + 10;
+    ctx.globalAlpha = a; ctx.fillStyle = 'rgba(8,14,12,.86)'; roundRect(x, y, bw, bh, 8); ctx.fill();
+    ctx.strokeStyle = 'rgba(242,182,50,.7)'; ctx.lineWidth = 1; ctx.stroke();
+    ctx.fillStyle = '#fff'; lines.forEach((l, i) => ctx.fillText(l, L.ox + W * s / 2, y + 7 + lh / 2 + i * lh));
+    ctx.globalAlpha = 1;
+  }
+}
+function wrap(t, maxw) {
+  const words = t.split(' '), out = []; let cur = '';
+  for (const w of words) { const n = cur ? cur + ' ' + w : w; if (ctx.measureText(n).width > maxw && cur) { out.push(cur); cur = w; } else cur = n; }
+  if (cur) out.push(cur); return out;
+}
+function statusText() {
+  if (!G) return '';
+  const P = G.players[G.cur];
+  if (G.state === 'over') return 'Spiel beendet';
+  if (G.state === 'replay') return 'Wiederholung in Zeitlupe – tippen zum Beenden';
+  if (G.mode === 0) {
+    const so = G.solo;
+    if (so.type === 'training') return 'Training · Kugel halten & ziehen · ⟲ Replay · ↶ Zurück';
+    if (so.type === 'lesson') return G.state === 'lessonaim' ? 'Die Linien zeigen den Lösungsstoß – tippe auf „Vorführen“' : 'Lektion – lies die Erklärung rechts';
+    let t = so.type === 'levels' ? LEVELS[so.idx].desc : 'Rekord: ' + SOLO.hi + ' · Linien-Bonus ×' + LINES_MULT[CFG.lines];
+    if (G.bih && G.state === 'aim') t += ' · Ball in Hand';
+    return t;
+  }
+  let t = P.name;
+  if (G.state === 'ai') t += ' überlegt …';
+  else if (G.state === 'replay') return 'Wiederholung in Zeitlupe – tippen zum Beenden';
+  else if (G.online && G.state === 'aim' && G.cur !== NET.me) t += ' zielt … (online)';
+  else if (G.state === 'waitnet') t += ' – warte auf Mitspieler …';
+  else if (G.state === 'moving') t += ' hat gestoßen';
+  else if (G.state === 'push') t += ' entscheidet nach Push-Out';
+  else t += ' ist am Zug';
+  if (G.isBreak) t += ' · Anstoß';
+  else if (G.mode === 8) {
+    if (!P.group) t += ' · Offener Tisch';
+    else if (legalTargets(8, P.group, onSet(G.balls))[0] === 8) t += ' · Auf die 8' + (CFG.call && isHumanTurn() ? (G.called === null ? ' – Tasche antippen' : ' – Tasche angesagt') : '');
+    else t += ' · ' + GROUP_NAME[P.group];
+  } else {
+    const t9 = legalTargets(9, null, onSet(G.balls))[0];
+    t += ' · Ziel: Kugel ' + t9;
+    if (G.pushShot) t += ' · PUSH-OUT';
+  }
+  if (G.bih && G.state === 'aim') t += G.bih === 'kitchen' ? ' · Ball in Hand (Kopffeld)' : ' · Ball in Hand';
+  return t;
+}
+
+function drawControls() {
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  const active = isHumanTurn();
+  ctx.globalAlpha = active ? 1 : 0.45;
+  // Kraft
+  const p = L.power;
+  ctx.fillStyle = '#16231e'; roundRect(p.x - 4, p.y - 4, p.w + 8, p.h + 8, 10); ctx.fill();
+  ctx.strokeStyle = '#2c4a3e'; ctx.lineWidth = 1; ctx.stroke();
+  const fh = p.h * G.power;
+  const g = ctx.createLinearGradient(0, p.y + p.h, 0, p.y);
+  g.addColorStop(0, '#3fb68b'); g.addColorStop(0.55, '#f2b632'); g.addColorStop(1, '#e0412f');
+  ctx.fillStyle = g; roundRect(p.x, p.y + p.h - fh, p.w, Math.max(4, fh), 6); ctx.fill();
+  const gl = ctx.createLinearGradient(p.x, 0, p.x + p.w, 0);
+  gl.addColorStop(0, 'rgba(0,0,0,.25)'); gl.addColorStop(0.35, 'rgba(255,255,255,.25)'); gl.addColorStop(1, 'rgba(0,0,0,.3)');
+  ctx.fillStyle = gl; roundRect(p.x, p.y + p.h - fh, p.w, Math.max(4, fh), 6); ctx.fill();
+  ctx.strokeStyle = 'rgba(255,255,255,.18)';
+  for (let i = 1; i < 10; i++) { const y = p.y + p.h * i / 10; ctx.beginPath(); ctx.moveTo(p.x + 4, y); ctx.lineTo(p.x + p.w - 4, y); ctx.stroke(); }
+  ctx.fillStyle = '#fff'; ctx.fillRect(p.x - 3, p.y + p.h - fh - 1.5, p.w + 6, 3);
+  ctx.font = 'bold 12px system-ui,sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillStyle = '#9fb5aa'; ctx.fillText('Kraft', p.x + p.w / 2, 13);
+  ctx.fillStyle = '#fff'; ctx.fillText(Math.round(G.power * 100) + '%', p.x + p.w / 2, p.y + p.h + 12);
+  // Effet (kleine Anzeige – gedrückt halten öffnet die große Kugel)
+  const sp = L.spin;
+  ctx.fillStyle = '#9fb5aa'; ctx.fillText('Effet', sp.cx, sp.cy - sp.r - 10);
+  miniBall(-1, sp.cx, sp.cy, sp.r);
+  ctx.strokeStyle = 'rgba(0,0,0,.18)'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(sp.cx - sp.r, sp.cy); ctx.lineTo(sp.cx + sp.r, sp.cy); ctx.moveTo(sp.cx, sp.cy - sp.r); ctx.lineTo(sp.cx, sp.cy + sp.r); ctx.stroke();
+  ctx.beginPath(); ctx.arc(sp.cx + G.sx * sp.r, sp.cy - G.sy * sp.r, sp.r * 0.2, 0, TAU);
+  ctx.fillStyle = 'rgba(40,90,175,.75)'; ctx.fill(); ctx.strokeStyle = '#123d7a'; ctx.stroke();
+  // Feinjustierung (Rändelrad)
+  const wh = L.wheel;
+  ctx.save(); roundRect(wh.x, wh.y, wh.w, wh.h, 8); ctx.clip();
+  const cg = ctx.createLinearGradient(wh.x, 0, wh.x + wh.w, 0);
+  cg.addColorStop(0, '#1b1b1b'); cg.addColorStop(0.3, '#6a6a6a'); cg.addColorStop(0.5, '#8a8a8a'); cg.addColorStop(0.75, '#4a4a4a'); cg.addColorStop(1, '#151515');
+  ctx.fillStyle = cg; ctx.fillRect(wh.x, wh.y, wh.w, wh.h);
+  const off = ((G.aim / WHEEL_RAD_PER_PX) % 8 + 8) % 8;
+  for (let y = wh.y - 8 + off; y < wh.y + wh.h + 8; y += 8) {
+    ctx.fillStyle = 'rgba(0,0,0,.45)'; ctx.fillRect(wh.x, y, wh.w, 2);
+    ctx.fillStyle = 'rgba(255,255,255,.18)'; ctx.fillRect(wh.x, y + 2, wh.w, 1);
+  }
+  const shade = ctx.createLinearGradient(0, wh.y, 0, wh.y + wh.h);
+  shade.addColorStop(0, 'rgba(0,0,0,.75)'); shade.addColorStop(0.3, 'rgba(0,0,0,0)'); shade.addColorStop(0.7, 'rgba(0,0,0,0)'); shade.addColorStop(1, 'rgba(0,0,0,.75)');
+  ctx.fillStyle = shade; ctx.fillRect(wh.x, wh.y, wh.w, wh.h);
+  ctx.restore();
+  ctx.strokeStyle = '#2c4a3e'; roundRect(wh.x, wh.y, wh.w, wh.h, 8); ctx.stroke();
+  for (const [r, sym] of [[L.nudgeUp, '▲  −0,01°'], [L.nudgeDown, '▼  +0,01°']]) {
+    ctx.fillStyle = '#1f3029'; roundRect(r.x, r.y, r.w, r.h, 7); ctx.fill(); ctx.strokeStyle = '#2c4a3e'; ctx.stroke();
+    ctx.fillStyle = '#cfe'; ctx.font = 'bold 11px system-ui,sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(sym, r.x + r.w / 2, r.y + r.h / 2);
+  }
+  const deg = ((G.aim * 180 / Math.PI) % 360 + 360) % 360;
+  ctx.font = 'bold 11px system-ui,sans-serif';
+  const tw = ctx.measureText(deg.toFixed(2) + '°').width + 10;
+  ctx.fillStyle = 'rgba(8,14,12,.85)'; roundRect(wh.x + wh.w / 2 - tw / 2, wh.y + wh.h / 2 - 9, tw, 18, 6); ctx.fill();
+  ctx.fillStyle = '#ffd76a'; ctx.fillText(deg.toFixed(2) + '°', wh.x + wh.w / 2, wh.y + wh.h / 2);
+  ctx.globalAlpha = 1;
+}
+
+// Große Kugel zum genauen Einstellen des Effets
+function drawSpinOverlay() {
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  ctx.fillStyle = 'rgba(0,0,0,.62)'; ctx.fillRect(0, 0, VW, VH);
+  const B = L.bigSpin, cx = B.cx, cy = B.cy, r = B.r;
+  miniBall(-1, cx, cy, r);
+  ctx.strokeStyle = 'rgba(0,0,0,.16)'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(cx - r, cy); ctx.lineTo(cx + r, cy); ctx.moveTo(cx, cy - r); ctx.lineTo(cx, cy + r); ctx.stroke();
+  for (const f of [0.25, 0.5]) { ctx.beginPath(); ctx.arc(cx, cy, r * f, 0, TAU); ctx.stroke(); }
+  ctx.setLineDash([5, 5]); ctx.strokeStyle = 'rgba(200,40,30,.55)';
+  ctx.beginPath(); ctx.arc(cx, cy, r * 0.8, 0, TAU); ctx.stroke(); ctx.setLineDash([]);
+  const mx = cx + G.sx * r, my = cy - G.sy * r;
+  ctx.beginPath(); ctx.arc(mx, my, r * 0.2, 0, TAU);
+  ctx.fillStyle = 'rgba(40,90,175,.55)'; ctx.fill(); ctx.strokeStyle = '#123d7a'; ctx.lineWidth = 2; ctx.stroke();
+  ctx.beginPath(); ctx.arc(mx, my, 3, 0, TAU); ctx.fillStyle = '#0b2550'; ctx.fill();
+  ctx.font = 'bold 13px system-ui,sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = '#fff';
+  ctx.fillText('Nachläufer', cx, cy - r - 14); ctx.fillText('Rückläufer', cx, cy + r + 14);
+  ctx.textAlign = 'right'; ctx.fillText('Links', cx - r - 10, cy);
+  ctx.textAlign = 'left'; ctx.fillText('Rechts', cx + r + 10, cy);
+  ctx.textAlign = 'center'; ctx.font = '12px system-ui,sans-serif'; ctx.fillStyle = '#ffd76a';
+  const v = Math.round(Math.abs(G.sy) * 125), h = Math.round(Math.abs(G.sx) * 125);
+  const desc = (G.sy > 0.02 ? 'Nachläufer ' + v + '%' : G.sy < -0.02 ? 'Rückläufer ' + v + '%' : 'Mitte') + ' · ' + (G.sx > 0.02 ? 'Rechts ' + h + '%' : G.sx < -0.02 ? 'Links ' + h + '%' : 'kein Seiteneffet');
+  ctx.fillText(desc, cx, Math.min(VH - 10, cy + r + 32));
+  ctx.fillStyle = 'rgba(255,255,255,.6)';
+  ctx.fillText('Finger bewegen · loslassen übernimmt · doppelt tippen = Mitte', cx, Math.max(10, cy - r - 34));
+}
+
+// Kugel in Bildschirm-Koordinaten (für Anzeigen)
+function miniBall(n, x, y, r) {
+  const rpx = r * DPR, s = ballSprite('m' + n + '_' + Math.round(rpx), n, IDENT3, 'm', rpx);
+  const hs = s.size / 2 / DPR;
+  ctx.drawImage(s.cv, x - hs, y - hs, hs * 2, hs * 2);
+}
+
+function draw() {
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.fillStyle = '#0d1512'; ctx.fillRect(0, 0, cv.width, cv.height);
+  if (!G) { drawTableBase(); return; }
+  drawTableBase();
+  tableTransform();
+  const px = 1 / L.s;
+  const balls = G.replay ? G.replay.S.balls : G.live ? G.live.balls : G.balls;
+  const cue = getBall(balls, 0);
+  const aiming = (G.state === 'aim' && !G.ai[G.cur]) || G.state === 'aipreview' || G.state === 'strike' || G.state === 'lessonaim';
+  const now = performance.now();
+  updateOrient(balls);
+  const humanAim = G.state === 'aim' && !G.ai[G.cur];
+  if (humanAim) drawTargetGlow(now, true);
+  // Taschenansage
+  if (aiming && needCall()) {
+    for (let k = 0; k < 6; k++) {
+      const d = POCKET_DRAW[k];
+      ctx.beginPath(); ctx.arc(d.x, d.y, d.r + 1.4, 0, TAU);
+      ctx.strokeStyle = G.called === k ? '#f2b632' : 'rgba(255,255,255,.3)'; ctx.lineWidth = (G.called === k ? 3 : 1.2) * px; ctx.stroke();
+      if (G.called === k) { ctx.fillStyle = '#f2b632'; ctx.font = 'bold 5px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('8', d.x, d.y); }
+    }
+  }
+  if (G.mode === 0) drawSoloTable();
+  drawSinking(now);
+  drawShadows(balls);
+  // Vorschau
+  let S = null;
+  if (aiming && cue.on) {
+    S = getPrediction();
+    if (!G.calledManual && needCall() && G.state === 'aim') { const e = S.ev.potted.find(p => p.n === 8); G.called = e ? e.pocket : null; }
+    drawPrediction(S);
+  }
+  for (const b of balls) if (b.on) drawBall(b.n, b.x, b.y, G.dragging && b.n === G.dragN ? 1.14 : 1);
+  if (humanAim) drawTargetGlow(now, false);
+  if (G.mode === 0 && G.solo.type === 'lesson') drawLesson(now);
+  else if (G.mode === 0) drawSoloOverlay(S);
+  if (aiming && cue.on) {
+    ctx.save(); ctx.beginPath(); ctx.rect(-BORDER, -BORDER, W + 2 * BORDER, H + 2 * BORDER); ctx.clip();
+    if (G.bih && humanAim) drawBallInHand(cue, now);
+    if (!G.dragging) drawCue(cue, G.state === 'strike' ? strikeOffset(now) : 0);
+    ctx.restore();
+  }
+  drawFloats(now);
+  drawHUD();
+  if (!L.lesson) drawControls();
+  if (G.state === 'replay') {
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    const x = L.ox + 10, y = L.oy + 14, blink = Math.sin(now / 250) > 0;
+    ctx.fillStyle = 'rgba(8,14,12,.8)'; roundRect(x - 6, y - 11, 150, 22, 11); ctx.fill();
+    if (blink) { ctx.beginPath(); ctx.arc(x + 5, y, 5, 0, TAU); ctx.fillStyle = '#ff3b30'; ctx.fill(); }
+    ctx.fillStyle = '#fff'; ctx.font = 'bold 12px system-ui,sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    ctx.fillText('REPLAY · Zeitlupe', x + 16, y);
+  }
+  if (G.spinUI) drawSpinOverlay();
+  drawConfetti(LAST_DT);
+}
+
+// ===================== Eingabe =====================
+const ptrs = new Map();
+const WHEEL_RAD_PER_PX = 0.00006; // ca. 0,0034° pro Pixel
+let lastSpinTap = 0;
+function toTable(x, y) { return {x: (x - L.ox) / L.s, y: (y - L.oy) / L.s}; }
+const inRect = (x, y, r) => x >= r.x && x <= r.x + r.w && y >= r.y && y <= r.y + r.h;
+// Kugel, die man an dieser Stelle aufnehmen darf (Ball in Hand / Training)
+function movableBallAt(t) {
+  const training = G.mode === 0 && G.solo.type === 'training';
+  if (!training && !G.bih) return null;
+  let best = null, bd = Math.max(R * 2.2, 24 / L.s);
+  for (const b of G.balls) {
+    if (!b.on || (!training && b.n !== 0)) continue;
+    const d = Math.hypot(t.x - b.x, t.y - b.y);
+    if (d < bd) { bd = d; best = b; }
+  }
+  return best;
+}
+const NUDGE = 0.000175; // ca. 0,01° pro Tipp
+function nudge(dir, mult) { G.aim += dir * NUDGE * (mult || 1); }
+cv.addEventListener('pointerdown', e => {
+  if (!G) return;
+  initAudio();
+  if (G.state === 'replay') { endReplay(); return; }
+  if (!$('chatDlg').classList.contains('hidden')) hide('chatDlg');
+  if (ptrs.size) return; // immer nur ein Finger gleichzeitig
+  const x = e.clientX, y = e.clientY, sp = L.spin;
+  let kind = null;
+  if (x < L.left) kind = 'power';
+  else if (Math.hypot(x - sp.cx, y - sp.cy) < sp.r + 8) kind = 'spin';
+  else if (inRect(x, y, L.nudgeUp)) kind = 'nudge-';
+  else if (inRect(x, y, L.nudgeDown)) kind = 'nudge+';
+  else if (x > L.rx && y > L.wheel.y - 4 && y < L.wheel.y + L.wheel.h + 4) kind = 'wheel';
+  else if (x >= L.left && x <= L.rx) kind = 'table';
+  if (!kind || !isHumanTurn()) return;
+  e.preventDefault();
+  try { cv.setPointerCapture(e.pointerId); } catch (err) {}
+  const now = performance.now();
+  const st = {kind, ly: y, x0: x, y0: y, t0: now, drag: false};
+  ptrs.set(e.pointerId, st);
+  if (kind === 'spin') {
+    if (now - lastSpinTap < 300) { G.sx = G.sy = 0; G.spinUI = false; st.kind = 'none'; lastSpinTap = 0; return; }
+    lastSpinTap = now;
+    G.spinUI = true; st.lx = x; st.ly = y; return;
+  }
+  if (kind === 'nudge-' || kind === 'nudge+') { st.dir = kind === 'nudge+' ? 1 : -1; st.next = now + 380; nudge(st.dir); return; }
+  if (kind === 'table') {
+    const t = toTable(x, y);
+    // Taschenansage nur durch Antippen einer Tasche
+    if (needCall()) {
+      for (let k = 0; k < 6; k++) { const d = POCKET_DRAW[k]; if (Math.hypot(t.x - d.x, t.y - d.y) < 9) { G.called = k; G.calledManual = true; st.kind = 'none'; return; } }
+    }
+    // Kugel aufnehmen nur durch kurzes Gedrückthalten – Wischen zielt immer
+    const mv = movableBallAt(t);
+    if (mv) { st.kind = 'hold'; st.n = mv.n; st.dx = mv.x - t.x; st.dy = mv.y - t.y; return; }
+  }
+  handlePtr(st, x, y);
+});
+cv.addEventListener('pointermove', e => {
+  const st = ptrs.get(e.pointerId);
+  if (!st || !isHumanTurn()) return;
+  const x = e.clientX, y = e.clientY;
+  if (st.kind === 'hold') {
+    if (Math.hypot(x - st.x0, y - st.y0) < 9) return;
+    st.kind = 'table'; // bewegt, bevor die Kugel aufgenommen wurde: zielen
+  }
+  handlePtr(st, x, y);
+});
+const endPtr = e => {
+  const st = ptrs.get(e.pointerId);
+  if (st && G) {
+    if (st.kind === 'spin') G.spinUI = false;
+    if (st.drag) G.dragging = false;
+    // kurzes Antippen einer Kugel: auf sie zielen
+    if (st.kind === 'hold' && isHumanTurn() && st.n !== 0) { const b = getBall(G.balls, st.n), c = getBall(G.balls, 0); G.aim = Math.atan2(b.y - c.y, b.x - c.x); }
+  }
+  ptrs.delete(e.pointerId);
+};
+cv.addEventListener('pointerup', endPtr); cv.addEventListener('pointercancel', endPtr);
+// Gedrückthalten und Wiederholung der Feinpfeile
+function pointerTick(now) {
+  for (const st of ptrs.values()) {
+    if (st.kind === 'hold' && now - st.t0 > 230 && isHumanTurn()) {
+      st.kind = 'table'; st.drag = true; st.dragN = st.n; G.dragging = true; G.dragN = st.n; vibrate(15);
+    } else if ((st.kind === 'nudge-' || st.kind === 'nudge+') && now >= st.next && isHumanTurn()) {
+      nudge(st.dir, now - st.t0 > 1800 ? 5 : 1); st.next = now + 55;
+    }
+  }
+}
+
+function handlePtr(st, x, y) {
+  if (st.kind === 'power') G.power = clamp((L.power.y + L.power.h - y) / L.power.h, 0.02, 1);
+  else if (st.kind === 'spin') {
+    // Relativ zur großen Kugel: der Finger verdeckt den Treffpunkt nicht
+    let sx = G.sx + (x - st.lx) / L.bigSpin.r, sy = G.sy - (y - st.ly) / L.bigSpin.r;
+    st.lx = x; st.ly = y;
+    const m = Math.hypot(sx, sy); if (m > 0.8) { sx *= 0.8 / m; sy *= 0.8 / m; }
+    G.sx = sx; G.sy = sy;
+  } else if (st.kind === 'wheel') {
+    const dy = y - st.ly; st.ly = y;
+    G.aim += dy * WHEEL_RAD_PER_PX * (Math.abs(dy) < 2 ? 0.5 : 1);
+  } else if (st.kind === 'table') {
+    const t = toTable(x, y), cue = getBall(G.balls, 0);
+    if (st.drag) {
+      const b = getBall(G.balls, st.dragN), kitchen = st.dragN === 0 && G.bih === 'kitchen';
+      const px = clamp(t.x + st.dx, R, kitchen ? HEAD_X : W - R), py = clamp(t.y + st.dy, R, H - R);
+      if (placeOK(G.balls, px, py, kitchen, st.dragN)) { b.x = px; b.y = py; b.on = true; G.ver++; }
+      else G.badPlaceT = performance.now();
+    } else if (Math.hypot(t.x - cue.x, t.y - cue.y) > 1) G.aim = Math.atan2(t.y - cue.y, t.x - cue.x);
+  }
+}
+
+// ===================== UI =====================
+const $ = id => document.getElementById(id);
+const show = id => $(id).classList.remove('hidden');
+const hide = id => $(id).classList.add('hidden');
+function toast(text, ms) { if (G) G.toast = {text, until: performance.now() + (ms || 2600)}; }
+const LINE_NAMES = {all: 'Alle', guide: 'Einfach', off: 'Aus'};
+function updateUI() {
+  $('bLines').textContent = 'Linien: ' + LINE_NAMES[CFG.lines];
+  if (!G) return;
+  const inLesson = G.mode === 0 && G.solo.type === 'lesson';
+  for (const id of ['bShoot', 'bLines', 'bReplay', 'bMenu']) $(id).classList.toggle('hidden', inLesson);
+  if (inLesson) { hide('bPush'); hide('bUndo'); hide('bChat'); return; }
+  $('bShoot').disabled = !isHumanTurn();
+  const canPush = G.mode === 9 && G.pushAvail && isHumanTurn();
+  $('bPush').classList.toggle('hidden', !canPush);
+  $('bPush').classList.toggle('on', !!G.pushShot);
+  $('bPush').textContent = 'Push';
+  const training = G.mode === 0 && G.solo.type === 'training';
+  $('bUndo').classList.toggle('hidden', !training);
+  $('bUndo').disabled = !(training && isHumanTurn() && G.beforeBalls);
+  $('bUndo').textContent = '↶';
+  const half = canPush || training;
+  place('bReplay', L.row.x, L.row.y, half ? L.row.half : L.row.w, 32);
+  $('bReplay').textContent = half ? '⟲' : '⟲ Replay';
+  $('bReplay').disabled = !(isHumanTurn() && G.lastShot);
+  $('bChat').classList.toggle('hidden', !G.online);
+  place('bMenu', L.bx, 6, G.online ? L.bw - 40 : L.bw, 32);
+  place('bChat', L.bx + L.bw - 34, 6, 34, 32);
+}
+function syncMenu() {
+  if (CFG.mode !== 9) CFG.mode = 8;
+  document.querySelectorAll('.seg[data-k]').forEach(seg => {
+    const k = seg.dataset.k;
+    seg.querySelectorAll('button').forEach(b => b.classList.toggle('sel', String(CFG[k]) === b.dataset.v));
+  });
+  $('bResume').classList.toggle('hidden', !G || G.state === 'over');
+  renderLobby();
+}
+document.querySelectorAll('.seg[data-k]').forEach(seg => seg.addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  const k = seg.dataset.k, v = b.dataset.v;
+  CFG[k] = (k === 'opp' || k === 'solo' || k === 'cloth') ? v : +v;
+  if (k === 'cloth') applyCloth();
+  saveCfg(); syncMenu();
+}));
+document.querySelectorAll('.tile').forEach(t => t.onclick = () => {
+  initAudio(); tryFullscreen();
+  const go = t.dataset.go;
+  if (go === 'ai' || go === 'human') { CFG.opp = go; saveCfg(); if (G && G.online) netReset(); newGame(); }
+  else if (go === 'online') { CFG.opp = 'online'; saveCfg(); openOnline(); }
+  else if (go === 'levels') showLevels();
+  else newSolo(go);
+});
+$('bDaily').onclick = () => claimDaily();
+$('bShop').onclick = () => showShop();
+$('bShopClose').onclick = () => { hide('shop'); syncMenu(); show('menu'); };
+document.querySelectorAll('#shopTabs button').forEach(b => b.onclick = () => { shopTab = b.dataset.tab; $('shopMsg').textContent = ''; renderShop(); });
+$('bLevelsBack').onclick = () => { hide('levels'); syncMenu(); show('menu'); };
+$('lsBack').onclick = () => { if (G && G.solo.step > 0) lessonStep(G.solo.step - 1); };
+$('lsNext').onclick = () => { if (!G) return; const n = LESSONS[G.solo.topic].length; if (G.solo.step < n - 1) lessonStep(G.solo.step + 1); else lessonFinish(); };
+$('lsDemo').onclick = () => lessonDemo();
+$('lsClose').onclick = () => lessonExit();
+$('bRulesClose').onclick = () => { hide('rules'); };
+$('bNext').onclick = () => newSolo('levels', G.nextLevel);
+$('bResume').onclick = () => hide('menu');
+$('bMenu').onclick = () => { syncMenu(); show('menu'); };
+$('bRules').onclick = () => show('rules');
+$('bAgain').onclick = () => {
+  if (G.mode === 0) newSolo(G.solo.type, G.solo.idx);
+  else if (G.online && NET.on) { if (NET.role === 'host') netStartGame(); else { netSend({t: 'rematch'}); hide('over'); toast('Revanche angefragt …'); } }
+  else newGame();
+};
+$('bSettings').onclick = () => { syncMenu(); $('nameInput').value = CFG.name || ''; show('settings'); };
+$('bSettingsClose').onclick = () => {
+  CFG.name = $('nameInput').value.trim().slice(0, 16); saveCfg(); hide('settings'); syncMenu();
+  if (G && !G.online && G.mode !== 0) G.players[0].name = myName();
+};
+$('bStats').onclick = () => showStats();
+$('bStatsClose').onclick = () => { hide('stats'); syncMenu(); };
+$('bStatsReset').onclick = () => { Object.assign(STATS, {games: 0, wins: 0, shots: 0, pots: 0, fouls: 0, best: 0}); saveStats(); showStats(); };
+$('bReplay').onclick = () => startReplay();
+$('bUndo').onclick = () => {
+  if (!isHumanTurn() || !G.beforeBalls) return;
+  G.balls = cloneBalls(G.beforeBalls); G.ver++; G.bih = 'any';
+  for (const b of G.balls) { const o = G.orient[b.n]; if (o) { o.lx = b.x; o.ly = b.y; o.ver++; } }
+  toast('Stoß rückgängig gemacht.');
+};
+$('bChat').onclick = () => $('chatDlg').classList.toggle('hidden');
+document.querySelectorAll('#chatDlg button').forEach(b => b.onclick = () => {
+  netSend({t: 'chat', text: b.textContent}); toast('Du: ' + b.textContent, 2000); hide('chatDlg');
+});
+// Online-Ablauf
+function openOnline() {
+  NET.mode = +CFG.mode;
+  ['onHost', 'onJoin', 'joinAnswerBox'].forEach(hide); show('onStep0');
+  ['hostCode', 'hostAnswer', 'joinCode', 'joinAnswer'].forEach(id => $(id).value = '');
+  onlineStatus(window.RTCPeerConnection ? '' : 'Dieses Gerät unterstützt keine Direktverbindung.');
+  hide('menu'); show('online');
+}
+const onErr = e => onlineStatus('Fehler: ' + (e && e.message ? e.message : e));
+$('bHost').onclick = () => {
+  hide('onStep0'); show('onHost'); onlineStatus('Einladungscode wird erstellt …');
+  netHost().then(code => { $('hostCode').value = code; onlineStatus('Fertig! Teile den Einladungscode mit deinem Freund.'); }).catch(onErr);
+};
+$('bJoin').onclick = () => { hide('onStep0'); show('onJoin'); onlineStatus(''); };
+$('bShareHost').onclick = () => { if ($('hostCode').value) shareText($('hostCode').value); };
+$('bCopyHost').onclick = () => { if ($('hostCode').value) copyText($('hostCode').value); };
+$('bPasteAnswer').onclick = () => pasteText().then(t => { $('hostAnswer').value = t; });
+$('bConnect').onclick = () => {
+  if (!NET.pc) return;
+  onlineStatus('Verbinde …');
+  netHostAccept($('hostAnswer').value).catch(() => onlineStatus('Der Antwortcode ist ungültig. Bitte vollständig einfügen.'));
+};
+$('bPasteJoin').onclick = () => pasteText().then(t => { $('joinCode').value = t; });
+$('bMakeAnswer').onclick = () => {
+  onlineStatus('Antwortcode wird erstellt …');
+  netJoin($('joinCode').value).then(code => { $('joinAnswer').value = code; show('joinAnswerBox'); onlineStatus('Schicke jetzt den Antwortcode zurück und warte kurz.'); })
+    .catch(() => onlineStatus('Der Einladungscode ist ungültig. Bitte vollständig einfügen.'));
+};
+$('bShareJoin').onclick = () => { if ($('joinAnswer').value) shareText($('joinAnswer').value); };
+$('bCopyJoin').onclick = () => { if ($('joinAnswer').value) copyText($('joinAnswer').value); };
+$('bOnlineBack').onclick = () => { if (!NET.on) netReset(); hide('online'); syncMenu(); show('menu'); };
+$('bOverMenu').onclick = () => { hide('over'); syncMenu(); show('menu'); };
+$('bShoot').onclick = () => shoot();
+$('bLines').onclick = () => { CFG.lines = CFG.lines === 'all' ? 'guide' : CFG.lines === 'guide' ? 'off' : 'all'; saveCfg(); updateUI(); };
+$('bPush').onclick = () => { if (!isHumanTurn()) return; G.pushShot = !G.pushShot; if (G.pushShot) toast('Push-Out angesagt: Nur die Regeln zur Weißen gelten.'); updateUI(); };
+$('bTake').onclick = () => { hide('pushDlg'); if (G.online) netSend({t: 'push', take: true}); startTurn(); };
+$('bPass').onclick = () => {
+  hide('pushDlg'); if (G.online) netSend({t: 'push', take: false});
+  G.cur = 1 - G.cur; toast('Zurückgegeben – ' + G.players[G.cur].name + ' ist am Zug.'); startTurn();
+};
+window.onAndroidBack = () => {
+  for (const id of ['chatDlg', 'settings', 'stats']) if (!$(id).classList.contains('hidden')) { hide(id); return true; }
+  if (!$('shop').classList.contains('hidden')) { $('bShopClose').onclick(); return true; }
+  if (!$('online').classList.contains('hidden')) { $('bOnlineBack').onclick(); return true; }
+  if (G && G.state === 'replay') { endReplay(); return true; }
+  if (!$('lessonBox').classList.contains('hidden')) { lessonExit(); return true; }
+  if (!$('rules').classList.contains('hidden')) { hide('rules'); return true; }
+  if (!$('levels').classList.contains('hidden')) { hide('levels'); syncMenu(); show('menu'); return true; }
+  if ($('menu').classList.contains('hidden')) { syncMenu(); show('menu'); return true; }
+  if (G && G.state !== 'over') { hide('menu'); return true; }
+  return false;
+};
+
+// ===================== Hauptschleife =====================
+let lastT = performance.now(), LAST_DT = 0;
+function frame(now) {
+  const dt = Math.min(0.05, (now - lastT) / 1000); lastT = now; LAST_DT = dt;
+  const paused = G && !G.online && ['menu', 'shop', 'stats', 'settings', 'levels', 'rules', 'online'].some(id => !$(id).classList.contains('hidden'));
+  if (G && !paused) {
+    netTick(now);
+    pointerTick(now);
+    if (G.state === 'moving' && G.live) {
+      const S = G.live, target = S.t + dt * TIME_SCALE;
+      let moving = true;
+      while (S.t < target) { if (!stepSim(S)) { moving = false; break; } }
+      trackSinking(S, now);
+      if (!moving) finishShot();
+    } else if (G.state === 'replay') {
+      const RP = G.replay, S = RP.S;
+      if (!RP.end) {
+        const target = S.t + dt * 0.45;
+        while (S.t < target) { if (!stepSim(S)) { RP.end = now; break; } }
+        trackSinking(S, now);
+      } else if (now - RP.end > 900) endReplay();
+    } else if (G.state === 'strike') {
+      if ((now - G.strikeT) * TIME_SCALE >= STRIKE_MS) launchShot();
+    } else if (G.state === 'ai') {
+      runAI();
+    } else if (G.state === 'aipreview' && now - G.aiT > 900 / TIME_SCALE) {
+      shoot();
+    }
+  }
+  if (!$('menu').classList.contains('hidden')) { drawLobbyBg(now, dt); drawHeroBall($('heroBall'), 8, dt, 0.7); }
+  else draw();
+  applyShake();
+  requestAnimationFrame(frame);
+}
+window.addEventListener('resize', () => { layout(); });
+layout(); syncMenu(); updateUI(); show('menu');
+startLoading();
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

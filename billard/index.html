@@ -462,6 +462,42 @@ button{font-family:var(--disp)}
 #menu .tile::after{mix-blend-mode:normal;opacity:.28}
 #menu .tile,#carousel .tile{will-change:auto}
 #menu .tile.act{will-change:transform}
+/* ===================== Version 6 ===================== */
+#banner{position:fixed;left:50%;top:12px;z-index:150;transform:translateX(-50%);min-width:min(420px,86vw);padding:10px 22px 10px 18px;border-radius:16px;background:linear-gradient(180deg,rgba(60,44,10,.97),rgba(20,14,3,.97));border:1px solid rgba(255,205,90,.75);box-shadow:0 0 30px rgba(255,190,50,.35),0 14px 40px rgba(0,0,0,.6);display:flex;flex-direction:column;align-items:center;gap:2px;pointer-events:none;font-family:var(--disp)}
+#banner b{font-size:16px;font-weight:900;font-style:italic;color:#ffe08a;letter-spacing:.3px;text-align:center}
+#banner small{font-size:12px;color:#e8d9b0}
+#banner.go{animation:bannerIn 3.2s cubic-bezier(.2,.9,.3,1.1) both}
+@keyframes bannerIn{0%{opacity:0;transform:translate(-50%,-30px) scale(.9)}10%{opacity:1;transform:translate(-50%,0) scale(1.04)}16%{transform:translate(-50%,0) scale(1)}88%{opacity:1;transform:translate(-50%,0)}100%{opacity:0;transform:translate(-50%,-20px)}}
+#menu .rankChip{display:inline-block;margin-left:7px;padding:1px 7px;border-radius:999px;font:800 9.5px var(--disp);font-style:normal;letter-spacing:.8px;text-transform:uppercase;color:#10141a;background:var(--rc,#d89058);vertical-align:2px;box-shadow:0 0 10px -2px var(--rc,#d89058)}
+#overRank{margin-top:8px;min-height:0}
+#overRank span{display:inline-block;padding:4px 14px;border-radius:999px;font:800 13px var(--disp);color:#10141a;background:var(--rc);box-shadow:0 0 16px -3px var(--rc)}
+#overStats table{margin:10px auto 0;border-collapse:collapse;font-family:var(--disp);font-size:13px;min-width:min(360px,80vw)}
+#overStats td{padding:3px 12px;text-align:center;color:#e6eef8;font-weight:700}
+#overStats th{padding:3px 8px;color:#9fb0c4;font-weight:600;font-size:12px}
+#overStats tr:first-child td{color:#ffe08a}
+#overStats tr+tr{border-top:1px solid rgba(255,255,255,.06)}
+#histBox h2{font-size:15px;margin:14px 0 6px;text-align:left}
+.rankBig{display:inline-block;padding:6px 14px;border-radius:12px;font:800 14px var(--disp);color:#10141a;background:var(--rc);box-shadow:0 0 18px -4px var(--rc)}
+.hist{display:flex;flex-direction:column;gap:4px;text-align:left}
+.hist div{display:grid;grid-template-columns:100px 1fr auto;gap:8px;align-items:center;padding:6px 10px;border-radius:10px;background:rgba(255,255,255,.04);border-left:3px solid #ff5d6c;font-size:13px}
+.hist div.w{border-left-color:#3fe08a}
+.hist b{font-weight:800}.hist div.w b{color:#7cffb4}.hist div.l b{color:#ff8a8a}
+.hist small{color:#8ea1b6}
+#avPick{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;max-width:330px}
+#avPick .av{width:34px;height:34px;border-radius:50%;border:2px solid rgba(255,255,255,.15);font:800 16px var(--disp);color:#1a1206;cursor:pointer;padding:0}
+#avPick .av.sel{border-color:#ffc23a;box-shadow:0 0 12px rgba(255,190,50,.7)}
+.bkBtns{display:flex;gap:6px}
+.bkBtns button{background:linear-gradient(180deg,rgba(52,64,84,.9),rgba(22,28,40,.9));border:1px solid rgba(255,255,255,.14);color:#e6eef8;border-radius:10px;padding:7px 12px;font-weight:700}
+#bkText{width:100%;box-sizing:border-box;margin-top:6px;background:rgba(0,0,0,.4);color:#cfe3ff;border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:8px;font:12px monospace;resize:none;user-select:text;-webkit-user-select:text}
+.introPanel{width:min(460px,92vw);padding:22px 26px}
+#introIcon{font-size:54px;line-height:1;margin-bottom:6px;filter:drop-shadow(0 6px 14px rgba(0,0,0,.5))}
+#introText{color:#c9d6e4;font-size:15px;line-height:1.45;min-height:66px}
+#introDots{display:flex;gap:6px;justify-content:center}
+#introDots i{width:7px;height:7px;border-radius:4px;background:rgba(255,255,255,.25);transition:width .25s}
+#introDots i.on{width:20px;background:linear-gradient(90deg,#ffe9a3,#ffc23a)}
+.upBtn{display:block;margin:4px auto 0;padding:4px 10px;border-radius:9px;font:800 11px var(--disp);color:#04121f;background:linear-gradient(180deg,#6fe0ff,#1e8fe0);box-shadow:0 2px 8px rgba(40,160,255,.4)}
+.upBtn.max{background:linear-gradient(180deg,#ffe58a,#e48a06);color:#3a1d00}
+
 </style>
 </head>
 <body>
@@ -496,7 +532,7 @@ button{font-family:var(--disp)}
   <div class="lobbyWrap">
     <div class="lobbyHead">
       <div class="logo"><canvas id="heroBall"></canvas><div class="wm"><b>BILLARD</b><i>LINIEN</i></div></div>
-      <div class="pcard" id="pcard" title="Level-Belohnungen"><div class="avRing" id="lbRing"><div class="avatar" id="lbAvatar">S</div><span class="lvBadge" id="lbLvNum">1</span></div><div class="pinfo"><b id="lbName">Spieler 1</b><div class="xpbar"><div id="lbXp"></div></div><small id="lbLevel">Level 1</small></div><span class="trkBtn"><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M5 12v9h14v-9M12 8v13M12 8c-1.5-4-6-4.5-6-1.5S12 8 12 8zM12 8c1.5-4 6-4.5 6-1.5S12 8 12 8z"/></svg></span></div>
+      <div class="pcard" id="pcard" title="Level-Belohnungen"><div class="avRing" id="lbRing"><div class="avatar" id="lbAvatar">S</div><span class="lvBadge" id="lbLvNum">1</span></div><div class="pinfo"><b id="lbName">Spieler 1</b><i class="rankChip" id="lbRank">Bronze</i><div class="xpbar"><div id="lbXp"></div></div><small id="lbLevel">Level 1</small></div><span class="trkBtn"><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M5 12v9h14v-9M12 8v13M12 8c-1.5-4-6-4.5-6-1.5S12 8 12 8zM12 8c1.5-4 6-4.5 6-1.5S12 8 12 8z"/></svg></span></div>
       <div class="hdrRight">
         <button class="coins" id="lbCoinsBtn" title="Shop"><i class="coin"></i><span id="lbCoins">0</span><b class="plus">+</b></button>
         <button id="bDaily" class="daily"><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M5 12v9h14v-9M12 8v13M12 8c-1.5-4-6-4.5-6-1.5S12 8 12 8zM12 8c1.5-4 6-4.5 6-1.5S12 8 12 8z"/></svg><span id="bDailyTxt">Tagesbonus</span></button>
@@ -504,7 +540,7 @@ button{font-family:var(--disp)}
     </div>
     <div class="lobbyOpts">
       <span>Spiel</span><div class="seg" data-k="mode"><button data-v="8">8-Ball</button><button data-v="9">9-Ball</button></div>
-      <span>Gegner</span><div class="seg" data-k="diff"><button data-v="0">Leicht</button><button data-v="1">Mittel</button><button data-v="2">Schwer</button></div>
+      <span>Gegner</span><div class="seg" data-k="diff"><button data-v="0">Leicht</button><button data-v="1">Mittel</button><button data-v="2">Schwer</button><button data-v="3">Profi</button></div>
     </div>
     <div class="stage">
       <div class="rail">
@@ -522,6 +558,8 @@ button{font-family:var(--disp)}
         <button class="tile" data-go="target" style="--c1:#ff5d6c;--c2:#450a14"><canvas class="art" data-art="target"></canvas><span class="tag">NEU · MINISPIEL</span><span class="tbody"><b>Zielscheibe</b><small id="tTgt"></small><p>Weiße genau ins Zentrum legen.</p></span><span class="play">Spielen <svg viewBox="0 0 24 24"><path d="M8 4.5l12 7.5-12 7.5z" class="f"/></svg></span></button>
         <button class="tile" data-go="lucky" style="--c1:#46e38f;--c2:#06361b"><canvas class="art" data-art="lucky"></canvas><span class="tag">TÄGLICH GRATIS</span><span class="tbody"><b>Glücksstoß</b><small id="tLucky"></small><p>Jede Tasche ein Preis – bis 800 Münzen.</p></span><span class="play">Spielen <svg viewBox="0 0 24 24"><path d="M8 4.5l12 7.5-12 7.5z" class="f"/></svg></span></button>
         <button class="tile" data-go="human" style="--c1:#43d9a0;--c2:#073a2a"><canvas class="art" data-art="human"></canvas><span class="tag">LOKAL</span><span class="tbody"><b>2 Spieler</b><small>An einem Gerät</small><p>Abwechselnd stoßen, ohne Internet.</p></span><span class="play">Spielen <svg viewBox="0 0 24 24"><path d="M8 4.5l12 7.5-12 7.5z" class="f"/></svg></span></button>
+        <button class="tile" data-go="daily" style="--c1:#ff9f43;--c2:#4a2405"><canvas class="art" data-art="daily"></canvas><span class="tag">TÄGLICH NEU</span><span class="tbody"><b>Tageslevel</b><small id="tDaily"></small><p>Jeden Tag eine andere Herausforderung.</p></span><span class="play">Spielen <svg viewBox="0 0 24 24"><path d="M8 4.5l12 7.5-12 7.5z" class="f"/></svg></span></button>
+        <button class="tile" data-go="speed" style="--c1:#4fd1ff;--c2:#05304a"><canvas class="art" data-art="speed"></canvas><span class="tag">NEU · ZEITRENNEN</span><span class="tbody"><b>Zeitrennen</b><small id="tSpeed"></small><p>15 Kugeln so schnell wie möglich abräumen.</p></span><span class="play">Spielen <svg viewBox="0 0 24 24"><path d="M8 4.5l12 7.5-12 7.5z" class="f"/></svg></span></button>
         <button class="tile" data-go="training" style="--c1:#3fd6e0;--c2:#063940"><canvas class="art" data-art="training"></canvas><span class="tag">ÜBEN</span><span class="tbody"><b>Training</b><small>Kugeln frei setzen</small><p>Jeden Stoß in Ruhe üben.</p></span><span class="play">Spielen <svg viewBox="0 0 24 24"><path d="M8 4.5l12 7.5-12 7.5z" class="f"/></svg></span></button>
         </div>
         <button class="carArrow r" id="carR"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
@@ -610,6 +648,12 @@ button{font-family:var(--disp)}
       <li><b>🎡 Glücksrad:</b> Einmal am Tag gratis drehen, jede weitere Drehung kostet 150 Münzen.</li>
       <li><b>🍀 Glücksstoß:</b> Ein Stoß auf die 1 – jede Tasche hat einen anderen Preis bis 800 Münzen. Einmal täglich gratis, danach 50 Münzen.</li>
       <li><b>🎯 Zielscheibe:</b> Fünf Stöße nur mit der Weißen. Bleibt sie im Zentrum liegen, gibt es 100 Punkte, im Ring 50, außen 20.</li>
+      <li><b>🏆 Liga:</b> Siege gegen den Computer und online bringen Rangpunkte, Niederlagen kosten welche. Ränge: Bronze, Silber, Gold, Platin, Diamant, Meister – jeder Aufstieg bringt eine Prämie.</li>
+      <li><b>⬆ Queue-Upgrades:</b> Im Inventar rüstest du jeden Queue bis Stufe 5 auf. Jede Stufe verbessert Kraft, Zielen, Effet und Zeit.</li>
+      <li><b>📅 Tageslevel:</b> Jeden Tag eine andere Herausforderung mit dreifacher Belohnung.</li>
+      <li><b>⏱ Zeitrennen:</b> Räume alle 15 Kugeln so schnell wie möglich ab. Eine versenkte Weiße kostet 10 Sekunden.</li>
+      <li><b>Physik:</b> Die Kugeln gleiten nach dem Stoß und gehen dann ins Rollen. Rückläufer und Nachläufer ziehen deshalb in einer Kurve. Beim Treffen reiben die Kugeln aneinander (Throw), Seiteneffet lenkt die Weiße leicht ab (Squirt). Triffst du die Weiße ganz außen im roten Ring, droht ein Fehlstoß.</li>
+      <li><b>Linkshänder-Modus</b>, Avatare und das Sichern deines Spielstands findest du in den Einstellungen.</li>
       <li><b>🏟 Turnier:</b> Startgeld 100 Münzen. Viertelfinale (leicht), Halbfinale (mittel), Finale (schwer) – wer alle drei gewinnt, bekommt 1.200 Münzen.</li>
     </ul>
     <h2>Allgemein</h2>
@@ -655,6 +699,12 @@ button{font-family:var(--disp)}
     <div class="row"><span>8 ansagen</span><div class="seg" data-k="call"><button data-v="1">An</button><button data-v="0">Aus</button></div></div>
     <div class="row"><span>Ton</span><div class="seg" data-k="sound"><button data-v="1">An</button><button data-v="0">Aus</button></div></div>
     <div class="row"><span>Vibration</span><div class="seg" data-k="vib"><button data-v="1">An</button><button data-v="0">Aus</button></div></div>
+    <div class="row"><span>Linkshänder</span><div class="seg" data-k="left"><button data-v="0">Aus</button><button data-v="1">An</button></div></div>
+    <div class="row"><span>Avatar</span><div id="avPick"></div></div>
+    <div class="row"><span>Spielstand</span><div class="bkBtns"><button id="bBackup">💾 Sichern</button><button id="bRestore">📥 Laden</button></div></div>
+    <textarea id="bkText" class="hidden" rows="3" placeholder="Sicherungscode hier einfügen"></textarea>
+    <div class="muted center" id="bkMsg"></div>
+    <div class="actions"><button id="bIntroAgain">❔ Einführung ansehen</button></div>
     <div class="actions"><button id="bSettingsClose" class="primary">Fertig</button></div>
   </div>
 </div>
@@ -662,7 +712,7 @@ button{font-family:var(--disp)}
 <div id="stats" class="overlay hidden">
   <div class="panel stats">
     <h1>Statistik</h1>
-    <table id="statsTable"></table>
+    <table id="statsTable"></table><div id="histBox"></div>
     <div class="actions"><button id="bStatsReset">Zurücksetzen</button><button id="bStatsClose" class="primary">Zurück</button></div>
   </div>
 </div>
@@ -707,11 +757,19 @@ button{font-family:var(--disp)}
   <div class="lsBtns"><button id="lsBack">◀</button><button id="lsDemo">▶ Vorführen</button><button id="lsNext">Weiter ▶</button></div>
 </div>
 
+<div id="banner" class="hidden"><b></b><small></small></div>
+<div id="intro" class="overlay hidden">
+  <div class="panel introPanel">
+    <div id="introIcon"></div><h1 id="introTitle"></h1><p id="introText"></p><div id="introDots"></div>
+    <div class="actions"><button id="bIntroSkip">Überspringen</button><button id="bIntroNext" class="primary">Weiter</button></div>
+  </div>
+</div>
+
 <div id="over" class="overlay hidden">
   <div class="panel">
     <h1 id="overTitle">Gewonnen!</h1>
     <div id="overText" style="color:var(--muted);font-size:15px"></div>
-    <div id="overReward"></div>
+    <div id="overReward"></div><div id="overRank"></div><div id="overStats"></div>
     <div class="actions"><button id="bNext" class="primary hidden">Nächstes Level</button><button id="bAgain" class="primary">Nochmal</button><button id="bOverMenu">Menü</button></div>
   </div>
 </div>
@@ -766,12 +824,24 @@ function cloneBalls(bs) { return bs.map(b => ({n: b.n, x: b.x, y: b.y, vx: b.vx,
 function getBall(bs, n) { for (const b of bs) if (b.n === n) return b; return null; }
 function onSet(bs) { const s = new Set(); for (const b of bs) if (b.on && b.n > 0) s.add(b.n); return s; }
 
+// Realistische Kugelphysik: Jede Kugel hat neben der Geschwindigkeit v eine „Rollgeschwindigkeit“ r
+// (Drehung um die waagrechte Achse, r = R·ω) und Seiteneffet es. Solange v ≠ r, gleitet die Kugel:
+// Gleitreibung bremst den Unterschied mit 7/2·μg ab, bis sie rollt (Nachläufer und Rückläufer als Kurve).
+const SLIDE = 185;          // μ_Gleiten · g in cm/s²
+const SQUIRT = 0.022;       // Ablenkung der Weißen durch Seiteneffet (rad bei vollem Effet)
+const ES_DECAY = 0.55;      // Abbau des Seiteneffets pro Sekunde
 function newSim(balls, shot) {
   const bs = cloneBalls(balls);
+  for (const b of bs) { b.rx = 0; b.ry = 0; b.es = 0; }
   const cue = getBall(bs, 0);
-  const v = Math.max(0.02, shot.power) * MAXV * (shot.force || 1);
-  cue.vx = Math.cos(shot.angle) * v; cue.vy = Math.sin(shot.angle) * v;
-  return {balls: bs, t: 0, sx: shot.sx || 0, sy: shot.sy || 0, spinUsed: false, cueTravel: 0, contact: null,
+  const v = Math.max(0.02, shot.power) * MAXV * (shot.force || 1), sx = clamp(shot.sx || 0, -1, 1), sy = clamp(shot.sy || 0, -1, 1);
+  const ang = shot.angle - SQUIRT * sx;
+  const dx = Math.cos(ang), dy = Math.sin(ang);
+  cue.vx = dx * v; cue.vy = dy * v;
+  // Treffpunkt sy·0,5·R über/unter der Mitte: r = 5/2 · v · h/R (bei h = 0,4·R rollt die Kugel sofort)
+  const roll = 2.5 * v * sy * 0.5;
+  cue.rx = dx * roll; cue.ry = dy * roll; cue.es = sx;
+  return {balls: bs, t: 0, sx, sy, contact: null,
     ev: {first: null, cueOut: false, railAfter: false, railBalls: new Set(), railCount: {}, touched: new Set(), potted: [], cuePotted: false}, paths: null, snd: null};
 }
 
@@ -801,19 +871,39 @@ function recPath(S, b, force) {
 function stepSim(S) {
   const bs = S.balls, ev = S.ev;
   let maxv2 = 0;
-  for (const b of bs) if (b.on) { const v = b.vx * b.vx + b.vy * b.vy; if (v > maxv2) maxv2 = v; }
-  if (maxv2 === 0) return false;
-  const dt = Math.min(1 / 120, 0.8 / Math.sqrt(maxv2));
+  let active = false;
+  for (const b of bs) if (b.on) {
+    const v = b.vx * b.vx + b.vy * b.vy; if (v > maxv2) maxv2 = v;
+    if (v > 0 || b.rx || b.ry) active = true;
+  }
+  if (!active) return false;
+  const dt = Math.min(1 / 120, 0.8 / Math.sqrt(Math.max(maxv2, 1)));
   S.t += dt;
   for (const b of bs) {
-    if (!b.on || (b.vx === 0 && b.vy === 0)) continue;
-    const v = Math.hypot(b.vx, b.vy);
-    let nv = v - (FRIC + DRAG * v) * dt;
-    if (nv < STOPV) nv = 0;
-    const k = nv / v; b.vx *= k; b.vy *= k;
+    if (!b.on || (b.vx === 0 && b.vy === 0 && !b.rx && !b.ry)) continue;
+    const ux = b.vx - b.rx, uy = b.vy - b.ry, u = Math.hypot(ux, uy);
+    if (u > 0.5) {
+      // Gleiten: Reibung gegen die Gleitrichtung, Drehung passt sich an
+      const du = 3.5 * SLIDE * dt;
+      if (du >= u) {
+        const fx = (5 * b.vx + 2 * b.rx) / 7, fy = (5 * b.vy + 2 * b.ry) / 7;
+        b.vx = b.rx = fx; b.vy = b.ry = fy;
+      } else {
+        const kx = ux / u, ky = uy / u;
+        b.vx -= kx * SLIDE * dt; b.vy -= ky * SLIDE * dt;
+        b.rx += kx * 2.5 * SLIDE * dt; b.ry += ky * 2.5 * SLIDE * dt;
+      }
+    } else {
+      // Rollen: Rollwiderstand des Tuchs
+      const v = Math.hypot(b.vx, b.vy);
+      let nv = v - (FRIC + DRAG * v) * dt;
+      if (nv < STOPV) nv = 0;
+      const k = v ? nv / v : 0; b.vx *= k; b.vy *= k; b.rx = b.vx; b.ry = b.vy;
+    }
+    if (b.es) { b.es *= Math.exp(-ES_DECAY * dt); if (Math.abs(b.es) < 0.01) b.es = 0; }
     b.x += b.vx * dt; b.y += b.vy * dt;
-    if (b.n === 0 && ev.first === null) { S.cueTravel += nv * dt; if (b.x > HEAD_X) ev.cueOut = true; }
-    if (nv === 0) recPath(S, b, true);
+    if (b.n === 0 && ev.first === null && b.x > HEAD_X) ev.cueOut = true;
+    if (b.vx === 0 && b.vy === 0 && !b.rx && !b.ry) recPath(S, b, true);
   }
   // Kugel gegen Kugel
   for (let i = 0; i < bs.length; i++) {
@@ -823,28 +913,31 @@ function stepSim(S) {
       if (a.vx === 0 && a.vy === 0 && b.vx === 0 && b.vy === 0) continue;
       const dx = b.x - a.x, dy = b.y - a.y, d2 = dx * dx + dy * dy;
       if (d2 >= 4 * R * R) continue;
-      const d = Math.sqrt(d2) || 1e-6, nx = dx / d, ny = dy / d;
-      const ov = (2 * R - d) / 2;
-      a.x -= nx * ov; a.y -= ny * ov; b.x += nx * ov; b.y += ny * ov;
+      // Genauen Berührzeitpunkt zurückrechnen, damit der Stoßwinkel exakt der Geometrie entspricht
+      const wx = b.vx - a.vx, wy = b.vy - a.vy, ww = wx * wx + wy * wy, pw = dx * wx + dy * wy;
+      let back = 0;
+      if (ww > 1e-9 && pw < 0) { back = (pw + Math.sqrt(Math.max(0, pw * pw - ww * (d2 - 4 * R * R)))) / ww; if (!(back > 0 && back < dt * 1.5)) back = 0; }
+      if (back) { a.x -= a.vx * back; a.y -= a.vy * back; b.x -= b.vx * back; b.y -= b.vy * back; }
+      const ex = b.x - a.x, ey = b.y - a.y, ed = Math.hypot(ex, ey) || 1e-6, nx = ex / ed, ny = ey / ed;
+      if (!back) { const ov = (2 * R - ed) / 2; a.x -= nx * ov; a.y -= ny * ov; b.x += nx * ov; b.y += ny * ov; }
       const rv = (a.vx - b.vx) * nx + (a.vy - b.vy) * ny;
-      if (rv <= 0) continue;
+      if (rv <= 0) { if (back) { a.x += a.vx * back; a.y += a.vy * back; b.x += b.vx * back; b.y += b.vy * back; } continue; }
       let cue = null, other = null;
       if (a.n === 0) { cue = a; other = b; } else if (b.n === 0) { cue = b; other = a; }
-      const pre = cue && !S.spinUsed ? {vx: cue.vx, vy: cue.vy} : null;
+      // Reibung zwischen den Kugeln („Throw“): Gleiten am Berührpunkt aus Schnitt und Seiteneffet
+      const tx = -ny, ty = nx;
+      let slip = (a.vx - b.vx) * tx + (a.vy - b.vy) * ty;
+      for (const [q, sg] of [[a, 1], [b, -1]]) if (q.es) {
+        const qv = Math.hypot(q.vx, q.vy) || 1, lx = q.vy / qv, ly = -q.vx / qv;
+        slip += sg * (lx * tx + ly * ty) * q.es * 1.25 * qv * 0.5;
+      }
       const jm = (1 + E_BALL) / 2 * rv;
       a.vx -= jm * nx; a.vy -= jm * ny; b.vx += jm * nx; b.vy += jm * ny;
-      if (pre) {
-        // Nachläufer / Rückläufer: wirkt bei der ersten Berührung, schwächer je weiter die Weiße vorher lief
-        S.spinUsed = true;
-        const sp = Math.hypot(pre.vx, pre.vy);
-        if (sp > 0) {
-          const decay = Math.exp(-S.cueTravel / 110);
-          const eff = S.sy * 0.8 * decay + 0.29 * (1 - decay);
-          const cnx = cue === a ? nx : -nx, cny = cue === a ? ny : -ny;
-          const vn = pre.vx * cnx + pre.vy * cny;
-          cue.vx += pre.vx / sp * vn * eff; cue.vy += pre.vy / sp * vn * eff;
-        }
-      }
+      const mu = 0.01 + 0.052 * Math.exp(-rv / 260);
+      const jt = Math.sign(slip) * Math.min(mu * jm, Math.abs(slip) / 7);
+      a.vx -= jt * tx; a.vy -= jt * ty; b.vx += jt * tx; b.vy += jt * ty;
+      if (cue) cue.es *= 0.75;
+      if (back) { a.x += a.vx * back; a.y += a.vy * back; b.x += b.vx * back; b.y += b.vy * back; }
       if (cue && ev.first === null) {
         ev.first = other.n;
         S.contact = {x: cue.x, y: cue.y, n: other.n, ox: other.x, oy: other.y, ovx: other.vx, ovy: other.vy, cvx: cue.vx, cvy: cue.vy};
@@ -860,7 +953,7 @@ function stepSim(S) {
     const pk = pocketCheck(b);
     if (pk >= 0) {
       b.pvx = b.vx; b.pvy = b.vy;
-      b.on = false; b.vx = b.vy = 0;
+      b.on = false; b.vx = b.vy = 0; b.rx = b.ry = 0; b.es = 0;
       if (S.paths) S.paths[b.n].push([POCKETS[pk].x, POCKETS[pk].y]);
       if (b.n === 0) { ev.cuePotted = true; ev.cueV = {vx: b.pvx || 0, vy: b.pvy || 0}; } else ev.potted.push({n: b.n, pocket: pk, vx: b.pvx || 0, vy: b.pvy || 0});
       if (S.snd) S.snd.push({t: 'pocket', v: 1});
@@ -879,10 +972,13 @@ function stepSim(S) {
         const tvx = b.vx - vn * nx, tvy = b.vy - vn * ny;
         const e = clamp(0.86 - 0.00042 * -vn, 0.62, 0.86);
         b.vx = tvx * CUSH_T - e * vn * nx; b.vy = tvy * CUSH_T - e * vn * ny;
-        if (b.n === 0 && S.sx !== 0) {
+        // Drehung an der Bande: Anteil quer zur Bande wird teilweise umgekehrt, die Kugel gleitet kurz
+        const rn = b.rx * nx + b.ry * ny;
+        b.rx = (b.rx - rn * nx) * CUSH_T - 0.4 * rn * nx; b.ry = (b.ry - rn * ny) * CUSH_T - 0.4 * rn * ny;
+        if (b.es) {
           // Seiteneffet verändert den Abprallwinkel an der Bande
-          const k = -0.42 * S.sx * (-vn);
-          b.vx += k * ny; b.vy += k * -nx; S.sx *= 0.6;
+          const k = -0.42 * b.es * (-vn);
+          b.vx += k * ny; b.vy += k * -nx; b.es *= 0.6;
         }
         if (ev.first !== null) ev.railAfter = true;
         else if (b.n === 0) { ev.kick = true; if (!S.cueRail) S.cueRail = {x: b.x, y: b.y}; }
@@ -1043,6 +1139,7 @@ function newGame(o) {
     pushAvail: false, pushShot: false, ver: 0, pred: null, predKey: '', toast: null, live: null
   };
   if (o.cur === undefined) breaker = 1 - breaker;
+  G.ms = [mkMs(), mkMs()];
   ['stats', 'settings', 'levels', 'pushDlg'].forEach(hide);
   initOrient();
   hide('over'); hide('menu');
@@ -1108,6 +1205,7 @@ function shoot() {
   }
   initAudio();
   G.spinUI = false;
+  if (isHumanTurn() && !(G.mode === 0 && G.solo.type === 'lesson')) maybeMiscue();
   if (G.online) netSend(aimMsg('shot'));
   G.aimView = G.aim; G.powerView = G.power;
   G.strikeFrom = G.state; G.state = 'strike'; G.strikeT = performance.now();
@@ -1128,6 +1226,7 @@ function launchShot() {
   vibrate(10 + Math.round(G.power * 30));
   G.shotCalled = G.called;
   G.shotLines = CFG.lines;
+  if (G.mode === 0 && G.solo.type === 'speed') G.solo.started = true;
   G.shotPred = linesMode() === 'all' && !G.ai[G.cur] ? getPrediction() : null;
   const S = newSim(G.balls, shotParams());
   S.snd = []; S.sunk = 0; S.cueSunk = false;
@@ -1152,13 +1251,14 @@ function finishShotLocal() {
   if (G.mode === 0) { soloFinish(S.ev); return; }
   const r = judge(G.before, S.ev, G.shotCalled, G.beforeBalls);
   const me = G.cur, opp = 1 - me, P = G.players[me];
+  if (G.ms) { const m = G.ms[me], np = S.ev.potted.length; m.shots++; if (r.foul) { m.fouls++; m.run = 0; } else { m.pots += np; m.run = r.cont ? m.run + np : 0; m.best = Math.max(m.best, m.run, np); } }
   if (me === localIdx() && !G.ai[me]) {
     const n = S.ev.potted.length;
     STATS.shots++; if (r.foul) STATS.fouls++; else STATS.pots += n;
     G.run = r.cont ? G.run + n : 0;
     STATS.best = Math.max(STATS.best, r.cont ? G.run : 0, r.foul ? 0 : n);
     saveStats();
-    if (!r.foul && n) { trackPots(S.ev); if (G.isBreak) track('breakpot'); }
+    if (!r.foul && n) { trackPots(S.ev); if (G.isBreak) track('breakpot'); if (!G.isBreak) shotPraise(S.ev); }
   }
   if (r.foul) { const c = getBall(G.balls, 0); floatText('Foul!', c.on ? c.x : W / 2, c.on ? c.y - 8 : H / 2, '#ff6655'); playSound('foul', 0); }
   else if (S.ev.potted.length > 1) floatText(S.ev.potted.length + ' Kugeln!', W / 2, H / 2);
@@ -1213,6 +1313,10 @@ function endGame(winner, reason) {
   if (winner === li && (G.ai[1] || G.online)) track('win');
   if (G.online) track('online');
   $('bNext').classList.add('hidden');
+  addHistory(winner === li);
+  const rd = rankChange(winner === li);
+  $('overRank').innerHTML = rd ? '<span style="--rc:' + RANKS[rankOf(PROFILE.rp)][2] + '">' + (rd > 0 ? '▲ +' : '▼ ') + rd + ' RP · ' + RANKS[rankOf(PROFILE.rp)][0] + '</span>' : '';
+  showMatchStats();
   let extra = '';
   if (G.tourn && TOURN) {
     if (winner === li) {
@@ -1264,7 +1368,7 @@ const LESSON_LEVELS = (() => {
 })();
 // 90 Herausforderungen (6 Themen × 15), automatisch mit der Spielphysik erzeugt und geprüft.
 // Jede enthält in „sol“ einen nachweislich funktionierenden Lösungsweg.
-const LEVELS = [{"name":"Gerade drauf","desc":"Versenke die 3 – Schnittwinkel etwa 4°.","cue":[196.15,96.66],"balls":[[3,222.97,111.58]],"shots":2,"par":1,"sol":[{"angle":0.520048,"power":0.4,"sx":0,"sy":0}]},{"name":"Leichter Schnitt","desc":"Versenke die 2 – Schnittwinkel etwa 8°.","cue":[154.01,65.47],"balls":[[2,138.35,32.33]],"shots":2,"par":1,"sol":[{"angle":-2.033282,"power":0.4,"sx":0,"sy":0}]},{"name":"Halbe Kugel","desc":"Versenke die 6 – Schnittwinkel etwa 11°.","cue":[73.35,56.97],"balls":[[6,95.94,93.1]],"shots":2,"par":1,"sol":[{"angle":1.037344,"power":0.4,"sx":0,"sy":0}]},{"name":"Mittelschnitt","desc":"Versenke die 9 – Schnittwinkel etwa 17°.","cue":[130.63,22.6],"balls":[[9,135.88,70.8]],"shots":2,"par":1,"sol":[{"angle":1.427976,"power":0.3,"sx":0,"sy":0}]},{"name":"Ecke anvisieren","desc":"Versenke die 13 – Schnittwinkel etwa 22°.","cue":[88.57,58.26],"balls":[[13,119.93,102.62]],"shots":2,"par":1,"sol":[{"angle":0.916029,"power":0.4,"sx":0,"sy":0}]},{"name":"Weiter Weg","desc":"Versenke die 5 – Schnittwinkel etwa 28°.","cue":[160.86,52.42],"balls":[[5,206.48,13.32]],"shots":2,"par":1,"sol":[{"angle":-0.753164,"power":0.4,"sx":0,"sy":0}]},{"name":"Viertelkugel","desc":"Versenke die 12 – Schnittwinkel etwa 31°. Nur in die markierte Tasche.","cue":[169.07,52.17],"balls":[[12,230.45,28.08]],"shots":2,"par":1,"sol":[{"angle":-0.329122,"power":0.4,"sx":0,"sy":0}],"pocket":{"12":2}},{"name":"Spitzer Winkel","desc":"Versenke die 13 – Schnittwinkel etwa 38°.","cue":[22.3,102.87],"balls":[[13,22.46,31.31]],"shots":2,"par":1,"sol":[{"angle":-1.519143,"power":0.4,"sx":0,"sy":0}]},{"name":"Feinarbeit","desc":"Versenke die 3 – Schnittwinkel etwa 44°.","cue":[172.14,64.45],"balls":[[3,241.17,29.84]],"shots":2,"par":1,"sol":[{"angle":-0.413861,"power":0.4,"sx":0,"sy":0}]},{"name":"Hauchdünn","desc":"Versenke die 5 – Schnittwinkel etwa 46°. Nur in die markierte Tasche.","cue":[11.89,115.9],"balls":[[5,23.62,33.65]],"shots":2,"par":1,"sol":[{"angle":-1.379945,"power":0.4,"sx":0,"sy":0}],"pocket":{"5":0}},{"name":"Nur Hilfslinie I","desc":"Nur die einfache Hilfslinie. Versenke die 5 – Schnittwinkel etwa 54°.","cue":[128.69,55.13],"balls":[[5,217.05,50.39]],"lines":"guide","shots":2,"par":1,"sol":[{"angle":-0.001571,"power":0.4,"sx":0,"sy":0}]},{"name":"Nur Hilfslinie II","desc":"Nur die einfache Hilfslinie. Versenke die 2 – Schnittwinkel etwa 56°.","cue":[122.72,87.6],"balls":[[2,216.86,82.4]],"lines":"guide","shots":2,"par":1,"sol":[{"angle":-0.105533,"power":0.4,"sx":0,"sy":0}]},{"name":"Nur Hilfslinie III","desc":"Nur die einfache Hilfslinie. Versenke die 3 – Schnittwinkel etwa 63°. Nur in die markierte Tasche.","cue":[112.8,74.9],"balls":[[3,14.3,90.29]],"lines":"guide","shots":2,"par":1,"sol":[{"angle":3.037694,"power":0.7,"sx":0,"sy":0}],"pocket":{"3":3}},{"name":"Blind gezielt I","desc":"Keine Linien! Versenke die 15 – Schnittwinkel etwa 69°.","cue":[12.81,8.49],"balls":[[15,23.69,113.11]],"lines":"off","shots":2,"par":1,"sol":[{"angle":1.416561,"power":0.4,"sx":0,"sy":0}]},{"name":"Blind gezielt II","desc":"Keine Linien! Versenke die 11 – Schnittwinkel etwa 72°.","cue":[114.94,49.24],"balls":[[11,7.13,75.2]],"lines":"off","shots":2,"par":1,"sol":[{"angle":2.95421,"power":0.4,"sx":0,"sy":0}]},{"name":"Kette","desc":"Versenke die 11 – triff aber zuerst die 6.","cue":[172.22,75.03],"balls":[[11,220.74,105.4],[6,215.52,102.05]],"targets":[11],"first":6,"shots":2,"par":1,"sol":[{"angle":0.367851,"power":0.9,"sx":0,"sy":0}]},{"name":"Doppel","desc":"Versenke die 2 – triff aber zuerst die 9.","cue":[198.17,45.96],"balls":[[2,234.39,96.39],[9,230.72,90.67]],"targets":[2],"first":9,"shots":2,"par":1,"sol":[{"angle":0.873515,"power":0.5,"sx":0,"sy":0}]},{"name":"Anstupser","desc":"Versenke die 3 – triff aber zuerst die 1.","cue":[226.24,54.18],"balls":[[3,243.73,106.59],[1,240.45,99.96]],"targets":[3],"first":1,"shots":2,"par":1,"sol":[{"angle":1.175835,"power":0.7,"sx":0,"sy":0}]},{"name":"Durchreicher","desc":"Versenke die 11 – triff aber zuerst die 5.","cue":[186.19,41.79],"balls":[[11,236.29,11.75],[5,229.5,15.98]],"targets":[11],"first":5,"shots":2,"par":1,"sol":[{"angle":-0.627392,"power":0.5,"sx":0,"sy":0}]},{"name":"Schräg weiter","desc":"Versenke die 2 – triff aber zuerst die 4.","cue":[172.61,99.8],"balls":[[2,225.46,31.54],[4,219.6,37.84]],"targets":[2],"first":4,"shots":2,"par":1,"sol":[{"angle":-0.94389,"power":0.5,"sx":0,"sy":0}]},{"name":"Domino","desc":"Versenke die 7 – triff aber zuerst die 14.","cue":[129.74,106.48],"balls":[[7,129.9,18.79],[14,131.15,27.9]],"targets":[7],"first":14,"shots":2,"par":1,"sol":[{"angle":-1.570855,"power":0.5,"sx":0,"sy":0}]},{"name":"Stellvertreter","desc":"Versenke die 3 – triff aber zuerst die 5.","cue":[131.73,17.61],"balls":[[3,126,105.82],[5,125.19,96.06]],"targets":[3],"first":5,"shots":2,"par":1,"sol":[{"angle":1.605983,"power":0.7,"sx":0,"sy":0}]},{"name":"Umweg","desc":"Versenke die 14 – triff aber zuerst die 6.","cue":[209.56,82.83],"balls":[[14,247.24,18.59],[6,243.85,28.42]],"targets":[14],"first":6,"shots":2,"par":1,"sol":[{"angle":-1.080454,"power":0.5,"sx":0,"sy":0}]},{"name":"Präzisionskette","desc":"Versenke die 11 – triff aber zuerst die 9.","cue":[172.15,38.72],"balls":[[11,238.58,7.19],[9,228.31,11.14]],"targets":[11],"first":9,"shots":2,"par":1,"sol":[{"angle":-0.698611,"power":0.9,"sx":0,"sy":0}]},{"name":"Dreierkette","desc":"Versenke die 1 – triff aber zuerst die 2 (über 12).","cue":[77.4,112.12],"balls":[[1,26.17,36.4],[12,32.87,45.87],[2,39.57,55.34]],"targets":[1],"first":2,"shots":2,"par":1,"sol":[{"angle":-2.224495,"power":0.9,"sx":0,"sy":0}]},{"name":"Lange Leitung","desc":"Versenke die 11 – triff aber zuerst die 14 (über 13).","cue":[192.95,44.1],"balls":[[11,140.33,115.83],[13,149.61,107.92],[14,158.78,99.88]],"targets":[11],"first":14,"shots":2,"par":1,"sol":[{"angle":1.876385,"power":0.9,"sx":0,"sy":0}]},{"name":"Kettenreaktion","desc":"Versenke die 6 – triff aber zuerst die 4 (über 12).","cue":[236.01,41.15],"balls":[[6,137.46,117.08],[12,145.71,107.3],[4,154.17,97.68]],"targets":[6],"first":4,"shots":2,"par":1,"sol":[{"angle":2.483123,"power":0.9,"sx":0,"sy":0}]},{"name":"Dreifach","desc":"Versenke die 7 – triff aber zuerst die 5 (über 6).","cue":[154.02,93.5],"balls":[[7,231.18,19.67],[6,221.86,29.29],[5,211.68,38.01]],"targets":[7],"first":5,"shots":2,"par":1,"sol":[{"angle":-0.824148,"power":0.9,"sx":0,"sy":0}]},{"name":"Meisterkette","desc":"Versenke die 9 – triff aber zuerst die 2 (über 13).","cue":[244.22,88.86],"balls":[[9,140.46,6.53],[13,152.95,12.85],[2,165.89,18.21]],"targets":[9],"first":2,"shots":2,"par":1,"sol":[{"angle":-2.565712,"power":0.7,"sx":0,"sy":0}]},{"name":"Kombi-König","desc":"Versenke die 14 – triff aber zuerst die 15 (über 9).","cue":[136.43,72.93],"balls":[[14,15.51,12.03],[9,27.18,20.8],[15,39.22,29.06]],"targets":[14],"first":15,"shots":2,"par":1,"sol":[{"angle":-2.759651,"power":0.7,"sx":0,"sy":0}]},{"name":"Erster Kick","desc":"Die Weiße muss zuerst eine Bande treffen. Rot markierte Kugeln nicht berühren!","cue":[198.64,28.31],"balls":[[12,25.18,118.88],[8,113.43,72.35]],"kick":true,"bomb":[8],"shots":3,"par":1,"sol":[{"angle":0.253073,"power":0.45,"sx":0,"sy":0}]},{"name":"Erste Bande","desc":"Versenke die 6 – sie muss vorher eine Bande berühren.","cue":[167.6,88.54],"balls":[[6,131.25,14.34]],"bank":true,"shots":3,"par":1,"sol":[{"angle":0.737402,"power":0.45,"sx":0,"sy":0}]},{"name":"Umleitung","desc":"Die Weiße muss zuerst eine Bande treffen. Rot markierte Kugeln nicht berühren!","cue":[98.8,57.66],"balls":[[2,141.28,118.63],[8,121.47,89.69]],"kick":true,"bomb":[8],"shots":3,"par":1,"sol":[{"angle":0.200713,"power":0.45,"sx":0,"sy":0}]},{"name":"Spiegelbild","desc":"Versenke die 5 – sie muss vorher eine Bande berühren.","cue":[92.5,36.38],"balls":[[5,13.8,107.5]],"bank":true,"shots":3,"par":1,"sol":[{"angle":2.172935,"power":0.45,"sx":0,"sy":0}]},{"name":"Bandenumweg","desc":"Die Weiße muss zuerst eine Bande treffen. Rot markierte Kugeln nicht berühren!","cue":[56.49,76.84],"balls":[[10,240.49,121.37],[8,147.94,100.11]],"kick":true,"bomb":[8],"shots":3,"par":1,"sol":[{"angle":1.143191,"power":0.45,"sx":0,"sy":0}]},{"name":"Rückpass","desc":"Versenke die 3 – sie muss vorher eine Bande berühren.","cue":[37.73,38.06],"balls":[[3,137.47,16.64]],"bank":true,"shots":3,"par":1,"sol":[{"angle":5.772677,"power":0.45,"sx":0,"sy":0}]},{"name":"Versteckspiel","desc":"Die Weiße muss zuerst eine Bande treffen. Rot markierte Kugeln nicht berühren!","cue":[48.73,24.24],"balls":[[9,19.22,106.57],[8,33.23,65.88]],"kick":true,"bomb":[8],"shots":3,"par":1,"sol":[{"angle":0.15708,"power":0.45,"sx":0,"sy":0}]},{"name":"Querschläger","desc":"Versenke die 3 – sie muss vorher eine Bande berühren.","cue":[218.02,85.88],"balls":[[3,239.12,22.58]],"bank":true,"shots":3,"par":1,"sol":[{"angle":1.45735,"power":0.45,"sx":0,"sy":0}]},{"name":"Über Eck","desc":"Die Weiße muss zuerst eine Bande treffen. Rot markierte Kugeln nicht berühren!","cue":[131.11,77.03],"balls":[[3,105.48,16.91],[8,119.55,48.82],[14,111.89,33.52]],"kick":true,"bomb":[8,14],"shots":3,"par":1,"sol":[{"angle":2.434734,"power":0.45,"sx":0,"sy":0}]},{"name":"Eins-Bande","desc":"Versenke die 14 – sie muss vorher eine Bande berühren.","cue":[150.11,48.57],"balls":[[14,10.85,13.49]],"bank":true,"shots":3,"par":1,"sol":[{"angle":2.129302,"power":0.45,"sx":0,"sy":0}]},{"name":"Hindernislauf","desc":"Die Weiße muss zuerst eine Bande treffen. Rot markierte Kugeln nicht berühren!","cue":[78.21,46.93],"balls":[[12,239.14,17.1],[8,160.08,33.82],[14,198.91,24.84]],"kick":true,"bomb":[8,14],"shots":3,"par":1,"sol":[{"angle":0.920661,"power":0.45,"sx":0,"sy":0}]},{"name":"Langer Bogen","desc":"Versenke die 10 – sie muss vorher eine Bande berühren.","cue":[41.23,70.13],"balls":[[10,245.16,34.87]],"bank":true,"shots":3,"par":1,"sol":[{"angle":0.658862,"power":0.45,"sx":0,"sy":0}]},{"name":"Doppelte Deckung","desc":"Die Weiße muss zuerst eine Bande treffen. Rot markierte Kugeln nicht berühren!","cue":[134.18,55.38],"balls":[[5,15.58,13.82],[8,73.28,36.17],[14,45.23,22.9]],"kick":true,"bomb":[8,14],"shots":3,"par":1,"sol":[{"angle":0.436332,"power":0.45,"sx":0,"sy":0}]},{"name":"Bandenkönig","desc":"Versenke die 4 – sie muss vorher eine Bande berühren.","cue":[31.61,58.06],"balls":[[4,223.85,120.98]],"bank":true,"shots":3,"par":1,"sol":[{"angle":0.318523,"power":0.45,"sx":0,"sy":0}]},{"name":"Kick-Profi","desc":"Die Weiße muss zuerst eine Bande treffen. Rot markierte Kugeln nicht berühren!","cue":[199.31,44.36],"balls":[[3,12.16,94.46],[8,104.92,68.67],[14,58.94,83.32]],"kick":true,"bomb":[8,14],"shots":3,"par":1,"sol":[{"angle":0.798488,"power":0.45,"sx":0,"sy":0}]},{"name":"Stopp I","desc":"Versenke die 12 und bring die Weiße in den goldenen Kreis. Stoppball: wenig Kraft, knapp unter der Mitte.","cue":[145.13,91.45],"balls":[[12,203.37,110.25]],"zone":{"x":197.65,"y":108.4,"r":10},"shots":2,"par":1,"sol":[{"angle":0.312267,"power":0.29425314778660105,"sx":0,"sy":-0.3459990073442455}]},{"name":"Nachlauf I","desc":"Versenke die 13 und bring die Weiße in den goldenen Kreis. Nachläufer: Effet oben.","cue":[218.92,112.68],"balls":[[13,238.54,52.07]],"zone":{"x":185.38,"y":117.83,"r":9.65},"shots":2,"par":1,"sol":[{"angle":-1.254735,"power":0.5711801697133017,"sx":0,"sy":0.5115113452829008}]},{"name":"Rücklauf I","desc":"Versenke die 2 und bring die Weiße in den goldenen Kreis. Rückläufer: Effet weit unten.","cue":[17.13,111.8],"balls":[[2,4.95,41.27]],"zone":{"x":19.04,"y":116.49,"r":9.3},"shots":2,"par":1,"sol":[{"angle":-1.747265,"power":0.6295917833361736,"sx":0,"sy":-0.7568413462987362}]},{"name":"Stopp II","desc":"Versenke die 15 und bring die Weiße in den goldenen Kreis. Stoppball: wenig Kraft, knapp unter der Mitte.","cue":[177.25,39.42],"balls":[[15,227.76,93.19]],"zone":{"x":235.02,"y":80.97,"r":8.95},"shots":2,"par":1,"sol":[{"angle":0.808574,"power":0.3461294361837811,"sx":0,"sy":-0.3735955353004837}]},{"name":"Nachlauf II","desc":"Versenke die 4 und bring die Weiße in den goldenen Kreis. Nachläufer: Effet oben.","cue":[149.97,24.65],"balls":[[4,199.76,9.68]],"zone":{"x":168.18,"y":88.85,"r":8.6},"shots":2,"par":1,"sol":[{"angle":-0.307355,"power":0.43327654238477187,"sx":0,"sy":0.554568529573534}]},{"name":"Rücklauf II","desc":"Versenke die 15 und bring die Weiße in den goldenen Kreis. Rückläufer: Effet weit unten.","cue":[27.73,101.78],"balls":[[15,16.47,44.02]],"zone":{"x":91.81,"y":75.56,"r":8.25},"shots":2,"par":1,"sol":[{"angle":-1.746608,"power":0.5025485692091978,"sx":0,"sy":-0.5574536569916894}]},{"name":"Stopp III","desc":"Versenke die 6 und bring die Weiße in den goldenen Kreis. Stoppball: wenig Kraft, knapp unter der Mitte.","cue":[139.53,20.5],"balls":[[6,196.21,5.03]],"zone":{"x":190.09,"y":34.76,"r":7.9},"shots":2,"par":1,"sol":[{"angle":-0.286666,"power":0.3533362166505941,"sx":0,"sy":-0.2575729856768497}]},{"name":"Nachlauf III","desc":"Versenke die 14 und bring die Weiße in den goldenen Kreis. Nachläufer: Effet oben.","cue":[187.64,90.06],"balls":[[14,226.75,27.35]],"zone":{"x":226.2,"y":6.17,"r":7.55},"shots":2,"par":1,"sol":[{"angle":-1.031711,"power":0.6457027856007697,"sx":0,"sy":0.4761346880933897}]},{"name":"Rücklauf III","desc":"Versenke die 11 und bring die Weiße in den goldenen Kreis. Rückläufer: Effet weit unten.","cue":[219.58,113.67],"balls":[[11,238.19,29.86]],"zone":{"x":178.91,"y":32.14,"r":7.2},"shots":2,"par":1,"sol":[{"angle":-1.370603,"power":0.3308749400223023,"sx":0,"sy":-0.803520941526406}]},{"name":"Stopp IV","desc":"Versenke die 10 und bring die Weiße in den goldenen Kreis. Stoppball: wenig Kraft, knapp unter der Mitte.","cue":[101.93,93.24],"balls":[[10,45.36,28.56]],"zone":{"x":69.03,"y":8.98,"r":6.85},"shots":2,"par":1,"sol":[{"angle":-2.268989,"power":0.25442971261424463,"sx":0,"sy":-0.40460257851733017}]},{"name":"Nachlauf IV","desc":"Versenke die 14 und bring die Weiße in den goldenen Kreis. Nachläufer: Effet oben.","cue":[153.46,86.38],"balls":[[14,207.26,26.6]],"zone":{"x":243.83,"y":28.24,"r":6.5},"shots":2,"par":1,"sol":[{"angle":-0.862241,"power":0.47526099971740554,"sx":0,"sy":0.6991982662580899}]},{"name":"Rücklauf IV","desc":"Versenke die 1 und bring die Weiße in den goldenen Kreis. Rückläufer: Effet weit unten.","cue":[195.92,56],"balls":[[1,231.91,110.53]],"zone":{"x":143.9,"y":95.64,"r":6.15},"shots":2,"par":1,"sol":[{"angle":1.020085,"power":0.33610524473996145,"sx":0,"sy":-0.7641269082734953}]},{"name":"Stopp-Meister","desc":"Versenke die 12 und bring die Weiße in den goldenen Kreis. Stoppball: wenig Kraft, knapp unter der Mitte.","cue":[169.61,46.55],"balls":[[12,232.88,20.64]],"zone":{"x":190.46,"y":104.58,"r":5.8},"shots":2,"par":1,"sol":[{"angle":-0.35475,"power":0.3556470588341574,"sx":0,"sy":-0.24811281363857576}]},{"name":"Nachlauf-Meister","desc":"Versenke die 1 und bring die Weiße in den goldenen Kreis. Nachläufer: Effet oben.","cue":[102.79,107.04],"balls":[[1,29.2,111.89]],"zone":{"x":219.68,"y":72.47,"r":5.45},"shots":2,"par":1,"sol":[{"angle":3.108453,"power":0.4391146554560934,"sx":0,"sy":0.5984672526123316}]},{"name":"Rücklauf-Meister","desc":"Versenke die 5 und bring die Weiße in den goldenen Kreis. Rückläufer: Effet weit unten.","cue":[60.39,117.56],"balls":[[5,9.58,44.82]],"zone":{"x":220.11,"y":92.48,"r":5.1},"shots":2,"par":1,"sol":[{"angle":-2.207574,"power":0.6493333194867397,"sx":0,"sy":-0.7858302747997596}]},{"name":"Dreh mal","desc":"Versenke die 11 und bring die Weiße mit Seiteneffet (rechts) über die Bande in den Kreis.","cue":[167.59,25.47],"balls":[[11,208.92,15.25]],"zone":{"x":180.52,"y":28.75,"r":11},"shots":2,"par":1,"sol":[{"angle":-0.230828,"power":0.7410764224087244,"sx":0.6450552259315994,"sy":0.10636446478141678}]},{"name":"Links rum","desc":"Versenke die 3 und bring die Weiße mit Seiteneffet (links) über die Bande in den Kreis.","cue":[30.11,36],"balls":[[3,7.72,97.19]],"zone":{"x":161.27,"y":19.11,"r":10.7},"shots":2,"par":1,"sol":[{"angle":1.93219,"power":0.8645569728522361,"sx":-0.5686486268735718,"sy":0.37494372823971495}]},{"name":"Rechts rum","desc":"Versenke die 1 und bring die Weiße mit Seiteneffet (rechts) über die Bande in den Kreis.","cue":[14.89,81.96],"balls":[[1,10.31,39.62]],"zone":{"x":151.1,"y":15.19,"r":10.4},"shots":2,"par":1,"sol":[{"angle":-1.657581,"power":0.8838898916886607,"sx":0.7854352838757612,"sy":-0.15836780016234506}]},{"name":"Bandenkurve","desc":"Versenke die 3 und bring die Weiße mit Seiteneffet (rechts) über die Bande in den Kreis.","cue":[206.78,84.96],"balls":[[3,236.42,108.03]],"zone":{"x":62.29,"y":49.87,"r":10.1},"shots":2,"par":1,"sol":[{"angle":0.632525,"power":0.7188609207369672,"sx":0.5308555237161254,"sy":0.19757419383971683}]},{"name":"Schräglage","desc":"Versenke die 11 und bring die Weiße mit Seiteneffet (rechts) über die Bande in den Kreis.","cue":[188.76,55.12],"balls":[[11,222.28,99.25]],"zone":{"x":182.99,"y":117.88,"r":9.8},"shots":2,"par":1,"sol":[{"angle":0.944285,"power":0.6794160256997757,"sx":0.5950832892652057,"sy":0.34968536062617106}]},{"name":"Seitenwechsel","desc":"Versenke die 9 und bring die Weiße mit Seiteneffet (rechts) über die Bande in den Kreis.","cue":[210.17,22.72],"balls":[[9,226.92,80.21]],"zone":{"x":170.61,"y":42.29,"r":9.5},"shots":2,"par":1,"sol":[{"angle":1.31204,"power":0.6323211557382351,"sx":0.6984298786141118,"sy":0.2419397347522619}]},{"name":"Englisch","desc":"Versenke die 12 und bring die Weiße mit Seiteneffet (rechts) über die Bande in den Kreis.","cue":[187.63,95.92],"balls":[[12,228.63,109.92]],"zone":{"x":45.72,"y":68.99,"r":9.2},"shots":2,"par":1,"sol":[{"angle":0.290466,"power":0.802770730505125,"sx":0.7593641388972123,"sy":0.08616489089381178}]},{"name":"Kurvenlage","desc":"Versenke die 1 und bring die Weiße mit Seiteneffet (rechts) über die Bande in den Kreis.","cue":[55.53,85.65],"balls":[[1,36.37,42.32]],"zone":{"x":92.6,"y":44.75,"r":8.9},"shots":2,"par":1,"sol":[{"angle":-1.947951,"power":0.767906899665439,"sx":0.6430093080005652,"sy":0.33487913099810435}]},{"name":"Drall","desc":"Versenke die 14 und bring die Weiße mit Seiteneffet (links) über die Bande in den Kreis.","cue":[181.63,64.87],"balls":[[14,222.31,109.47]],"zone":{"x":63.67,"y":68.52,"r":8.6},"shots":2,"par":1,"sol":[{"angle":0.86515,"power":0.62452554287134,"sx":-0.7307080807772968,"sy":-0.15857275194422002}]},{"name":"Schnitt mit Dreh","desc":"Versenke die 12 und bring die Weiße mit Seiteneffet (links) über die Bande in den Kreis.","cue":[58.15,63.7],"balls":[[12,32.77,102.53]],"zone":{"x":101.26,"y":102.12,"r":8.3},"shots":2,"par":1,"sol":[{"angle":2.101803,"power":0.6643836799843161,"sx":-0.7866886730243865,"sy":-0.026944958272830076}]},{"name":"Zwei Banden","desc":"Versenke die 13 und bring die Weiße mit Seiteneffet (links) über die Bande in den Kreis.","cue":[41.59,96.6],"balls":[[13,10.32,49.77]],"zone":{"x":15.79,"y":5.73,"r":8},"shots":2,"par":1,"sol":[{"angle":-2.202287,"power":0.8111780531756478,"sx":-0.7427871109651342,"sy":0.2659479820197206}]},{"name":"Spin-Kunst","desc":"Versenke die 12 und bring die Weiße mit Seiteneffet (links) über die Bande in den Kreis.","cue":[204.73,70.33],"balls":[[12,227.49,108.07]],"zone":{"x":5.82,"y":106.65,"r":7.7},"shots":2,"par":1,"sol":[{"angle":1.086844,"power":0.6266856033479262,"sx":-0.5035936046408459,"sy":0.015426397395984458}]},{"name":"Effet-Profi","desc":"Versenke die 7 und bring die Weiße mit Seiteneffet (links) über die Bande in den Kreis.","cue":[72.6,41.66],"balls":[[7,38.72,32.38]],"zone":{"x":177.24,"y":45.7,"r":7.4},"shots":2,"par":1,"sol":[{"angle":-2.952874,"power":0.6003226447386307,"sx":-0.7201622321364294,"sy":-0.04672896606229663}]},{"name":"Drehmeister","desc":"Versenke die 7 und bring die Weiße mit Seiteneffet (rechts) über die Bande in den Kreis.","cue":[192.16,76.26],"balls":[[7,215.29,29.24]],"zone":{"x":102.32,"y":31.91,"r":7.1},"shots":2,"par":1,"sol":[{"angle":-1.16805,"power":0.6859899737806945,"sx":0.6418527154446825,"sy":-0.14282304244247407}]},{"name":"Kunststoß","desc":"Versenke die 4 und bring die Weiße mit Seiteneffet (links) über die Bande in den Kreis.","cue":[62.4,70.14],"balls":[[4,40.28,103.2]],"zone":{"x":38.03,"y":55,"r":6.8},"shots":2,"par":1,"sol":[{"angle":2.088856,"power":0.5949331692396352,"sx":-0.5298077710111662,"sy":0.3784147693395683}]},{"name":"Aufwärmen","desc":"Räume alle 3 Kugeln ab. Plane die Weiße für den nächsten Stoß!","cue":[62.41,87.53],"balls":[[5,169.19,32.62],[12,169.75,80.74],[6,39.83,101.54]],"shots":7,"par":3,"sol":[{"angle":2.707992,"power":0.6,"sx":0,"sy":-0.4},{"angle":-1.4291,"power":0.8,"sx":0,"sy":0.4}]},{"name":"Der Reihe nach","desc":"Räume 3 Kugeln der Reihe nach ab (immer die niedrigste zuerst). Plane die Weiße für den nächsten Stoß!","cue":[56.05,59.42],"balls":[[1,205.93,48.72],[2,94.75,28.53],[3,94.1,42.41]],"order":true,"shots":7,"par":3,"sol":[{"angle":-0.0484,"power":0.8,"sx":0,"sy":0},{"angle":3.011639,"power":0.8,"sx":0,"sy":0}]},{"name":"Kleines Feld","desc":"Räume alle 4 Kugeln ab. Plane die Weiße für den nächsten Stoß!","cue":[60.44,54.13],"balls":[[11,226.97,111.05],[9,208.62,21.3],[7,100.83,32.81],[10,72.37,44.99]],"shots":8,"par":3,"sol":[{"angle":-0.707121,"power":0.8,"sx":0,"sy":0},{"angle":-0.184553,"power":0.45,"sx":0,"sy":0}]},{"name":"Zählen lernen","desc":"Räume 4 Kugeln der Reihe nach ab (immer die niedrigste zuerst). Plane die Weiße für den nächsten Stoß!","cue":[63.02,91.09],"balls":[[1,240,95.65],[2,212.11,110.6],[3,88.2,62.22],[4,186.11,73.99]],"order":true,"shots":8,"par":4,"sol":[{"angle":0.010989,"power":0.8,"sx":0,"sy":-0.4},{"angle":1.873503,"power":0.45,"sx":0,"sy":-0.4},{"angle":0.535176,"power":0.3,"sx":0,"sy":-0.4},{"angle":0.043881,"power":0.3,"sx":0,"sy":0}]},{"name":"Vierer-Pack","desc":"Räume alle 5 Kugeln ab. Plane die Weiße für den nächsten Stoß!","cue":[68.13,76.35],"balls":[[14,228.32,29.41],[1,214.42,79.08],[9,65.65,90.06],[12,43.32,90.15],[15,60.01,111.37]],"shots":9,"par":4,"sol":[{"angle":2.017659,"power":0.6,"sx":0,"sy":-0.4},{"angle":0.149036,"power":0.8,"sx":0,"sy":0},{"angle":-0.472301,"power":0.8,"sx":0,"sy":-0.4}]},{"name":"Rechenaufgabe","desc":"Räume 5 Kugeln der Reihe nach ab (immer die niedrigste zuerst). Plane die Weiße für den nächsten Stoß!","cue":[74.52,57.91],"balls":[[1,164.37,46.79],[2,63.94,80.37],[3,149.64,105.83],[4,193.36,58.17],[5,201.85,110.35]],"order":true,"shots":9,"par":5,"sol":[{"angle":-0.070825,"power":0.6,"sx":0,"sy":-0.4},{"angle":1.07714,"power":0.6,"sx":0,"sy":-0.4},{"angle":1.509539,"power":0.3,"sx":0,"sy":0.4},{"angle":0.445965,"power":0.8,"sx":0,"sy":0.4}]},{"name":"Fünf gewinnt","desc":"Räume alle 6 Kugeln ab. Plane die Weiße für den nächsten Stoß!","cue":[73.18,86.54],"balls":[[4,36.63,91.47],[6,127.13,35.86],[13,197.74,112.38],[2,24.91,56.35],[15,210.66,72.74],[5,137.41,50.56]],"shots":10,"par":4,"sol":[{"angle":-0.456787,"power":0.6,"sx":0,"sy":0},{"angle":-2.786418,"power":0.8,"sx":0,"sy":0},{"angle":-0.666423,"power":0.45,"sx":0,"sy":-0.4}]},{"name":"Ordnung muss sein","desc":"Räume 6 Kugeln der Reihe nach ab (immer die niedrigste zuerst). Plane die Weiße für den nächsten Stoß!","cue":[62.38,57.55],"balls":[[1,192.32,108.97],[2,185.19,64.24],[3,82.91,72.22],[4,154.83,101.4],[5,51.26,65.73],[6,85.83,26.83]],"order":true,"shots":10,"par":6,"sol":[{"angle":0.380192,"power":0.8,"sx":0,"sy":0},{"angle":1.607109,"power":0.8,"sx":0,"sy":0},{"angle":2.947851,"power":0.45,"sx":0,"sy":0},{"angle":2.753466,"power":0.45,"sx":0,"sy":0.4},{"angle":0.084725,"power":0.6,"sx":0,"sy":0}]},{"name":"Halbes Dutzend","desc":"Räume alle 7 Kugeln ab. Plane die Weiße für den nächsten Stoß!","cue":[60.03,77.39],"balls":[[9,104.53,102.88],[1,13.82,90.92],[13,39.18,21.72],[12,99.91,19.49],[3,117.16,50.89],[11,191.58,51.54],[7,159.92,10.57]],"shots":11,"par":4,"sol":[{"angle":2.903469,"power":0.8,"sx":0,"sy":-0.4},{"angle":0.103261,"power":0.6,"sx":0,"sy":0.4},{"angle":-2.110093,"power":0.8,"sx":0,"sy":0.4}]},{"name":"Siebener-Lauf","desc":"Räume 7 Kugeln der Reihe nach ab (immer die niedrigste zuerst). Plane die Weiße für den nächsten Stoß!","cue":[67.43,69.36],"balls":[[1,85.12,96.81],[2,107.9,57.54],[3,172.02,74.54],[4,73.21,87.23],[5,89.2,68.81],[6,132.28,10.77],[7,13.91,106.44]],"order":true,"shots":11,"par":5,"sol":[{"angle":0.838687,"power":0.6,"sx":0,"sy":-0.4},{"angle":-1.323983,"power":0.8,"sx":0,"sy":-0.4},{"angle":-1.152864,"power":0.8,"sx":0,"sy":-0.4},{"angle":-2.172456,"power":0.8,"sx":0,"sy":0}]},{"name":"Gemischte Tüte","desc":"Räume alle 8 Kugeln ab. Plane die Weiße für den nächsten Stoß!","cue":[34.75,78.88],"balls":[[1,157.65,32.33],[15,89.71,51.22],[4,166.38,40.33],[10,33.89,93.37],[11,25.38,10.92],[6,170.24,71.98],[3,63.96,39.47],[13,129.66,69.98]],"shots":12,"par":5,"sol":[{"angle":-0.387077,"power":0.8,"sx":0,"sy":0.4},{"angle":1.844377,"power":0.45,"sx":0,"sy":0},{"angle":0.719416,"power":0.8,"sx":0,"sy":0},{"angle":-2.632857,"power":0.8,"sx":0,"sy":0.4}]},{"name":"Acht in Folge","desc":"Räume 8 Kugeln der Reihe nach ab (immer die niedrigste zuerst). Plane die Weiße für den nächsten Stoß!","cue":[52,80.93],"balls":[[1,113.41,56.7],[2,157.26,91.99],[3,150.46,25.69],[4,115.98,43.18],[5,205.01,112.19],[6,87.63,91.99],[7,166.96,41.66],[8,82.85,59.5]],"order":true,"shots":12,"par":6,"sol":[{"angle":-0.319251,"power":0.6,"sx":0,"sy":0.4},{"angle":1.964957,"power":0.6,"sx":0,"sy":-0.4},{"angle":-3.070103,"power":0.8,"sx":0,"sy":0},{"angle":1.626407,"power":0.3,"sx":0,"sy":-0.4},{"angle":-0.050267,"power":0.8,"sx":0,"sy":-0.4}]},{"name":"Großer Tisch","desc":"Räume alle 9 Kugeln ab. Plane die Weiße für den nächsten Stoß!","cue":[62.54,52.54],"balls":[[6,109.86,115.66],[15,192.96,49.53],[4,181.29,92.77],[12,168.66,91.62],[14,222.41,83.19],[5,202.55,114.61],[11,71.58,84.51],[1,37.94,31.57],[9,53.82,81.03]],"shots":13,"par":6,"sol":[{"angle":0.014576,"power":0.6,"sx":0,"sy":0},{"angle":-2.998936,"power":0.45,"sx":0,"sy":0},{"angle":1.592168,"power":0.8,"sx":0,"sy":0.4},{"angle":2.692402,"power":0.6,"sx":0,"sy":-0.4},{"angle":0.242038,"power":0.8,"sx":0,"sy":-0.4}]},{"name":"Neuner-Lauf","desc":"Räume 9 Kugeln der Reihe nach ab (immer die niedrigste zuerst). Plane die Weiße für den nächsten Stoß!","cue":[52.17,88.91],"balls":[[1,167.25,116.05],[2,84.85,47.77],[3,147.97,86.18],[4,197.21,16.33],[5,239.5,14.78],[6,226.67,102.09],[7,83.39,113.47],[8,24.25,43.12],[9,211.95,108.6]],"order":true,"shots":13,"par":6,"sol":[{"angle":0.252469,"power":0.8,"sx":0,"sy":0.4},{"angle":-2.747073,"power":0.6,"sx":0,"sy":-0.4},{"angle":-0.052922,"power":0.8,"sx":0,"sy":0},{"angle":1.76827,"power":0.3,"sx":0,"sy":0},{"angle":1.105652,"power":0.8,"sx":0,"sy":-0.4}]},{"name":"Grand Final","desc":"Räume alle 9 Kugeln ab. Plane die Weiße für den nächsten Stoß!","cue":[41.12,27.42],"balls":[[10,45.16,57.07],[2,241.73,37.58],[3,159.42,83.26],[13,144.47,44.72],[5,237.06,93.4],[15,191.42,99.22],[9,196.61,55.15],[14,61.69,25.01],[12,238.99,83.73]],"shots":13,"par":6,"sol":[{"angle":0.469772,"power":0.8,"sx":0,"sy":0.4},{"angle":3.027322,"power":0.8,"sx":0,"sy":0.4},{"angle":-3.123744,"power":0.6,"sx":0,"sy":0.4},{"angle":-0.059626,"power":0.45,"sx":0,"sy":0.4},{"angle":0.004207,"power":0.6,"sx":0,"sy":0}]}];
+const LEVELS = [{"name":"Gerade drauf","desc":"Versenke die 3 – Schnittwinkel etwa 4°.","cue":[196.15,96.66],"balls":[[3,222.97,111.58]],"shots":2,"par":1,"sol":[{"angle":0.520048,"power":0.4,"sx":0,"sy":0}]},{"name":"Leichter Schnitt","desc":"Versenke die 2 – Schnittwinkel etwa 8°.","cue":[154.01,65.47],"balls":[[2,138.35,32.33]],"shots":2,"par":1,"sol":[{"angle":-2.033282,"power":0.4,"sx":0,"sy":0}]},{"name":"Halbe Kugel","desc":"Versenke die 6 – Schnittwinkel etwa 11°.","cue":[73.35,56.97],"balls":[[6,95.94,93.1]],"shots":2,"par":1,"sol":[{"angle":1.037344,"power":0.4,"sx":0,"sy":0}]},{"name":"Mittelschnitt","desc":"Versenke die 9 – Schnittwinkel etwa 17°.","cue":[130.63,22.6],"balls":[[9,135.88,70.8]],"shots":2,"par":1,"sol":[{"angle":1.427976,"power":0.4,"sx":0,"sy":0}]},{"name":"Ecke anvisieren","desc":"Versenke die 13 – Schnittwinkel etwa 22°.","cue":[88.57,58.26],"balls":[[13,119.93,102.62]],"shots":2,"par":1,"sol":[{"angle":0.916029,"power":0.4,"sx":0,"sy":0}]},{"name":"Weiter Weg","desc":"Versenke die 5 – Schnittwinkel etwa 28°.","cue":[160.86,52.42],"balls":[[5,206.48,13.32]],"shots":2,"par":1,"sol":[{"angle":-0.753164,"power":0.4,"sx":0,"sy":0}]},{"name":"Viertelkugel","desc":"Versenke die 9 – Schnittwinkel etwa 30°. Nur in die markierte Tasche.","cue":[246.41,61.78],"balls":[[9,182.19,46.59]],"shots":2,"par":1,"sol":[{"angle":-2.952596,"power":0.4,"sx":0,"sy":0}],"pocket":{"9":1}},{"name":"Spitzer Winkel","desc":"Versenke die 12 – Schnittwinkel etwa 36°.","cue":[160.99,49.4],"balls":[[12,229.7,28.98]],"shots":2,"par":1,"sol":[{"angle":-0.241856,"power":0.4,"sx":0,"sy":0}]},{"name":"Feinarbeit","desc":"Versenke die 13 – Schnittwinkel etwa 43°.","cue":[16.36,109.25],"balls":[[13,23.16,32.31]],"shots":2,"par":1,"sol":[{"angle":-1.431876,"power":0.4,"sx":0,"sy":0}]},{"name":"Hauchdünn","desc":"Versenke die 3 – Schnittwinkel etwa 49°. Nur in die markierte Tasche.","cue":[163.86,61.14],"balls":[[3,240.88,30.53]],"shots":2,"par":1,"sol":[{"angle":-0.326594,"power":0.4,"sx":0,"sy":0}],"pocket":{"3":2}},{"name":"Nur Hilfslinie I","desc":"Nur die einfache Hilfslinie. Versenke die 3 – Schnittwinkel etwa 51°.","cue":[104.65,120.89],"balls":[[3,16.37,112.08]],"lines":"guide","shots":2,"par":1,"sol":[{"angle":-2.992279,"power":0.4,"sx":0,"sy":0}]},{"name":"Nur Hilfslinie II","desc":"Nur die einfache Hilfslinie. Versenke die 2 – Schnittwinkel etwa 56°.","cue":[122.73,87.68],"balls":[[2,216.86,82.4]],"lines":"guide","shots":2,"par":1,"sol":[{"angle":-0.106402,"power":0.4,"sx":0,"sy":0}]},{"name":"Nur Hilfslinie III","desc":"Nur die einfache Hilfslinie. Versenke die 3 – Schnittwinkel etwa 63°. Nur in die markierte Tasche.","cue":[112.8,74.9],"balls":[[3,14.3,90.29]],"lines":"guide","shots":2,"par":1,"sol":[{"angle":3.037694,"power":0.4,"sx":0,"sy":0}],"pocket":{"3":3}},{"name":"Blind gezielt I","desc":"Keine Linien! Versenke die 15 – Schnittwinkel etwa 69°.","cue":[12.81,8.49],"balls":[[15,23.69,113.11]],"lines":"off","shots":2,"par":1,"sol":[{"angle":1.416561,"power":0.4,"sx":0,"sy":0}]},{"name":"Blind gezielt II","desc":"Keine Linien! Versenke die 11 – Schnittwinkel etwa 72°.","cue":[114.94,49.24],"balls":[[11,7.13,75.2]],"lines":"off","shots":2,"par":1,"sol":[{"angle":2.95421,"power":0.55,"sx":0,"sy":0}]},{"name":"Kette","desc":"Versenke die 11 – triff aber zuerst die 6.","cue":[172.22,75.03],"balls":[[11,220.74,105.4],[6,215.52,102.05]],"targets":[11],"first":6,"shots":2,"par":1,"sol":[{"angle":0.375851,"power":0.9,"sx":0,"sy":0}]},{"name":"Doppel","desc":"Versenke die 2 – triff aber zuerst die 9.","cue":[198.17,45.96],"balls":[[2,234.39,96.39],[9,230.72,90.67]],"targets":[2],"first":9,"shots":2,"par":1,"sol":[{"angle":0.851515,"power":0.7,"sx":0,"sy":0}]},{"name":"Anstupser","desc":"Versenke die 11 – triff aber zuerst die 5.","cue":[189.51,40.32],"balls":[[11,236.29,11.75],[5,230.04,15.71]],"targets":[11],"first":5,"shots":2,"par":1,"sol":[{"angle":-0.699701,"power":0.7,"sx":0,"sy":0}]},{"name":"Durchreicher","desc":"Versenke die 2 – triff aber zuerst die 4.","cue":[174.54,96.75],"balls":[[2,225.46,31.54],[4,220.03,37.42]],"targets":[2],"first":4,"shots":2,"par":1,"sol":[{"angle":-0.984626,"power":0.5,"sx":0,"sy":0}]},{"name":"Schräg weiter","desc":"Versenke die 7 – triff aber zuerst die 14.","cue":[130.78,102.89],"balls":[[7,129.9,18.79],[14,131.08,27.31]],"targets":[7],"first":14,"shots":2,"par":1,"sol":[{"angle":-1.600791,"power":0.9,"sx":0,"sy":0}]},{"name":"Domino","desc":"Versenke die 14 – triff aber zuerst die 6.","cue":[214.77,77.6],"balls":[[14,247.24,18.59],[6,244.24,27.29]],"targets":[14],"first":6,"shots":2,"par":1,"sol":[{"angle":-1.100917,"power":0.9,"sx":0,"sy":0}]},{"name":"Stellvertreter","desc":"Versenke die 11 – triff aber zuerst die 9.","cue":[178.74,35.83],"balls":[[11,238.58,7.19],[9,229.48,10.82]],"targets":[11],"first":9,"shots":2,"par":1,"sol":[{"angle":-0.671958,"power":0.9,"sx":0,"sy":0}]},{"name":"Umweg","desc":"Versenke die 7 – triff aber zuerst die 1.","cue":[129.91,22.69],"balls":[[7,129.21,84.93],[1,130.17,74.57]],"targets":[7],"first":1,"shots":2,"par":1,"sol":[{"angle":1.50585,"power":0.9,"sx":0,"sy":0}]},{"name":"Präzisionskette","desc":"Versenke die 1 – triff aber zuerst die 11.","cue":[190.15,51.74],"balls":[[1,140.33,115.83],[11,148.64,108.63]],"targets":[1],"first":11,"shots":2,"par":1,"sol":[{"angle":2.153202,"power":0.9,"sx":0,"sy":0}]},{"name":"Dreierkette","desc":"Versenke die 4 – triff aber zuerst die 2 (über 6).","cue":[57.83,114.4],"balls":[[4,15.41,38.19],[6,20.25,48.74],[2,24.8,59.41]],"targets":[4],"first":2,"shots":2,"par":1,"sol":[{"angle":-2.155647,"power":0.7,"sx":0,"sy":0}]},{"name":"Lange Leitung","desc":"Versenke die 1 – triff aber zuerst die 6 (über 10).","cue":[207.27,20.17],"balls":[[1,146.27,112.37],[10,155.96,104.95],[6,165.1,96.88]],"targets":[1],"first":6,"shots":2,"par":1,"sol":[{"angle":1.875407,"power":0.9,"sx":0,"sy":0}]},{"name":"Kettenreaktion","desc":"Versenke die 6 – triff aber zuerst die 4 (über 12).","cue":[236.01,41.15],"balls":[[6,137.46,117.08],[12,145.71,107.3],[4,154.17,97.68]],"targets":[6],"first":4,"shots":2,"par":1,"sol":[{"angle":2.491123,"power":0.9,"sx":0,"sy":0}]},{"name":"Dreifach","desc":"Versenke die 9 – triff aber zuerst die 7 (über 6).","cue":[140.73,83.94],"balls":[[9,38.97,117.39],[6,52.09,114.63],[7,65.25,112.11]],"targets":[9],"first":7,"shots":2,"par":1,"sol":[{"angle":2.730461,"power":0.7,"sx":0,"sy":0}]},{"name":"Meisterkette","desc":"Versenke die 9 – triff aber zuerst die 2 (über 13).","cue":[244.22,88.86],"balls":[[9,140.46,6.53],[13,152.95,12.85],[2,165.89,18.21]],"targets":[9],"first":2,"shots":2,"par":1,"sol":[{"angle":-2.449712,"power":0.7,"sx":0,"sy":0}]},{"name":"Kombi-König","desc":"Versenke die 14 – triff aber zuerst die 15 (über 9).","cue":[136.43,72.93],"balls":[[14,15.51,12.03],[9,27.18,20.8],[15,39.22,29.06]],"targets":[14],"first":15,"shots":2,"par":1,"sol":[{"angle":-2.755651,"power":0.9,"sx":0,"sy":0}]},{"name":"Erster Kick","desc":"Die Weiße muss zuerst eine Bande treffen. Rot markierte Kugeln nicht berühren!","cue":[198.64,28.31],"balls":[[12,25.18,118.88],[8,113.43,72.35]],"kick":true,"bomb":[8],"shots":3,"par":1,"sol":[{"angle":0.248709,"power":0.45,"sx":0,"sy":0}]},{"name":"Erste Bande","desc":"Versenke die 6 – sie muss vorher eine Bande berühren.","cue":[167.6,88.54],"balls":[[6,131.25,14.34]],"bank":true,"shots":3,"par":1,"sol":[{"angle":1.775873,"power":0.45,"sx":0,"sy":0}]},{"name":"Umleitung","desc":"Die Weiße muss zuerst eine Bande treffen. Rot markierte Kugeln nicht berühren!","cue":[98.8,57.66],"balls":[[2,141.28,118.63],[8,121.47,89.69]],"kick":true,"bomb":[8],"shots":3,"par":1,"sol":[{"angle":0.187623,"power":0.45,"sx":0,"sy":0}]},{"name":"Spiegelbild","desc":"Versenke die 5 – sie muss vorher eine Bande berühren.","cue":[92.5,36.38],"balls":[[5,13.8,107.5]],"bank":true,"shots":3,"par":1,"sol":[{"angle":2.225295,"power":0.45,"sx":0,"sy":0}]},{"name":"Bandenumweg","desc":"Die Weiße muss zuerst eine Bande treffen. Rot markierte Kugeln nicht berühren!","cue":[56.49,76.84],"balls":[[10,240.49,121.37],[8,147.94,100.11]],"kick":true,"bomb":[8],"shots":3,"par":1,"sol":[{"angle":1.178097,"power":0.45,"sx":0,"sy":0}]},{"name":"Rückpass","desc":"Versenke die 3 – sie muss vorher eine Bande berühren.","cue":[37.73,38.06],"balls":[[3,137.47,16.64]],"bank":true,"shots":3,"par":1,"sol":[{"angle":0.549779,"power":0.45,"sx":0,"sy":0}]},{"name":"Versteckspiel","desc":"Die Weiße muss zuerst eine Bande treffen. Rot markierte Kugeln nicht berühren!","cue":[48.73,24.24],"balls":[[9,19.22,106.57],[8,33.23,65.88]],"kick":true,"bomb":[8],"shots":3,"par":1,"sol":[{"angle":2.103122,"power":0.45,"sx":0,"sy":0}]},{"name":"Querschläger","desc":"Versenke die 3 – sie muss vorher eine Bande berühren.","cue":[218.02,85.88],"balls":[[3,239.12,22.58]],"bank":true,"shots":3,"par":1,"sol":[{"angle":4.908739,"power":0.45,"sx":0,"sy":0}]},{"name":"Über Eck","desc":"Die Weiße muss zuerst eine Bande treffen. Rot markierte Kugeln nicht berühren!","cue":[131.11,77.03],"balls":[[3,105.48,16.91],[8,119.55,48.82],[14,111.89,33.52]],"kick":true,"bomb":[8,14],"shots":3,"par":1,"sol":[{"angle":2.543817,"power":0.45,"sx":0,"sy":0}]},{"name":"Eins-Bande","desc":"Versenke die 14 – sie muss vorher eine Bande berühren.","cue":[150.11,48.57],"balls":[[14,10.85,13.49]],"bank":true,"shots":3,"par":1,"sol":[{"angle":0.479966,"power":0.45,"sx":0,"sy":0}]},{"name":"Hindernislauf","desc":"Die Weiße muss zuerst eine Bande treffen. Rot markierte Kugeln nicht berühren!","cue":[78.21,46.93],"balls":[[12,239.14,17.1],[8,160.08,33.82],[14,198.91,24.84]],"kick":true,"bomb":[8,14],"shots":3,"par":1,"sol":[{"angle":0.938114,"power":0.45,"sx":0,"sy":0}]},{"name":"Langer Bogen","desc":"Versenke die 10 – sie muss vorher eine Bande berühren.","cue":[41.23,70.13],"balls":[[10,245.16,34.87]],"bank":true,"shots":3,"par":1,"sol":[{"angle":0.702495,"power":0.65,"sx":0,"sy":0}]},{"name":"Doppelte Deckung","desc":"Die Weiße muss zuerst eine Bande treffen. Rot markierte Kugeln nicht berühren!","cue":[134.18,55.38],"balls":[[5,15.58,13.82],[8,73.28,36.17],[14,45.23,22.9]],"kick":true,"bomb":[8,14],"shots":3,"par":1,"sol":[{"angle":0.449422,"power":0.45,"sx":0,"sy":0}]},{"name":"Bandenkönig","desc":"Versenke die 4 – sie muss vorher eine Bande berühren.","cue":[31.61,58.06],"balls":[[4,223.85,120.98]],"bank":true,"shots":3,"par":1,"sol":[{"angle":0.318523,"power":0.45,"sx":0,"sy":0}]},{"name":"Kick-Profi","desc":"Die Weiße muss zuerst eine Bande treffen. Rot markierte Kugeln nicht berühren!","cue":[199.31,44.36],"balls":[[3,12.16,94.46],[8,104.92,68.67],[14,58.94,83.32]],"kick":true,"bomb":[8,14],"shots":3,"par":1,"sol":[{"angle":2.574361,"power":0.45,"sx":0,"sy":0}]},{"name":"Stopp I","desc":"Versenke die 12 und bring die Weiße in den goldenen Kreis. Stoppball: wenig Kraft, knapp unter der Mitte.","cue":[145.13,91.45],"balls":[[12,203.37,110.25]],"zone":{"x":201.33,"y":109.59,"r":10},"shots":2,"par":1,"sol":[{"angle":0.312267,"power":0.29425314778660105,"sx":0,"sy":-0.3459990073442455}]},{"name":"Nachlauf I","desc":"Versenke die 13 und bring die Weiße in den goldenen Kreis. Nachläufer: Effet oben.","cue":[218.92,112.68],"balls":[[13,238.54,52.07]],"zone":{"x":218.67,"y":58.49,"r":9.65},"shots":2,"par":1,"sol":[{"angle":-1.254735,"power":0.5711801697133017,"sx":0,"sy":0.5115113452829008}]},{"name":"Rücklauf I","desc":"Versenke die 2 und bring die Weiße in den goldenen Kreis. Rückläufer: Effet weit unten.","cue":[17.13,111.8],"balls":[[2,4.95,41.27]],"zone":{"x":17.98,"y":80.42,"r":9.3},"shots":2,"par":1,"sol":[{"angle":-1.747265,"power":0.6295917833361736,"sx":0,"sy":-0.7568413462987362}]},{"name":"Stopp II","desc":"Versenke die 15 und bring die Weiße in den goldenen Kreis. Stoppball: wenig Kraft, knapp unter der Mitte.","cue":[177.25,39.42],"balls":[[15,227.76,93.19]],"zone":{"x":229.19,"y":87.71,"r":8.95},"shots":2,"par":1,"sol":[{"angle":0.808574,"power":0.3461294361837811,"sx":0,"sy":-0.3735955353004837}]},{"name":"Nachlauf II","desc":"Versenke die 4 und bring die Weiße in den goldenen Kreis. Nachläufer: Effet oben.","cue":[149.97,24.65],"balls":[[4,199.76,9.68]],"zone":{"x":219.9,"y":47.04,"r":8.6},"shots":2,"par":1,"sol":[{"angle":-0.307355,"power":0.43327654238477187,"sx":0,"sy":0.554568529573534}]},{"name":"Rücklauf II","desc":"Versenke die 15 und bring die Weiße in den goldenen Kreis. Rückläufer: Effet weit unten.","cue":[27.73,101.78],"balls":[[15,16.47,44.02]],"zone":{"x":72.39,"y":83.61,"r":8.25},"shots":2,"par":1,"sol":[{"angle":-1.746608,"power":0.5025485692091978,"sx":0,"sy":-0.5574536569916894}]},{"name":"Stopp III","desc":"Versenke die 6 und bring die Weiße in den goldenen Kreis. Stoppball: wenig Kraft, knapp unter der Mitte.","cue":[139.53,20.5],"balls":[[6,196.21,5.03]],"zone":{"x":192.98,"y":11.94,"r":7.9},"shots":2,"par":1,"sol":[{"angle":-0.286666,"power":0.3533362166505941,"sx":0,"sy":-0.2575729856768497}]},{"name":"Nachlauf III","desc":"Versenke die 14 und bring die Weiße in den goldenen Kreis. Nachläufer: Effet oben.","cue":[187.64,90.06],"balls":[[14,226.75,27.35]],"zone":{"x":214.64,"y":120.07,"r":7.55},"shots":2,"par":1,"sol":[{"angle":-1.031711,"power":0.6457027856007697,"sx":0,"sy":0.4761346880933897}]},{"name":"Rücklauf III","desc":"Versenke die 11 und bring die Weiße in den goldenen Kreis. Rückläufer: Effet weit unten.","cue":[219.58,113.67],"balls":[[11,238.19,29.86]],"zone":{"x":213.19,"y":36.27,"r":7.2},"shots":2,"par":1,"sol":[{"angle":-1.370603,"power":0.3308749400223023,"sx":0,"sy":-0.803520941526406}]},{"name":"Stopp IV","desc":"Versenke die 10 und bring die Weiße in den goldenen Kreis. Stoppball: wenig Kraft, knapp unter der Mitte.","cue":[101.93,93.24],"balls":[[10,45.36,28.56]],"zone":{"x":43.69,"y":5.14,"r":6.85},"shots":2,"par":1,"sol":[{"angle":-2.268989,"power":0.25442971261424463,"sx":0,"sy":-0.40460257851733017}]},{"name":"Nachlauf IV","desc":"Versenke die 14 und bring die Weiße in den goldenen Kreis. Nachläufer: Effet oben.","cue":[153.46,86.38],"balls":[[14,207.26,26.6]],"zone":{"x":232.61,"y":118.87,"r":6.5},"shots":2,"par":1,"sol":[{"angle":-0.862241,"power":0.47526099971740554,"sx":0,"sy":0.6991982662580899}]},{"name":"Rücklauf IV","desc":"Versenke die 1 und bring die Weiße in den goldenen Kreis. Rückläufer: Effet weit unten.","cue":[195.92,56],"balls":[[1,231.91,110.53]],"zone":{"x":182.4,"y":122.62,"r":6.15},"shots":2,"par":1,"sol":[{"angle":1.020085,"power":0.33610524473996145,"sx":0,"sy":-0.7641269082734953}]},{"name":"Stopp-Meister","desc":"Versenke die 12 und bring die Weiße in den goldenen Kreis. Stoppball: wenig Kraft, knapp unter der Mitte.","cue":[169.61,46.55],"balls":[[12,232.88,20.64]],"zone":{"x":228.44,"y":61.36,"r":5.8},"shots":2,"par":1,"sol":[{"angle":-0.35475,"power":0.3556470588341574,"sx":0,"sy":-0.24811281363857576}]},{"name":"Nachlauf-Meister","desc":"Versenke die 1 und bring die Weiße in den goldenen Kreis. Nachläufer: Effet oben.","cue":[102.79,107.04],"balls":[[1,29.2,111.89]],"zone":{"x":122.71,"y":17.74,"r":5.45},"shots":2,"par":1,"sol":[{"angle":3.108453,"power":0.4391146554560934,"sx":0,"sy":0.5984672526123316}]},{"name":"Rücklauf-Meister","desc":"Versenke die 5 und bring die Weiße in den goldenen Kreis. Rückläufer: Effet weit unten.","cue":[60.39,117.56],"balls":[[5,9.58,44.82]],"zone":{"x":162.09,"y":43.27,"r":5.1},"shots":2,"par":1,"sol":[{"angle":-2.207574,"power":0.6493333194867397,"sx":0,"sy":-0.7858302747997596}]},{"name":"Dreh mal","desc":"Versenke die 11 und bring die Weiße mit Seiteneffet (rechts) über die Bande in den Kreis.","cue":[167.59,25.47],"balls":[[11,208.92,15.25]],"zone":{"x":232.85,"y":8.29,"r":11},"shots":2,"par":1,"sol":[{"angle":-0.230828,"power":0.7410764224087244,"sx":0.6450552259315994,"sy":0.10636446478141678}]},{"name":"Links rum","desc":"Versenke die 3 und bring die Weiße mit Seiteneffet (links) über die Bande in den Kreis.","cue":[30.11,36],"balls":[[3,7.72,97.19]],"zone":{"x":202.66,"y":69.44,"r":10.7},"shots":2,"par":1,"sol":[{"angle":1.93219,"power":0.8645569728522361,"sx":-0.5686486268735718,"sy":0.37494372823971495}]},{"name":"Rechts rum","desc":"Versenke die 6 und bring die Weiße mit Seiteneffet (links) über die Bande in den Kreis.","cue":[75.04,55.38],"balls":[[6,38.01,85.81]],"zone":{"x":45.66,"y":14.24,"r":10.4},"shots":2,"par":1,"sol":[{"angle":2.472427,"power":0.7063350620243396,"sx":-0.6326949775836873,"sy":-0.17102350193589155}]},{"name":"Bandenkurve","desc":"Versenke die 3 und bring die Weiße mit Seiteneffet (rechts) über die Bande in den Kreis.","cue":[206.78,84.96],"balls":[[3,236.42,108.03]],"zone":{"x":141.33,"y":42.5,"r":10.1},"shots":2,"par":1,"sol":[{"angle":0.632525,"power":0.7188609207369672,"sx":0.5308555237161254,"sy":0.19757419383971683}]},{"name":"Schräglage","desc":"Versenke die 12 und bring die Weiße mit Seiteneffet (rechts) über die Bande in den Kreis.","cue":[188.47,93.42],"balls":[[12,228.63,109.92]],"zone":{"x":100.21,"y":77.61,"r":9.8},"shots":2,"par":1,"sol":[{"angle":0.360279,"power":0.802770730505125,"sx":0.7593641388972123,"sy":0.08616489089381178}]},{"name":"Seitenwechsel","desc":"Versenke die 1 und bring die Weiße mit Seiteneffet (rechts) über die Bande in den Kreis.","cue":[58.21,84.47],"balls":[[1,36.37,42.32]],"zone":{"x":54.28,"y":94.29,"r":9.5},"shots":2,"par":1,"sol":[{"angle":-2.017764,"power":0.767906899665439,"sx":0.6430093080005652,"sy":0.33487913099810435}]},{"name":"Englisch","desc":"Versenke die 7 und bring die Weiße mit Seiteneffet (links) über die Bande in den Kreis.","cue":[70.79,47.67],"balls":[[7,38.72,32.38]],"zone":{"x":10.85,"y":90.76,"r":9.2},"shots":2,"par":1,"sol":[{"angle":-2.743435,"power":0.6003226447386307,"sx":-0.7201622321364294,"sy":-0.04672896606229663}]},{"name":"Kurvenlage","desc":"Versenke die 7 und bring die Weiße mit Seiteneffet (rechts) über die Bande in den Kreis.","cue":[184.18,71.91],"balls":[[7,215.29,29.24]],"zone":{"x":29.78,"y":86.69,"r":8.9},"shots":2,"par":1,"sol":[{"angle":-0.976063,"power":0.6859899737806945,"sx":0.6418527154446825,"sy":-0.14282304244247407}]},{"name":"Drall","desc":"Versenke die 4 und bring die Weiße mit Seiteneffet (links) über die Bande in den Kreis.","cue":[66.91,73.21],"balls":[[4,40.28,103.2]],"zone":{"x":36.88,"y":8.24,"r":8.6},"shots":2,"par":1,"sol":[{"angle":2.245935,"power":0.5949331692396352,"sx":-0.5298077710111662,"sy":0.3784147693395683}]},{"name":"Schnitt mit Dreh","desc":"Versenke die 11 und bring die Weiße mit Seiteneffet (rechts) über die Bande in den Kreis.","cue":[7.85,68.87],"balls":[[11,9.85,31.95]],"zone":{"x":201.82,"y":49.38,"r":8.3},"shots":2,"par":1,"sol":[{"angle":-1.456307,"power":0.7178048845463455,"sx":0.6367727840956173,"sy":0.10036459008248737}]},{"name":"Zwei Banden","desc":"Versenke die 15 und bring die Weiße mit Seiteneffet (links) über die Bande in den Kreis.","cue":[192.17,50.68],"balls":[[15,211.67,89.49]],"zone":{"x":31.06,"y":17.1,"r":8},"shots":2,"par":1,"sol":[{"angle":1.160608,"power":0.5658160692387336,"sx":-0.6016386593699635,"sy":-0.09810393804595988}]},{"name":"Spin-Kunst","desc":"Versenke die 7 und bring die Weiße mit Seiteneffet (rechts) über die Bande in den Kreis.","cue":[228.76,30.64],"balls":[[7,233.63,90.98]],"zone":{"x":12.39,"y":5.33,"r":7.7},"shots":2,"par":1,"sol":[{"angle":1.532933,"power":0.8680654724212669,"sx":0.7080853157248745,"sy":0.1998027759323841}]},{"name":"Effet-Profi","desc":"Versenke die 9 und bring die Weiße mit Seiteneffet (rechts) über die Bande in den Kreis.","cue":[173.65,95.34],"balls":[[9,222.56,104.06]],"zone":{"x":67.49,"y":117.92,"r":7.4},"shots":2,"par":1,"sol":[{"angle":0.120743,"power":0.5764043387847042,"sx":0.523962333856133,"sy":0.08989024005359515}]},{"name":"Drehmeister","desc":"Versenke die 14 und bring die Weiße mit Seiteneffet (links) über die Bande in den Kreis.","cue":[198.36,99.87],"balls":[[14,226.72,121.04]],"zone":{"x":139.26,"y":97.57,"r":7.1},"shots":2,"par":1,"sol":[{"angle":0.721946,"power":0.6151400648593623,"sx":-0.7058290864833766,"sy":-0.041086947778746}]},{"name":"Kunststoß","desc":"Versenke die 11 und bring die Weiße mit Seiteneffet (links) über die Bande in den Kreis.","cue":[7.82,56.27],"balls":[[11,11.95,94.48]],"zone":{"x":203.84,"y":115.99,"r":6.8},"shots":2,"par":1,"sol":[{"angle":1.388892,"power":0.5780267361682033,"sx":-0.7879355905055699,"sy":-0.11306074577060563}]},{"name":"Aufwärmen","desc":"Räume alle 3 Kugeln ab. Plane die Weiße für den nächsten Stoß!","cue":[62.41,87.53],"balls":[[5,169.19,32.62],[12,169.75,80.74],[6,39.83,101.54]],"shots":7,"par":3,"sol":[{"angle":2.598343,"power":0.3,"sx":0,"sy":-0.4},{"angle":-0.467618,"power":0.6,"sx":0,"sy":0.4},{"angle":-2.929422,"power":0.6,"sx":0,"sy":-0.4}]},{"name":"Der Reihe nach","desc":"Räume 3 Kugeln der Reihe nach ab (immer die niedrigste zuerst). Plane die Weiße für den nächsten Stoß!","cue":[56.05,59.42],"balls":[[1,205.93,48.72],[2,94.75,28.53],[3,94.1,42.41]],"order":true,"shots":7,"par":3,"sol":[{"angle":-0.045432,"power":0.8,"sx":0,"sy":0.4},{"angle":0.271441,"power":0.8,"sx":0,"sy":0}]},{"name":"Kleines Feld","desc":"Räume alle 4 Kugeln ab. Plane die Weiße für den nächsten Stoß!","cue":[60.44,54.13],"balls":[[11,226.97,111.05],[9,208.62,21.3],[7,100.83,32.81],[10,72.37,44.99]],"shots":8,"par":4,"sol":[{"angle":-0.873032,"power":0.6,"sx":0,"sy":0},{"angle":0.205295,"power":0.45,"sx":0,"sy":0.4},{"angle":-0.517003,"power":0.45,"sx":0,"sy":0.4}]},{"name":"Zählen lernen","desc":"Räume 4 Kugeln der Reihe nach ab (immer die niedrigste zuerst). Plane die Weiße für den nächsten Stoß!","cue":[63.02,91.09],"balls":[[1,240,95.65],[2,212.11,110.6],[3,88.2,62.22],[4,186.11,73.99]],"order":true,"shots":8,"par":4,"sol":[{"angle":0.053578,"power":0.6,"sx":0,"sy":0.4},{"angle":-0.464489,"power":0.45,"sx":0,"sy":-0.4},{"angle":-1.885101,"power":0.8,"sx":0,"sy":-0.4},{"angle":-0.173144,"power":0.8,"sx":0,"sy":0}]},{"name":"Vierer-Pack","desc":"Räume alle 5 Kugeln ab. Plane die Weiße für den nächsten Stoß!","cue":[68.13,76.35],"balls":[[14,228.32,29.41],[1,214.42,79.08],[9,65.65,90.06],[12,43.32,90.15],[15,60.01,111.37]],"shots":9,"par":4,"sol":[{"angle":-0.272093,"power":0.8,"sx":0,"sy":-0.4},{"angle":2.734027,"power":0.8,"sx":0,"sy":0.4},{"angle":0.032391,"power":0.8,"sx":0,"sy":0.4}]},{"name":"Rechenaufgabe","desc":"Räume 5 Kugeln der Reihe nach ab (immer die niedrigste zuerst). Plane die Weiße für den nächsten Stoß!","cue":[72.42,72.64],"balls":[[1,217.67,39.83],[2,238.28,107.2],[3,119.68,99.34],[4,187.18,12.95],[5,153.3,73.17]],"order":true,"shots":9,"par":5,"sol":[{"angle":-0.201526,"power":0.8,"sx":0,"sy":-0.4},{"angle":0.736209,"power":0.3,"sx":0,"sy":0},{"angle":-1.869772,"power":0.6,"sx":0,"sy":0.4},{"angle":0.312937,"power":0.8,"sx":0,"sy":0.4}]},{"name":"Fünf gewinnt","desc":"Räume alle 6 Kugeln ab. Plane die Weiße für den nächsten Stoß!","cue":[39.01,26.86],"balls":[[7,85.83,26.83],[3,150.16,80.59],[2,163.62,58.44],[6,231.28,73.29],[11,152.78,25.04],[13,182.91,26.67]],"shots":10,"par":4,"sol":[{"angle":-0.071742,"power":0.8,"sx":0,"sy":-0.4},{"angle":-1.373548,"power":0.3,"sx":0,"sy":0.4},{"angle":-2.465804,"power":0.45,"sx":0,"sy":0.4}]},{"name":"Ordnung muss sein","desc":"Räume 6 Kugeln der Reihe nach ab (immer die niedrigste zuerst). Plane die Weiße für den nächsten Stoß!","cue":[64.15,39.58],"balls":[[1,49.7,11.52],[2,125.68,101.31],[3,107.16,74.84],[4,118.96,77.65],[5,103.84,32.33],[6,43.8,93.14]],"order":true,"shots":10,"par":6,"sol":[{"angle":-1.888704,"power":0.8,"sx":0,"sy":0.4},{"angle":0.787942,"power":0.8,"sx":0,"sy":0.4},{"angle":-2.892026,"power":0.8,"sx":0,"sy":-0.4},{"angle":0.074678,"power":0.6,"sx":0,"sy":0},{"angle":3.080097,"power":0.8,"sx":0,"sy":0.4}]},{"name":"Halbes Dutzend","desc":"Räume alle 7 Kugeln ab. Plane die Weiße für den nächsten Stoß!","cue":[53.43,48.64],"balls":[[12,55.81,19.32],[10,60,74.67],[1,99.05,94.32],[4,191.19,47.71],[7,140.44,114.26],[13,19.15,53.86],[2,197.62,101.5]],"shots":11,"par":5,"sol":[{"angle":0.02174,"power":0.8,"sx":0,"sy":0.4},{"angle":1.022748,"power":0.6,"sx":0,"sy":-0.4},{"angle":3.025297,"power":0.8,"sx":0,"sy":0},{"angle":1.044859,"power":0.45,"sx":0,"sy":-0.4}]},{"name":"Siebener-Lauf","desc":"Räume 7 Kugeln der Reihe nach ab (immer die niedrigste zuerst). Plane die Weiße für den nächsten Stoß!","cue":[57.48,65.5],"balls":[[1,13.66,10.89],[2,219.3,20.16],[3,167.66,114.33],[4,29.86,99.65],[5,68.82,101.65],[6,143.02,35.77],[7,13.94,108.64]],"order":true,"shots":11,"par":6,"sol":[{"angle":-2.180438,"power":0.8,"sx":0,"sy":0},{"angle":-0.36306,"power":0.8,"sx":0,"sy":0},{"angle":3.089966,"power":0.45,"sx":0,"sy":0.4},{"angle":2.636054,"power":0.3,"sx":0,"sy":0},{"angle":-0.697873,"power":0.6,"sx":0,"sy":0.4}]},{"name":"Gemischte Tüte","desc":"Räume alle 8 Kugeln ab. Plane die Weiße für den nächsten Stoß!","cue":[66.59,48.3],"balls":[[1,63.96,39.47],[12,129.66,69.98],[5,113.19,84.94],[15,113.41,56.7],[11,157.26,91.99],[10,150.46,25.69],[6,115.98,43.18],[13,205.01,112.19]],"shots":12,"par":5,"sol":[{"angle":0.100209,"power":0.8,"sx":0,"sy":-0.4},{"angle":3.005653,"power":0.8,"sx":0,"sy":0},{"angle":0.22175,"power":0.6,"sx":0,"sy":0},{"angle":2.608399,"power":0.45,"sx":0,"sy":0.4}]},{"name":"Acht in Folge","desc":"Räume 8 Kugeln der Reihe nach ab (immer die niedrigste zuerst). Plane die Weiße für den nächsten Stoß!","cue":[31.48,62.68],"balls":[[1,184.38,83.06],[2,50.49,49.83],[3,24.87,93.93],[4,109.86,115.66],[5,67.83,56.94],[6,192.96,49.53],[7,181.29,92.77],[8,168.66,91.62]],"order":true,"shots":12,"par":8,"sol":[{"angle":0.114632,"power":0.6,"sx":0,"sy":0},{"angle":-2.911766,"power":0.8,"sx":0,"sy":0},{"angle":-2.989482,"power":0.8,"sx":0,"sy":0.4},{"angle":2.898519,"power":0.3,"sx":0,"sy":0.4},{"angle":-1.863732,"power":0.8,"sx":0,"sy":0},{"angle":2.174275,"power":0.8,"sx":0,"sy":0.4},{"angle":0.982162,"power":0.3,"sx":0,"sy":0}]},{"name":"Großer Tisch","desc":"Räume alle 9 Kugeln ab. Plane die Weiße für den nächsten Stoß!","cue":[75.74,79.51],"balls":[[6,27.1,72.57],[1,202.93,29.99],[4,197.04,85.58],[13,13.34,98.63],[2,221.56,48.92],[10,216.49,77.05],[14,43.91,13.68],[15,82.36,47.2],[12,206.19,58.98]],"shots":13,"par":6,"sol":[{"angle":-1.469116,"power":0.45,"sx":0,"sy":0.4},{"angle":-0.123915,"power":0.8,"sx":0,"sy":0.4},{"angle":0.238292,"power":0.6,"sx":0,"sy":0.4},{"angle":-3.033888,"power":0.8,"sx":0,"sy":0},{"angle":-2.308751,"power":0.45,"sx":0,"sy":0.4}]},{"name":"Neuner-Lauf","desc":"Räume 9 Kugeln der Reihe nach ab (immer die niedrigste zuerst). Plane die Weiße für den nächsten Stoß!","cue":[79.3,52.98],"balls":[[1,183.66,87.45],[2,29.38,106.69],[3,28.75,24.73],[4,28.95,77.46],[5,232.93,13.48],[6,132.28,32.06],[7,203,25.43],[8,113.19,26.34],[9,43.39,116.87]],"order":true,"shots":13,"par":7,"sol":[{"angle":0.274322,"power":0.8,"sx":0,"sy":-0.4},{"angle":2.447507,"power":0.6,"sx":0,"sy":-0.4},{"angle":2.895124,"power":0.8,"sx":0,"sy":0},{"angle":-0.113994,"power":0.8,"sx":0,"sy":0},{"angle":-0.031605,"power":0.6,"sx":0,"sy":0.4},{"angle":-1.488039,"power":0.6,"sx":0,"sy":0.4}]},{"name":"Grand Final","desc":"Räume alle 9 Kugeln ab. Plane die Weiße für den nächsten Stoß!","cue":[42.89,75.76],"balls":[[7,158.95,54.84],[1,28.01,35.16],[4,90.03,17.76],[2,28.64,21.47],[3,21.92,77.7],[14,46.61,41.15],[10,85.36,91.37],[13,168.28,15],[5,155.21,21.56]],"shots":13,"par":6,"sol":[{"angle":-0.472925,"power":0.8,"sx":0,"sy":0},{"angle":-2.830669,"power":0.8,"sx":0,"sy":0},{"angle":2.71458,"power":0.8,"sx":0,"sy":0.4},{"angle":-3.113293,"power":0.8,"sx":0,"sy":0.4},{"angle":2.828341,"power":0.6,"sx":0,"sy":0}]}];
 const LEVEL_REWARDS = LEVELS.map((lv, i) => 40 + Math.floor(i / 15) * 10 + (i % 15) * 8);
 const SOLO = {stars: [], hi: 0, lessons: []};
 try { Object.assign(SOLO, JSON.parse(localStorage.getItem('billard_solo') || '{}')); } catch (e) {}
@@ -1294,6 +1398,8 @@ function newSolo(type, idx) {
     balls = [{n: 0, x: lv.cue[0], y: lv.cue[1], vx: 0, vy: 0, on: true}].concat(lv.balls.map(b => ({n: b[0], x: b[1], y: b[2], vx: 0, vy: 0, on: true})));
   } else if (type === 'training') {
     balls = rack(8);
+  } else if (type === 'speed') {
+    balls = rack(8); so.time = 0;
   } else if (type === 'lucky') {
     balls = [{n: 0, x: W * 0.25, y: H / 2, vx: 0, vy: 0, on: true}];
     const x = W * 0.5 + Math.random() * W * 0.3, y = H * 0.25 + Math.random() * H * 0.5;
@@ -1306,7 +1412,7 @@ function newSolo(type, idx) {
   G = {
     mode: 0, solo: so, diff: 0,
     players: [{name: 'Du', group: null, fouls: 0}, {name: '', group: null, fouls: 0}],
-    ai: [false, false], cur: 0, balls, isBreak: false, bih: type === 'training' ? 'any' : null,
+    ai: [false, false], cur: 0, balls, isBreak: false, bih: type === 'training' ? 'any' : type === 'speed' ? 'kitchen' : null,
     state: 'aim', aim: 0, power: 0.5, sx: 0, sy: 0, called: null, calledManual: false,
     pushAvail: false, pushShot: false, ver: 0, pred: null, predKey: '', toast: null, live: null
   };
@@ -1315,6 +1421,7 @@ function newSolo(type, idx) {
   if (type === 'target') placeTarget();
   ['over', 'menu', 'levels', 'stats', 'settings'].forEach(hide);
   if (type === 'levels') toast(LEVELS[so.idx].desc, 3500);
+  else if (type === 'speed') toast('Zeitrennen: Räume alle 15 Kugeln so schnell wie möglich ab – die Uhr läuft ab dem ersten Stoß. Weiße versenkt = 10 Sekunden Strafe.', 5000);
   else if (type === 'lucky') toast('Glücksstoß: Ein Stoß – in welche Tasche fällt die gelbe 1? Jede Tasche hat einen anderen Preis.', 4500);
   else if (type === 'target') toast('Zielscheibe: Lass die Weiße möglichst genau im Zentrum liegen bleiben. 5 Stöße – Mitte 100, Ring 50, außen 20 Punkte.', 4500);
   else if (type === 'training') toast('Training: Kugel kurz gedrückt halten und ziehen, um sie zu versetzen. ↶ macht den letzten Stoß rückgängig.', 4500);
@@ -1366,7 +1473,8 @@ function soloFinish(ev) {
     placeTarget();
     return startTurn();
   }
-  if (!scratch) trackPots(ev);
+  if (!scratch) { trackPots(ev); if (so.type !== 'lesson') shotPraise(ev); }
+  if (so.type === 'speed') return speedFinish(ev, scratch, placeCue);
   if (so.type === 'training') {
     so.shots++; so.pots = (so.pots || 0) + ev.potted.length;
     if (ev.potted.length) floatText(ev.potted.length > 1 ? ev.potted.length + ' versenkt!' : 'Drin!', W / 2, H / 2, '#7dffb0');
@@ -1443,6 +1551,7 @@ function endSolo(win, text, stars) {
   showReward(0, 0);
   if (so.type === 'arcade') { track('arcade', so.score); const c = Math.min(400, Math.floor(so.score / 40)), xp = Math.floor(so.score / 120); showReward(gain(c, xp), xp); }
   if (so.type === 'lucky') { if (win) showReward(gain(so.prize, 10), 10); if (win) { confetti(); playSound('win', 0); } title = win ? '🍀 Glückstreffer!' : 'Kein Glück'; }
+  if (so.type === 'speed') { const c = clamp(Math.round(400 - so.time * 2), 40, 400); showReward(gain(c, 60), 60); confetti(); playSound('win', 0); title = '⏱ ' + fmtTime(so.time); }
   if (so.type === 'target') { const c = Math.floor(so.score / 10), xp = Math.floor(so.score / 20); showReward(gain(c, xp), xp); if (so.score >= 200) confetti(); title = '🎯 ' + so.score + ' Punkte'; }
   if (so.type === 'levels') {
     if (win) {
@@ -1451,6 +1560,7 @@ function endSolo(win, text, stars) {
       showReward(gain(coins, xp), xp);
       if (!prev) text += ' Erstmals geschafft – Belohnung freigeschaltet!';
       confetti(); playSound('win', 0); SOLO.stars[so.idx] = Math.max(prev, stars); saveSolo(); track('level');
+      if (so.daily) text += dailyBonus(so);
       const tr = checkTopicReward(topicOf(so.idx));
       if (tr) { const c2 = gain(tr, 50); text += ' 🎁 Thema „' + TOPICS[topicOf(so.idx)].name + '“ komplett: +' + c2 + ' Münzen!'; showReward(coins + c2, xp + 50); } title = '★'.repeat(stars) + '☆'.repeat(3 - stars) + ' Geschafft!'; }
     else title = 'Nicht geschafft';
@@ -1460,6 +1570,8 @@ function endSolo(win, text, stars) {
   const nx = so.type === 'levels' && win ? nextLevelInTopic(so.idx) : -1;
   $('bNext').classList.toggle('hidden', !(nx >= 0 && levelUnlocked(nx)));
   $('bNext').textContent = 'Nächstes Level';
+  if (so.daily) $('bNext').classList.add('hidden');
+  $('overRank').innerHTML = ''; $('overStats').innerHTML = '';
   G.nextLevel = nx;
   setTimeout(() => show('over'), 600);
 }
@@ -1570,16 +1682,16 @@ const DEMO = {
   l1: {angle: 0.464121, power: 0.5, sx: 0, sy: 0},
   l2: {angle: -0.203941, power: 0.45, sx: 0, sy: 0},
   combo: {angle: 2.694753, power: 0.55, sx: 0, sy: 0},
-  bank4: {angle: 0.154898, power: 0.5, sx: 0, sy: 0},
+  bank4: {angle: 0.170498, power: 0.45, sx: 0, sy: 0},
   kick: {angle: 0.667588, power: 0.6, sx: 0, sy: 0},
-  bank14: {angle: 0.584685, power: 0.6, sx: 0, sy: 0},
-  stop: {angle: 0.464121, power: 0.15, sx: 0, sy: -0.4},
-  follow: {angle: -0.503647, power: 0.4, sx: 0, sy: 0.4},
+  bank14: {angle: 0.579085, power: 0.6, sx: 0, sy: 0},
+  stop: {angle: 0.464121, power: 0.35, sx: 0, sy: -0.4},
+  follow: {angle: -0.496847, power: 0.7, sx: 0, sy: 0.3},
   draw: {angle: 0.464121, power: 0.45, sx: 0, sy: -0.8},
-  effet: {angle: 0.471121, power: 0.9, sx: -0.7, sy: 0.6},
-  noeffet: {angle: 0.471121, power: 0.9, sx: 0, sy: 0.6},
-  position: {angle: -1.122127, power: 0.4, sx: 0, sy: -0.4},
-  brk: {angle: 0, power: 0.95, sx: 0, sy: -0.25}
+  effet: {angle: 0.400321, power: 0.7, sx: -0.7, sy: 0.6},
+  noeffet: {angle: 0.400321, power: 0.7, sx: 0, sy: 0.6},
+  position: {angle: -1.120927, power: 0.4, sx: 0, sy: -0.4},
+  brk: {angle: 0.0004, power: 0.95, sx: 0, sy: -0.25}
 };
 const LESSONS = [
   [ // Zielen
@@ -1655,7 +1767,7 @@ function lessonStep(i) {
   G.balls = lessonBalls(so.level); G.ver++;
   for (const b of G.balls) { const o = G.orient[b.n]; if (o) { o.lx = b.x; o.ly = b.y; o.ver++; } else G.orient[b.n] = {M: IDENT3.slice(), ver: 1, lx: b.x, ly: b.y, k: 0}; }
   const d = st.demo && DEMO[st.demo];
-  if (st.demo === 'brk') { const c = getBall(G.balls, 0); G.aim = Math.atan2(FOOT.y - c.y, FOOT.x - c.x); G.power = d.power; G.sx = d.sx; G.sy = d.sy; }
+  if (st.demo === 'brk') { const c = getBall(G.balls, 0); G.aim = Math.atan2(FOOT.y - c.y, FOOT.x - c.x) + d.angle; G.power = d.power; G.sx = d.sx; G.sy = d.sy; }
   else if (d) { G.aim = d.angle; G.power = d.power; G.sx = d.sx; G.sy = d.sy; }
   G.state = d ? 'lessonaim' : 'lesson';
   $('lsTopic').textContent = TOPICS[so.topic].icon + ' ' + TOPICS[so.topic].name;
@@ -1871,11 +1983,11 @@ function* aiThink() {
   }
   const cue = getBall(base, 0), kitchen = G.bih === 'kitchen';
   const list = combos(base, legalTargets(G.mode, G.players[me].group, onSet(base)), cue, !!G.bih, kitchen).sort((a, b) => b.e - a.e);
-  const powers = [[0.42], [0.32, 0.55], [0.26, 0.4, 0.58, 0.8]][diff];
-  const spins = diff === 2 ? [0, -0.6, 0.5] : [0];
+  const powers = [[0.42], [0.32, 0.55], [0.26, 0.4, 0.58, 0.8], [0.22, 0.32, 0.42, 0.55, 0.7, 0.85]][diff];
+  const spins = diff === 3 ? [0, -0.6, -0.3, 0.3, 0.6] : diff === 2 ? [0, -0.6, 0.5] : [0];
   let best = null;
   const consider = c => { if (!best || c.score > best.score) best = c; };
-  for (const cb of list.slice(0, [3, 6, 10][diff])) {
+  for (const cb of list.slice(0, [3, 6, 10, 14][diff])) {
     const px = cb.place ? cb.place.x : cue.x, py = cb.place ? cb.place.y : cue.y;
     const angle = Math.atan2(cb.gy - py, cb.gx - px);
     for (const power of powers) for (const sy of spins) {
@@ -1887,15 +1999,15 @@ function* aiThink() {
   if (!best || best.score < 500) {
     // Kein sicherer Stoß: Winkel absuchen (Sicherheitsstoß, Bandenstoß)
     const place = G.bih ? (best && best.place) || findFree(base, W * 0.22, H / 2, kitchen) : null;
-    const step = [6, 4, 3][diff] * Math.PI / 180;
+    const step = [6, 4, 3, 2][diff] * Math.PI / 180;
     for (let a = 0; a < TAU; a += step) for (const power of diff ? [0.3, 0.55] : [0.45]) {
       const res = evalShot(base, place, {angle: a, power, sx: 0, sy: 0}, null);
       consider({place, angle: a, power, sx: 0, sy: 0, called: res.called, score: res.score});
       if (Math.floor(a / step) % 4 === 0) yield;
     }
   }
-  best.angle += gauss() * [0.02, 0.007, 0.0022][diff];
-  best.power = clamp(best.power * (1 + gauss() * [0.08, 0.04, 0.015][diff]), 0.05, 1);
+  best.angle += gauss() * [0.02, 0.007, 0.0022, 0.0009][diff];
+  best.power = clamp(best.power * (1 + gauss() * [0.08, 0.04, 0.015, 0.008][diff]), 0.05, 1);
   return best;
 }
 function startAI() { G.state = 'ai'; G.aiGen = aiThink(); G.aiStart = performance.now(); }
@@ -2236,7 +2348,7 @@ function shareText(t) {
 }
 function copyText(t) {
   if (window.AndroidBridge) AndroidBridge.copy(t);
-  else { try { navigator.clipboard.writeText(t); } catch (e) {} }
+  else { try { navigator.clipboard.writeText(t).catch(() => {}); } catch (e) {} }
   onlineStatus('📋 Kopiert!');
 }
 async function pasteText() {
@@ -2334,10 +2446,11 @@ function renderLobby() {
   const d = dailyAvail();
   $('bDailyTxt').textContent = d ? 'Tagesbonus abholen' : 'Morgen wieder';
   $('bDaily').classList.toggle('ready', d); $('bDaily').disabled = !d;
-  $('tAi').textContent = 'Sieg: ' + [30, 60, 120][+CFG.diff] + ' 🪙';
+  $('tAi').textContent = 'Sieg: ' + [30, 60, 120, 200][+CFG.diff] + ' 🪙';
   const stars = SOLO.stars.reduce((x, y) => x + (y || 0), 0);
   $('tLv').textContent = '★ ' + stars + ' / ' + LEVELS.length * 3;
   $('tArc').textContent = 'Rekord: ' + fmt(SOLO.hi);
+  if (typeof renderExtras === 'function') renderExtras();
   if (typeof claimable === 'function') {
     const q = claimable(); $('qBadge').textContent = q; $('qBadge').classList.toggle('hidden', !q);
     $('wBadge').classList.toggle('hidden', !wheelFree());
@@ -2352,7 +2465,7 @@ function rewardGame(winner) {
   if (!won) { showReward(0, 0); return; }
   let c, x;
   if (G.online) { c = 80; x = 60; }
-  else if (G.ai[1]) { c = [30, 60, 120][G.diff]; x = [30, 45, 70][G.diff]; }
+  else if (G.ai[1]) { c = [30, 60, 120, 200][G.diff]; x = [30, 45, 70, 100][G.diff]; }
   else { c = 10; x = 15; }
   showReward(gain(c, x), x);
 }
@@ -2383,7 +2496,7 @@ function renderShop() {
     const prev = document.createElement('canvas'); prev.className = 'prev'; card.appendChild(prev);
     const t = document.createElement('div'); t.className = 'cname'; t.textContent = it.name; card.appendChild(t);
     if (shopTab === 'cues') {
-      const st = CUE_STATS[id] || [1, 1, 1, 1], box = document.createElement('div'); box.className = 'stats4';
+      const st = cueStatsOf(id), box = document.createElement('div'); box.className = 'stats4';
       ['Kraft', 'Zielen', 'Effet', 'Zeit'].forEach((nm, k) => { box.innerHTML += '<span>' + nm + '</span><i><b style="width:' + st[k] * 10 + '%"></b></i>'; });
       card.appendChild(box);
     }
@@ -2479,9 +2592,15 @@ function renderInventory() {
     const prev = document.createElement('canvas'); prev.className = 'prev'; card.appendChild(prev);
     const t = document.createElement('div'); t.className = 'cname'; t.textContent = d.name; card.appendChild(t);
     if (invTab === 'cues') {
-      const st = CUE_STATS[id] || [1, 1, 1, 1], box = document.createElement('div'); box.className = 'stats4';
+      const st = cueStatsOf(id), box = document.createElement('div'); box.className = 'stats4';
       ['Kraft', 'Zielen', 'Effet', 'Zeit'].forEach((nm, k) => { box.innerHTML += '<span>' + nm + '</span><i><b style="width:' + st[k] * 10 + '%"></b></i>'; });
       card.appendChild(box);
+    }
+    if (invTab === 'cues') {
+      const up = document.createElement('span'); up.className = 'upBtn' + (cueLv(id) >= 5 ? ' max' : '');
+      up.textContent = cueLv(id) >= 5 ? '★ Stufe 5/5' : '⬆ Stufe ' + (cueLv(id) + 1) + ' · ' + fmt(upgradeCost(id)) + ' 🪙';
+      up.onclick = e => { e.stopPropagation(); if (upgradeCue(id)) renderInventory(); else $('invMsg') && ($('invMsg').textContent = 'Nicht genug Münzen.'); };
+      card.appendChild(up);
     }
     const st2 = document.createElement('div'); st2.className = 'invState'; st2.textContent = act === id ? '✓ Ausgerüstet' : 'Tippen zum Ausrüsten';
     card.appendChild(st2);
@@ -2693,6 +2812,31 @@ function artSpark(c, x, y, r) {
   artGlow(c, x, y, r * 1.6, 'rgba(255,255,255,.5)');
 }
 const ART_DRAW = {
+  daily(c, w, h, d) {
+    const cx = w / 2, cy = h * 0.5, s = h * 0.62;
+    artGlow(c, cx, cy, h * 0.6, 'rgba(255,160,60,.5)');
+    c.save(); c.shadowColor = 'rgba(0,0,0,.5)'; c.shadowBlur = 14; c.shadowOffsetY = 6;
+    c.fillStyle = '#f4efe6'; c.beginPath(); c.roundRect ? c.roundRect(cx - s * 0.42, cy - s * 0.4, s * 0.84, s * 0.84, 10) : c.rect(cx - s * 0.42, cy - s * 0.4, s * 0.84, s * 0.84); c.fill(); c.restore();
+    c.fillStyle = '#e8562a'; c.fillRect(cx - s * 0.42, cy - s * 0.4, s * 0.84, s * 0.22);
+    c.fillStyle = '#fff'; c.font = '900 ' + Math.round(s * 0.13) + 'px ' + UIF; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('HEUTE', cx, cy - s * 0.29);
+    artBall(c, (dailyLevelIdx() % 15) + 1, cx, cy + s * 0.12, s * 0.2, 0.3, 0.4, d);
+    artStar(c, cx + s * 0.48, cy - s * 0.42, s * 0.12, 0.2);
+  },
+  speed(c, w, h, d) {
+    const cx = w / 2, cy = h * 0.54, r = h * 0.3;
+    artGlow(c, cx, cy, h * 0.6, 'rgba(80,200,255,.5)');
+    for (let i = 0; i < 3; i++) { c.strokeStyle = 'rgba(120,220,255,' + (0.35 - i * 0.1) + ')'; c.lineWidth = 3; c.beginPath(); c.moveTo(cx - r * (1.5 + i * 0.25), cy - r * 0.4 + i * r * 0.4); c.lineTo(cx - r * 1.05, cy - r * 0.4 + i * r * 0.4); c.stroke(); }
+    c.fillStyle = '#d9dee6'; c.fillRect(cx - r * 0.12, cy - r * 1.32, r * 0.24, r * 0.3);
+    c.save(); c.shadowColor = 'rgba(0,0,0,.55)'; c.shadowBlur = 14; c.shadowOffsetY = 6;
+    const g = c.createRadialGradient(cx - r * 0.3, cy - r * 0.3, r * 0.1, cx, cy, r); g.addColorStop(0, '#ffffff'); g.addColorStop(1, '#b8c4d2');
+    c.fillStyle = g; c.beginPath(); c.arc(cx, cy, r, 0, TAU); c.fill(); c.restore();
+    c.strokeStyle = '#1e8fe0'; c.lineWidth = r * 0.12; c.beginPath(); c.arc(cx, cy, r * 0.94, 0, TAU); c.stroke();
+    c.strokeStyle = '#ff5d3c'; c.lineWidth = r * 0.12; c.beginPath(); c.arc(cx, cy, r * 0.94, -Math.PI / 2, -Math.PI / 2 + TAU * 0.7); c.stroke();
+    c.strokeStyle = '#1a2230'; c.lineWidth = r * 0.07; c.lineCap = 'round';
+    c.beginPath(); c.moveTo(cx, cy); c.lineTo(cx + r * 0.5, cy - r * 0.35); c.stroke();
+    c.beginPath(); c.arc(cx, cy, r * 0.08, 0, TAU); c.fillStyle = '#1a2230'; c.fill();
+    artBall(c, 5, cx + r * 1.3, cy + r * 0.6, r * 0.35, 0.3, 0.2, d);
+  },
   ai(c, w, h, d) {
     artGlow(c, w * 0.36, h * 0.52, h * 0.5, 'rgba(80,180,255,.45)'); artGlow(c, w * 0.66, h * 0.52, h * 0.45, 'rgba(255,200,60,.35)');
     artBall(c, 9, w * 0.68, h * 0.5, h * 0.2, 0.3, -0.4, d);
@@ -2839,7 +2983,7 @@ function startLoading() {
     }
     if (i >= tasks.length && shown >= 99 && now - t0 > 1800) {
       $('loader').classList.add('fade');
-      setTimeout(() => { hide('loader'); checkInviteLink(); }, 600);
+      setTimeout(() => { hide('loader'); checkInviteLink(); if (!PROFILE.introSeen) showIntro(); }, 600);
       return;
     }
     requestAnimationFrame(tick);
@@ -3096,6 +3240,279 @@ function tournRound() {
   toast('🏟 ' + TOURN_NAMES[TOURN.round] + ' gegen ' + TOURN_OPP[TOURN.round] + '!', 3500);
 }
 
+// ===================== Version 6: Liga, Upgrades, Tageslevel, Zeitrennen, Kommentare und mehr =====================
+const today = () => dayKey(new Date());
+// ---------- Banner (Aufstieg, Erfolge) ----------
+const BANNERS = [];
+function banner(title, sub) {
+  BANNERS.push([title, sub || '']);
+  if (BANNERS.length === 1) nextBanner();
+}
+function nextBanner() {
+  const el = $('banner'); if (!BANNERS.length) return;
+  const [t, s] = BANNERS[0];
+  el.querySelector('b').textContent = t; el.querySelector('small').textContent = s;
+  el.classList.remove('hidden', 'go'); void el.offsetWidth; el.classList.add('go');
+  playSound('chat', 0);
+  setTimeout(() => { el.classList.add('hidden'); BANNERS.shift(); nextBanner(); }, 3200);
+}
+// Erfolge melden, sobald sie erreicht sind
+PROFILE.achSeen = PROFILE.achSeen || ACHIEVEMENTS.filter(a => a[4]() >= a[5]).map(a => a[0]);
+function checkAchievements() {
+  for (const a of ACHIEVEMENTS) if (!PROFILE.achSeen.includes(a[0]) && a[4]() >= a[5]) {
+    PROFILE.achSeen.push(a[0]); banner('🏅 Erfolg: ' + a[2], 'Belohnung unter „Aufgaben“ abholen');
+  }
+  saveProfile();
+}
+const _track = track;
+track = function (ev, n) { _track(ev, n); checkAchievements(); };
+
+// ---------- Liga mit Rangpunkten ----------
+const RANKS = [['Bronze', 0, '#d89058'], ['Silber', 200, '#cfd8e2'], ['Gold', 500, '#ffc23a'], ['Platin', 1000, '#5fe0d0'], ['Diamant', 1800, '#7cc4ff'], ['Meister', 3000, '#ff7ad9']];
+PROFILE.rp = PROFILE.rp || 0;
+const rankOf = rp => { let i = 0; RANKS.forEach((r, k) => { if (rp >= r[1]) i = k; }); return i; };
+function rankChange(won) {
+  let d = 0;
+  if (G.online) d = won ? 35 : -15;
+  else if (G.ai[1]) d = won ? [10, 20, 30, 45][G.diff] : -[12, 9, 6, 4][G.diff];
+  if (!d) return 0;
+  const before = rankOf(PROFILE.rp);
+  PROFILE.rp = Math.max(0, PROFILE.rp + d);
+  const after = rankOf(PROFILE.rp);
+  if (after > before) { const c = gain(after * 250, 100); banner('🏆 Aufstieg in die Liga ' + RANKS[after][0] + '!', '+' + c + ' Münzen Aufstiegsprämie'); }
+  saveProfile();
+  return d;
+}
+function rankLine() {
+  const i = rankOf(PROFILE.rp), nx = RANKS[i + 1];
+  return RANKS[i][0] + ' · ' + fmt(PROFILE.rp) + ' RP' + (nx ? ' (nächster Rang: ' + fmt(nx[1]) + ')' : '');
+}
+
+// ---------- Queue-Upgrades ----------
+PROFILE.cueLv = PROFILE.cueLv || {};
+const cueLv = id => PROFILE.cueLv[id] || 0;
+const cueStatsOf = id => (CUE_STATS[id] || CUE_STATS.klassik).map(v => Math.min(10, v + cueLv(id)));
+const upgradeCost = id => (cueLv(id) + 1) * (150 + ((CUES[id] && CUES[id].tier) || 0) * 120);
+function upgradeCue(id) {
+  if (cueLv(id) >= 5) return false;
+  const c = upgradeCost(id);
+  if (PROFILE.coins < c) { toast('Dir fehlen ' + fmt(c - PROFILE.coins) + ' Münzen für das Upgrade.'); return false; }
+  PROFILE.coins -= c; PROFILE.cueLv[id] = cueLv(id) + 1; saveProfile();
+  banner('⬆ ' + CUES[id].name + ' auf Stufe ' + cueLv(id), 'Kraft, Zielen, Effet und Zeit +1');
+  return true;
+}
+
+// ---------- Tages-Herausforderung ----------
+function dailyLevelIdx() { const k = today().split('-').reduce((a, v) => a * 31 + +v, 17); return Math.abs(k) % LEVELS.length; }
+function startDailyLevel() {
+  const i = dailyLevelIdx();
+  newSolo('levels', i); G.solo.daily = true;
+  toast('📅 Tages-Herausforderung: ' + LEVELS[i].desc + (PROFILE.dailyLvDay === today() ? ' (heute schon geschafft)' : ' Dreifache Belohnung beim ersten Erfolg heute!'), 5000);
+}
+function dailyBonus(so) {
+  if (PROFILE.dailyLvDay === today()) return '';
+  PROFILE.dailyLvDay = today(); saveProfile();
+  const c = gain(LEVEL_REWARDS[so.idx] * 3, 80); track('daily');
+  return ' 📅 Tagesbonus: +' + c + ' Münzen!';
+}
+
+// ---------- Zeitrennen ----------
+const fmtTime = t => Math.floor(t / 60) + ':' + String(Math.floor(t % 60)).padStart(2, '0') + ',' + Math.floor((t % 1) * 10);
+function speedFinish(ev, scratch, placeCue) {
+  const so = G.solo;
+  so.shots++;
+  if (scratch) { so.time += 10; const c = getBall(G.balls, 0); floatText('+10 s Strafe', W / 2, H / 2, '#ff6655'); placeCue(); }
+  if (!onSet(G.balls).size) {
+    const rec = !SOLO.speedBest || so.time < SOLO.speedBest;
+    if (rec) { SOLO.speedBest = so.time; saveSolo(); }
+    track('speed');
+    return endSolo(true, 'Alle 15 Kugeln in ' + fmtTime(so.time) + (rec ? ' – neuer Rekord!' : ' (Rekord: ' + fmtTime(SOLO.speedBest) + ')'));
+  }
+  return startTurn();
+}
+
+// ---------- Spielstatistik einer Partie ----------
+const mkMs = () => ({shots: 0, pots: 0, fouls: 0, run: 0, best: 0});
+function showMatchStats() {
+  const box = $('overStats');
+  if (!G || !G.ms || G.mode === 0) { box.innerHTML = ''; return; }
+  const row = (lab, f) => '<tr><td>' + f(0) + '</td><th>' + lab + '</th><td>' + f(1) + '</td></tr>';
+  const pct = i => G.ms[i].shots ? Math.round(G.ms[i].pots / G.ms[i].shots * 100) + ' %' : '–';
+  box.innerHTML = '<table><tr><td><b>' + G.players[0].name + '</b></td><th></th><td><b>' + G.players[1].name + '</b></td></tr>' +
+    row('Stöße', i => G.ms[i].shots) + row('Versenkt', i => G.ms[i].pots) + row('Trefferquote', pct) + row('Beste Serie', i => G.ms[i].best) + row('Fouls', i => G.ms[i].fouls) + '</table>';
+}
+
+// ---------- Stoß-Kommentare ----------
+function shotPraise(ev) {
+  const out = [], pots = ev.potted.filter(p => p.n > 0);
+  if (!pots.length || ev.cuePotted) return;
+  if (pots.length >= 3) out.push('Dreierpack!'); else if (pots.length === 2) out.push('Doppelpack!');
+  if (pots.some(p => ev.railCount[p.n] > 0)) out.push('Bandenstoß!');
+  if (ev.first !== null && pots.some(p => p.n !== ev.first) && !pots.some(p => p.n === ev.first)) out.push('Kombination!');
+  if (ev.kick) out.push('Kick-Shot!');
+  const bb = G.beforeBalls;
+  if (bb && ev.first !== null) {
+    const c = getBall(bb, 0), f = getBall(bb, ev.first);
+    if (c && f && Math.hypot(c.x - f.x, c.y - f.y) > 150 && pots.some(p => p.n === ev.first)) out.push('Distanzstoß!');
+  }
+  out.slice(0, 2).forEach((t, i) => floatText(t + ' +5 EP', W / 2, H * 0.32 + i * 12, '#7cffc4'));
+  if (out.length) gain(0, 5 * Math.min(2, out.length));
+}
+
+// ---------- Spielverlauf ----------
+PROFILE.hist = PROFILE.hist || [];
+function addHistory(won) {
+  PROFILE.hist.unshift({d: Date.now(), m: G.mode, o: G.players[1 - localIdx()].name, w: won, k: G.online ? 'Online' : G.ai[1] ? 'Computer' + (G.tourn ? ' (Turnier)' : '') : 'Lokal'});
+  PROFILE.hist = PROFILE.hist.slice(0, 20); saveProfile();
+}
+function renderHistory() {
+  const h = PROFILE.hist;
+  $('histBox').innerHTML = '<h2>Liga</h2><div class="rankBig" style="--rc:' + RANKS[rankOf(PROFILE.rp)][2] + '">' + rankLine() + '</div>' +
+    '<h2>Letzte Partien</h2>' + (h.length ? '<div class="hist">' + h.map(e => {
+      const d = new Date(e.d);
+      return '<div class="' + (e.w ? 'w' : 'l') + '"><b>' + (e.w ? 'Sieg' : 'Niederlage') + '</b><span>' + e.m + '-Ball gegen ' + e.o + ' · ' + e.k + '</span><small>' + d.getDate() + '.' + (d.getMonth() + 1) + '. ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0') + '</small></div>';
+    }).join('') + '</div>' : '<div class="muted">Noch keine Partien gespielt.</div>');
+}
+
+// ---------- Avatare ----------
+const AVATARS = [['★', '#ffd58a', '#f08a24'], ['♛', '#ffe9a3', '#c98a10'], ['♞', '#b8e1ff', '#2a6fd6'], ['⚡', '#fff3a0', '#ff8a00'], ['☯', '#f0f0f0', '#555'], ['♠', '#c9c9ff', '#3b3bb0'],
+  ['♣', '#b5ffcf', '#1a8f4a'], ['♥', '#ffb3c1', '#d6203f'], ['♦', '#ffd0a8', '#e0561a'], ['✦', '#e3c6ff', '#7a2fd6'], ['☀', '#fff0a8', '#f0a000'], ['☾', '#cfe3ff', '#3a4f8a']];
+function paintAvatar(el) {
+  const a = AVATARS[PROFILE.avatar];
+  if (!a) { el.style.background = ''; return; }
+  el.textContent = a[0]; el.style.background = 'radial-gradient(circle at 35% 30%,' + a[1] + ',' + a[2] + ' 70%)'; el.style.color = '#1a1206';
+}
+function renderAvPick() {
+  const box = $('avPick'); box.innerHTML = '';
+  [-1, ...AVATARS.keys()].forEach(i => {
+    const b = document.createElement('button'); b.className = 'av' + ((PROFILE.avatar ?? -1) === i ? ' sel' : '');
+    if (i < 0) { b.textContent = (CFG.name || 'S').charAt(0).toUpperCase(); b.style.background = 'radial-gradient(circle at 35% 30%,#ffd58a,#f08a24 55%,#a8380e)'; }
+    else { b.textContent = AVATARS[i][0]; b.style.background = 'radial-gradient(circle at 35% 30%,' + AVATARS[i][1] + ',' + AVATARS[i][2] + ' 70%)'; }
+    b.onclick = () => { PROFILE.avatar = i; saveProfile(); renderAvPick(); };
+    box.appendChild(b);
+  });
+}
+
+// ---------- Spielstand sichern ----------
+function backupCode() {
+  return btoa(unescape(encodeURIComponent(JSON.stringify({v: 1, p: PROFILE, s: SOLO, st: STATS, c: CFG}))));
+}
+function restoreCode(code) {
+  try {
+    const d = JSON.parse(decodeURIComponent(escape(atob(code.trim()))));
+    if (!d || !d.p || typeof d.p.coins !== 'number') throw 0;
+    localStorage.setItem('billard_profile', JSON.stringify(d.p));
+    if (d.s) localStorage.setItem('billard_solo', JSON.stringify(d.s));
+    if (d.st) localStorage.setItem('billard_stats', JSON.stringify(d.st));
+    if (d.c) localStorage.setItem('billard_cfg', JSON.stringify(d.c));
+    location.reload();
+    return true;
+  } catch (e) { return false; }
+}
+
+// ---------- Ball-in-Hand-Vorschlag ----------
+function bihHint() {
+  if (!G || !G.bih || !isHumanTurn() || G.state !== 'aim' || G.dragging) return null;
+  if (G.mode === 0 && (G.solo.type === 'lesson' || G.solo.type === 'levels' || G.solo.type === 'training')) return null;
+  if (linesMode() === 'off') return null;
+  if (G.bihHintVer !== G.ver) {
+    G.bihHintVer = G.ver; G.bihPlace = null;
+    const ver = G.ver;
+    setTimeout(() => {
+      if (!G || G.ver !== ver || !G.bih) return;
+      const cue = getBall(G.balls, 0), list = combos(G.balls, currentTargets(), cue, true, G.bih === 'kitchen').filter(c => c.place).sort((a, b) => b.e - a.e);
+      G.bihPlace = list.length ? list[0].place : null;
+    }, 40);
+  }
+  const c = getBall(G.balls, 0), p = G.bihPlace;
+  if (!p || Math.hypot(p.x - c.x, p.y - c.y) < 3) return null;
+  return p;
+}
+function drawBihHint(now) {
+  const p = bihHint(); if (!p) return;
+  const px = 1 / L.s, a = 0.55 + 0.35 * Math.sin(now / 260);
+  ctx.setLineDash([2 * px, 2 * px]); ctx.beginPath(); ctx.arc(p.x, p.y, R + 0.4, 0, TAU);
+  ctx.strokeStyle = 'rgba(124,255,196,' + a + ')'; ctx.lineWidth = 1.6 * px; ctx.stroke(); ctx.setLineDash([]);
+  lessonLabel('Vorschlag', p.x, p.y - R - 6, '#7cffc4');
+}
+
+// ---------- Bewegungsspuren ----------
+function drawTrails(balls) {
+  if (G.state !== 'moving' && G.state !== 'replay') { G.trails = null; return; }
+  G.trails = G.trails || {};
+  for (const b of balls) {
+    if (!b.on) { delete G.trails[b.n]; continue; }
+    const tr = G.trails[b.n] = G.trails[b.n] || [];
+    const l = tr[tr.length - 1];
+    if (!l || (l[0] - b.x) ** 2 + (l[1] - b.y) ** 2 > 0.6) { tr.push([b.x, b.y]); if (tr.length > 9) tr.shift(); }
+    if (Math.hypot(b.vx || 0, b.vy || 0) < 70 || tr.length < 3) { if (tr.length > 1 && Math.hypot(b.vx || 0, b.vy || 0) < 1) tr.splice(0, tr.length - 1); continue; }
+    ctx.lineCap = 'round';
+    for (let i = 1; i < tr.length; i++) {
+      ctx.beginPath(); ctx.moveTo(tr[i - 1][0], tr[i - 1][1]); ctx.lineTo(tr[i][0], tr[i][1]);
+      ctx.strokeStyle = b.n === 0 ? 'rgba(255,255,255,' + (0.22 * i / tr.length) + ')' : colorOf(b.n) + Math.round(60 * i / tr.length).toString(16).padStart(2, '0');
+      ctx.lineWidth = R * 1.5 * i / tr.length; ctx.stroke();
+    }
+  }
+}
+
+// ---------- Zeitlupe kurz vor dem entscheidenden Ball ----------
+function slowmoFactor(S) {
+  if (!G || G.mode === 0) return 1;
+  const b = getBall(S.balls, G.mode === 9 ? 9 : 8);
+  if (!b || !b.on) return 1;
+  const v = Math.hypot(b.vx, b.vy); if (v < 15) return 1;
+  for (const p of AIM_PTS) {
+    const dx = p.x - b.x, dy = p.y - b.y, d = Math.hypot(dx, dy);
+    if (d < 24 && (dx * b.vx + dy * b.vy) / (d * v) > 0.8) { G.slowT = performance.now(); return 0.3; }
+  }
+  return 1;
+}
+function drawSlowmo() {
+  const t = G && G.slowT ? performance.now() - G.slowT : 1e9;
+  if (t > 500) return;
+  const a = t < 250 ? 1 : 1 - (t - 250) / 250, bh = VH * 0.07 * a;
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  ctx.fillStyle = 'rgba(0,0,0,' + (0.75 * a) + ')'; ctx.fillRect(0, 0, VW, bh); ctx.fillRect(0, VH - bh, VW, bh);
+}
+
+// ---------- Fehlstoß (Miscue) ----------
+const MISCUE_R = 0.8;
+function maybeMiscue() {
+  const off = Math.hypot(G.sx, G.sy);
+  G.miscue = false;
+  if (off <= MISCUE_R || Math.random() > (off - MISCUE_R) / (0.95 - MISCUE_R) * 0.85) return;
+  G.aim += gauss() * 0.05; G.power *= 0.3; G.sx = G.sy = 0; G.miscue = true;
+  toast('Fehlstoß! Die Queuespitze ist abgerutscht – zu weit außen getroffen.', 3200);
+  playSound('foul', 0); vibrate(90);
+}
+
+// ---------- Einführung beim ersten Start ----------
+const INTRO = [
+  ['🎯', 'Zielen', 'Wische irgendwo über den Tisch, um den Queue zu drehen. Mit dem Rad rechts und ▲ ▼ zielst du ganz fein.'],
+  ['💪', 'Stoßen', 'Zieh den Queue links nach unten und lass los. Je weiter du ziehst, desto fester der Stoß.'],
+  ['🌀', 'Effet', 'Halte die kleine Kugel rechts gedrückt und wähle den Treffpunkt: oben Nachläufer, unten Rückläufer, seitlich Effet. Ganz außen droht ein Fehlstoß!'],
+  ['📏', 'Linien', 'Mit „Linien“ wählst du die Hilfe: Alle zeigt jede Bahn bis zum Ende, Einfach nur die Richtung, Aus gar nichts.'],
+  ['🏆', 'Fortschritt', 'Steig in der Liga auf, löse 90 Herausforderungen, erledige Tagesaufgaben und rüste deinen Queue auf.']
+];
+let introStep = 0;
+function showIntro() { introStep = 0; renderIntro(); show('intro'); }
+function renderIntro() {
+  const s = INTRO[introStep];
+  $('introIcon').textContent = s[0]; $('introTitle').textContent = s[1]; $('introText').textContent = s[2];
+  $('introDots').innerHTML = INTRO.map((_, i) => '<i class="' + (i === introStep ? 'on' : '') + '"></i>').join('');
+  $('bIntroNext').textContent = introStep < INTRO.length - 1 ? 'Weiter' : 'Los geht’s!';
+}
+function introNext() { if (introStep < INTRO.length - 1) { introStep++; renderIntro(); } else { hide('intro'); PROFILE.introSeen = true; saveProfile(); } }
+
+// ---------- Lobby-Ergänzungen ----------
+function renderExtras() {
+  const i = rankOf(PROFILE.rp);
+  $('lbRank').textContent = RANKS[i][0]; $('lbRank').style.setProperty('--rc', RANKS[i][2]);
+  paintAvatar($('lbAvatar'));
+  $('tDaily').textContent = PROFILE.dailyLvDay === today() ? '✓ Heute geschafft' : 'Heute: Level ' + (dailyLevelIdx() + 1) + ' · 3× Belohnung';
+  $('tSpeed').textContent = SOLO.speedBest ? 'Rekord: ' + fmtTime(SOLO.speedBest) : 'Noch kein Rekord';
+}
+
 // ===================== Wiederholung =====================
 function copyOrient(src) {
   const o = {}; src = src || G.orient;
@@ -3185,7 +3602,21 @@ function layout() {
   L.wheel = {x: bx + 16, y: wTop + nh + 4, w: bw - 32, h: wH - 2 * nh - 8};
   L.nudgeDown = {x: bx + 4, y: wTop + wH - nh, w: bw - 8, h: nh};
   L.bigSpin = {cx: VW / 2, cy: VH / 2 + 4, r: Math.min(VH * 0.33, VW * 0.22)};
+  // Linkshänder: Stoß-Leiste rechts, Bedienung links, Tisch gespiegelt verschoben
+  L.mir = !!(+CFG.left) && !lesson;
+  if (L.mir) {
+    const mx = r => { r.x = VW - r.x - r.w; };
+    mx(L.power); mx(L.nudgeUp); mx(L.wheel); mx(L.nudgeDown);
+    L.spin.cx = VW - L.spin.cx;
+    L.row.x = VW - L.row.x - L.row.w; L.bx = VW - L.bx - L.bw;
+    const x0 = L.ox - BORDER * s; L.ox = VW - x0 - tw * s + BORDER * s;
+    for (const id of ['bMenu', 'bShoot', 'bLines', 'bPush', 'bUndo', 'bReplay']) { const e = $(id).style; e.left = (VW - parseFloat(e.left) - parseFloat(e.width)) + 'px'; }
+    $('chatDlg').style.right = 'auto'; $('chatDlg').style.left = (right + 4) + 'px';
+  } else { $('chatDlg').style.left = 'auto'; }
 }
+// Bereichs-Prüfung unabhängig von der Seite
+const inPowerCol = x => L.mir ? x > VW - L.left : x < L.left;
+const inCtrlCol = x => L.mir ? x < VW - L.rx : x > L.rx;
 function place(id, x, y, w, h) { const e = document.getElementById(id).style; e.left = x + 'px'; e.top = y + 'px'; e.width = w + 'px'; e.height = h + 'px'; }
 
 function tableTransform() { ctx.setTransform(DPR * L.s, 0, 0, DPR * L.s, DPR * L.ox, DPR * L.oy); }
@@ -4467,7 +4898,7 @@ const CUE_STATS = {klassik: [1, 1, 1, 1], ebenholz: [2, 2, 1, 2], kirsch: [2, 2,
 // Gelten in Partien und der Trefferserie – Lektionen, Herausforderungen und Training bleiben neutral
 const statsActive = () => G && (G.mode !== 0 || G.solo.type === 'arcade');
 function cueStats(i) {
-  const id = cueFor(i), st = CUE_STATS[id] || CUE_STATS.klassik, on = statsActive() && !(G.ai && G.ai[i]);
+  const id = cueFor(i), st = cueStatsOf(id), on = statsActive() && !(G.ai && G.ai[i]);
   return {
     force: on ? 0.95 + st[0] * 0.02 : 1,
     line: 38 + st[1] * 9,
@@ -4492,7 +4923,7 @@ function updateAimView(dt) {
 // Welcher Queue gehört zum Spieler am Zug?
 function cueFor(i) {
   if (!G || G.mode === 0) return PROFILE.cue;
-  if (G.ai[i]) return ['klassik', 'carbon', 'gold'][G.diff] || 'klassik';
+  if (G.ai[i]) return ['klassik', 'carbon', 'gold', 'sonnenfeuer'][G.diff] || 'klassik';
   if (G.online) return i === NET.me ? PROFILE.cue : (NET.peerCue || 'klassik');
   return i === 0 ? PROFILE.cue : 'klassik';
 }
@@ -4506,8 +4937,8 @@ function drawHUD() {
   ctx.textBaseline = 'middle';
   if (G.mode === 0) {
     const so = G.solo, lv = so.type === 'lesson' ? LESSON_LEVELS[so.level] : LEVELS[so.idx];
-    const left = so.type === 'lucky' ? '🍀 Glücksstoß' : so.type === 'target' ? '🎯 Zielscheibe · ' + so.score + ' Punkte' : so.type === 'lesson' ? '🎓 Lern-Modus' : so.type === 'levels' ? 'Level ' + (so.idx + 1) + ': ' + lv.name : so.type === 'training' ? 'Training' : 'Punkte: ' + so.score;
-    const right = so.type === 'lucky' ? 'Hauptpreis: 800 🪙' : so.type === 'target' ? 'Stoß ' + Math.min(5, so.shots + 1) + ' / 5' : so.type === 'lesson' ? TOPICS[so.topic].name : so.type === 'levels' ? 'Stöße: ' + so.shots + ' / ' + lv.shots + ' · Par ' + lv.par
+    const left = so.type === 'speed' ? '⏱ ' + fmtTime(so.time || 0) : so.type === 'lucky' ? '🍀 Glücksstoß' : so.type === 'target' ? '🎯 Zielscheibe · ' + so.score + ' Punkte' : so.type === 'lesson' ? '🎓 Lern-Modus' : so.type === 'levels' ? 'Level ' + (so.idx + 1) + ': ' + lv.name : so.type === 'training' ? 'Training' : 'Punkte: ' + so.score;
+    const right = so.type === 'speed' ? 'Versenkt: ' + (15 - onSet(G.balls).size) + ' / 15' : so.type === 'lucky' ? 'Hauptpreis: 800 🪙' : so.type === 'target' ? 'Stoß ' + Math.min(5, so.shots + 1) + ' / 5' : so.type === 'lesson' ? TOPICS[so.topic].name : so.type === 'levels' ? 'Stöße: ' + so.shots + ' / ' + lv.shots + ' · Par ' + lv.par
       : so.type === 'training' ? 'Stöße: ' + so.shots + ' · Versenkt: ' + (so.pots || 0)
       : '❤'.repeat(so.lives) + '  · Serie ×' + Math.max(1, so.combo);
     ctx.font = 'bold ' + fs + 'px ' + UIF;
@@ -4560,6 +4991,7 @@ function drawHUD() {
     let label = 'Ziel:', list = tg;
     if (G.isBreak) { label = 'Anstoß'; list = []; }
     else if (G.mode === 0 && G.solo.type === 'training') { label = 'Freies Spiel'; list = []; }
+    else if (G.mode === 0 && G.solo.type === 'speed') { label = 'Alle Kugeln'; list = []; }
     else if (G.mode === 0 && G.solo.type === 'target') { label = '🎯 Weiße ins Zentrum'; list = []; }
     else if (G.mode === 0 && G.solo.type === 'lesson') { label = 'Lektion ' + (G.solo.step + 1) + ' / ' + LESSONS[G.solo.topic].length; list = []; }
     else if (G.mode === 8 && !G.players[G.cur].group) { label = 'Ziel: Volle oder Halbe (nicht die 8)'; list = []; }
@@ -4610,6 +5042,7 @@ function statusText() {
     const so = G.solo;
     if (so.type === 'training') return 'Training · Kugel halten & ziehen · ⟲ Replay · ↶ Zurück';
     if (so.type === 'lesson') return G.state === 'lessonaim' ? 'Die Linien zeigen den Lösungsstoß – tippe auf „Vorführen“' : 'Lektion – lies die Erklärung rechts';
+    if (so.type === 'speed') return 'Zeitrennen · Rekord: ' + (SOLO.speedBest ? fmtTime(SOLO.speedBest) : '–') + (G.bih && G.state === 'aim' ? ' · Ball in Hand' : '');
     if (so.type === 'lucky') return 'Ein Stoß: Versenke die 1 in der Tasche mit dem höchsten Preis';
     if (so.type === 'target') return 'Lass die Weiße im Zentrum der Zielscheibe liegen';
     let t = so.type === 'levels' ? LEVELS[so.idx].desc : 'Rekord: ' + SOLO.hi + ' · Linien-Bonus ×' + LINES_MULT[CFG.lines];
@@ -4670,7 +5103,7 @@ function drawControls() {
   ctx.strokeStyle = 'rgba(0,0,0,.18)'; ctx.lineWidth = 1;
   ctx.beginPath(); ctx.moveTo(sp.cx - sp.r, sp.cy); ctx.lineTo(sp.cx + sp.r, sp.cy); ctx.moveTo(sp.cx, sp.cy - sp.r); ctx.lineTo(sp.cx, sp.cy + sp.r); ctx.stroke();
   ctx.beginPath(); ctx.arc(sp.cx + G.sx * sp.r, sp.cy - G.sy * sp.r, sp.r * 0.2, 0, TAU);
-  ctx.fillStyle = 'rgba(255,60,60,.85)'; ctx.fill(); ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.2; ctx.stroke();
+  ctx.fillStyle = Math.hypot(G.sx, G.sy) > MISCUE_R ? 'rgba(255,50,40,.95)' : 'rgba(40,130,255,.9)'; ctx.fill(); ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.2; ctx.stroke();
   // Feinjustierung (Rändelrad)
   const wh = L.wheel;
   ctx.save(); roundRect(wh.x, wh.y, wh.w, wh.h, 8); ctx.clip();
@@ -4736,16 +5169,19 @@ function drawSpinOverlay() {
   for (const f of [0.25, 0.5]) { ctx.beginPath(); ctx.arc(cx, cy, r * f, 0, TAU); ctx.stroke(); }
   ctx.setLineDash([5, 5]); ctx.strokeStyle = 'rgba(200,40,30,.55)';
   ctx.beginPath(); ctx.arc(cx, cy, r * 0.8, 0, TAU); ctx.stroke(); ctx.setLineDash([]);
+  ctx.fillStyle = 'rgba(255,60,50,.16)'; ctx.beginPath(); ctx.arc(cx, cy, r * 0.97, 0, TAU); ctx.arc(cx, cy, r * 0.8, 0, TAU, true); ctx.fill();
+  ctx.font = 'bold 11px ' + UIF; ctx.textAlign = 'center'; ctx.fillStyle = '#ff8a7a'; ctx.fillText('Fehlstoß-Gefahr', cx + r * 0.62, cy + r * 0.78);
   const mx = cx + G.sx * r, my = cy - G.sy * r;
   ctx.beginPath(); ctx.arc(mx, my, r * 0.2, 0, TAU);
-  ctx.fillStyle = 'rgba(40,90,175,.55)'; ctx.fill(); ctx.strokeStyle = '#123d7a'; ctx.lineWidth = 2; ctx.stroke();
+  const danger = Math.hypot(G.sx, G.sy) > MISCUE_R;
+  ctx.fillStyle = danger ? 'rgba(230,40,30,.6)' : 'rgba(40,90,175,.55)'; ctx.fill(); ctx.strokeStyle = danger ? '#7a0f08' : '#123d7a'; ctx.lineWidth = 2; ctx.stroke();
   ctx.beginPath(); ctx.arc(mx, my, 3, 0, TAU); ctx.fillStyle = '#0b2550'; ctx.fill();
   ctx.font = 'bold 13px ' + UIF; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = '#fff';
   ctx.fillText('Nachläufer', cx, cy - r - 14); ctx.fillText('Rückläufer', cx, cy + r + 14);
   ctx.textAlign = 'right'; ctx.fillText('Links', cx - r - 10, cy);
   ctx.textAlign = 'left'; ctx.fillText('Rechts', cx + r + 10, cy);
   ctx.textAlign = 'center'; ctx.font = '12px ' + UIF; ctx.fillStyle = '#ffd76a';
-  const v = Math.round(Math.abs(G.sy) * 125), h = Math.round(Math.abs(G.sx) * 125);
+  const v = Math.round(Math.abs(G.sy) * 105), h = Math.round(Math.abs(G.sx) * 105);
   const desc = (G.sy > 0.02 ? 'Nachläufer ' + v + '%' : G.sy < -0.02 ? 'Rückläufer ' + v + '%' : 'Mitte') + ' · ' + (G.sx > 0.02 ? 'Rechts ' + h + '%' : G.sx < -0.02 ? 'Links ' + h + '%' : 'kein Seiteneffet');
   ctx.fillText(desc, cx, Math.min(VH - 10, cy + r + 32));
   ctx.fillStyle = 'rgba(255,255,255,.6)';
@@ -4817,7 +5253,9 @@ function draw() {
     // Bei „Alle“ bleiben die Bahnen während des Stoßes sichtbar – die Kugeln laufen genau darauf
     ctx.save(); ctx.globalAlpha = 0.55; drawPrediction(G.shotPred); ctx.restore();
   }
+  drawTrails(balls);
   for (const b of balls) if (b.on) drawBall(b.n, b.x, b.y, G.dragging && b.n === G.dragN ? 1.14 : 1);
+  drawBihHint(now);
   if (humanAim) drawTargetGlow(now, false);
   if (G.mode === 0 && G.solo.type === 'lesson') drawLesson(now);
   else if (G.mode === 0) drawSoloOverlay(S);
@@ -4829,6 +5267,7 @@ function draw() {
   }
   drawFloats(now);
   drawHUD();
+  drawSlowmo();
   if (!L.lesson) drawControls();
   if (G.state === 'replay') {
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
@@ -4872,12 +5311,13 @@ cv.addEventListener('pointerdown', e => {
   if (ptrs.size) return; // immer nur ein Finger gleichzeitig
   const x = e.clientX, y = e.clientY, sp = L.spin;
   let kind = null;
-  if (x < L.left) kind = 'power';
+  const cx0 = L.mir ? 0 : L.rx;
+  if (inPowerCol(x)) kind = 'power';
   else if (Math.hypot(x - sp.cx, y - sp.cy) < sp.r + 16 * L.u) kind = 'spin';
-  else if (inRect(x, y, {x: L.rx, y: L.nudgeUp.y - 4, w: L.right, h: L.nudgeUp.h + 6})) kind = 'nudge-';
-  else if (inRect(x, y, {x: L.rx, y: L.nudgeDown.y - 2, w: L.right, h: L.nudgeDown.h + 6})) kind = 'nudge+';
-  else if (x > L.rx && y > L.wheel.y - 4 && y < L.wheel.y + L.wheel.h + 4) kind = 'wheel';
-  else if (x >= L.left && x <= L.rx) kind = 'table';
+  else if (inRect(x, y, {x: cx0, y: L.nudgeUp.y - 4, w: L.right, h: L.nudgeUp.h + 6})) kind = 'nudge-';
+  else if (inRect(x, y, {x: cx0, y: L.nudgeDown.y - 2, w: L.right, h: L.nudgeDown.h + 6})) kind = 'nudge+';
+  else if (inCtrlCol(x) && y > L.wheel.y - 4 && y < L.wheel.y + L.wheel.h + 4) kind = 'wheel';
+  else if (!inPowerCol(x) && !inCtrlCol(x)) kind = 'table';
   if (!kind || !isHumanTurn()) return;
   e.preventDefault();
   try { cv.setPointerCapture(e.pointerId); } catch (err) {}
@@ -4908,9 +5348,9 @@ function updateCursor(x, y) {
   if (!isPC() || !G || !L) return;
   let c = 'default';
   if (isHumanTurn()) {
-    if (x < L.left) c = 'ns-resize';
+    if (inPowerCol(x)) c = 'ns-resize';
     else if (Math.hypot(x - L.spin.cx, y - L.spin.cy) < L.spin.r + 16 * L.u) c = 'pointer';
-    else if (x > L.rx) c = y > L.wheel.y && y < L.wheel.y + L.wheel.h ? 'ns-resize' : 'pointer';
+    else if (inCtrlCol(x)) c = y > L.wheel.y && y < L.wheel.y + L.wheel.h ? 'ns-resize' : 'pointer';
     else c = G.dragging ? 'grabbing' : ptrs.size ? 'grabbing' : 'grab';
   }
   if (cv.style.cursor !== c) cv.style.cursor = c;
@@ -4973,7 +5413,7 @@ function handlePtr(st, x, y) {
     // Relativ zur großen Kugel: der Finger verdeckt den Treffpunkt nicht
     let sx = G.sx + (x - st.lx) / L.bigSpin.r, sy = G.sy - (y - st.ly) / L.bigSpin.r;
     st.lx = x; st.ly = y;
-    const m = Math.hypot(sx, sy); if (m > 0.8) { sx *= 0.8 / m; sy *= 0.8 / m; }
+    const m = Math.hypot(sx, sy); if (m > 0.95) { sx *= 0.95 / m; sy *= 0.95 / m; }
     G.sx = sx; G.sy = sy;
   } else if (st.kind === 'wheel') {
     const dy = y - st.ly; st.ly = y;
@@ -5022,7 +5462,7 @@ function updateUI() {
   $('bUndo').disabled = !(training && isHumanTurn() && G.beforeBalls);
   $('bUndo').textContent = '↶';
   const half = canPush || training;
-  place('bReplay', L.row.x, L.row.y, half ? L.row.half : L.row.w, 32);
+  place('bReplay', L.mir && half ? L.row.x + L.row.w - L.row.half : L.row.x, L.row.y, half ? L.row.half : L.row.w, 32);
   $('bReplay').textContent = half ? '⟲' : '⟲ Replay';
   $('bReplay').disabled = !(isHumanTurn() && G.lastShot);
   $('bChat').classList.toggle('hidden', !G.online);
@@ -5047,7 +5487,7 @@ document.querySelectorAll('.seg[data-k]').forEach(seg => seg.addEventListener('c
   const k = seg.dataset.k, v = b.dataset.v;
   CFG[k] = (k === 'opp' || k === 'solo' || k === 'cloth' || k === 'device') ? v : +v;
   if (k === 'cloth') applyCloth();
-  if (k === 'device') { layout(); lobbyResize(); applySkins(); showDevInfo(); }
+  if (k === 'device' || k === 'left') { layout(); lobbyResize(); applySkins(); showDevInfo(); }
   saveCfg(); syncMenu();
 }));
 document.querySelectorAll('.tile').forEach(t => t.onclick = () => {
@@ -5058,6 +5498,7 @@ document.querySelectorAll('.tile').forEach(t => t.onclick = () => {
   else if (go === 'levels') showLevels();
   else if (go === 'tourn') { if (G && G.online) netReset(); startTournament(); }
   else if (go === 'lucky') newLucky();
+  else if (go === 'daily') startDailyLevel();
   else newSolo(go);
 });
 $('bDaily').onclick = () => claimDaily();
@@ -5115,7 +5556,12 @@ $('bAgain').onclick = () => {
 };
 const DEV_NAMES = {pc: 'PC (Maus und Tastatur)', tablet: 'Tablet', phone: 'Handy'};
 function showDevInfo() { $('devInfo').textContent = 'Erkannt: ' + DEV_NAMES[DETECTED] + (CFG.device !== 'auto' ? ' · Eingestellt: ' + DEV_NAMES[deviceType()] : ''); }
-$('bSettings').onclick = () => { syncMenu(); $('nameInput').value = CFG.name || ''; showDevInfo(); show('settings'); };
+$('bSettings').onclick = () => { syncMenu(); $('nameInput').value = CFG.name || ''; showDevInfo(); renderAvPick(); $('bkMsg').textContent = ''; show('settings'); };
+$('bBackup').onclick = () => { const c = backupCode(); $('bkText').value = c; $('bkText').classList.remove('hidden'); copyText(c); $('bkMsg').textContent = 'Sicherungscode kopiert. Bewahre ihn gut auf – damit holst du deinen Fortschritt auf jedes Gerät.'; };
+$('bRestore').onclick = () => { const t = $('bkText'); if (t.classList.contains('hidden') || !t.value.trim()) { t.value = ''; t.classList.remove('hidden'); t.focus(); $('bkMsg').textContent = 'Füge deinen Sicherungscode ein und tippe noch einmal auf „Laden“.'; return; } if (!restoreCode(t.value)) $('bkMsg').textContent = 'Dieser Code ist ungültig.'; };
+$('bIntroAgain').onclick = () => { hide('settings'); showIntro(); };
+$('bIntroNext').onclick = () => introNext();
+$('bIntroSkip').onclick = () => { introStep = INTRO.length - 1; introNext(); };
 $('bSettingsClose').onclick = () => {
   CFG.name = $('nameInput').value.trim().slice(0, 16); saveCfg(); hide('settings'); syncMenu();
   if (G && !G.online && G.mode !== 0) G.players[0].name = myName();
@@ -5214,8 +5660,9 @@ function frame(now) {
     netTick(now);
     pointerTick(now);
     tickTimer(dt);
+    if (G.mode === 0 && G.solo.type === 'speed' && G.solo.started && G.state !== 'over') G.solo.time += dt;
     if (G.state === 'moving' && G.live) {
-      const S = G.live, target = S.t + dt * TIME_SCALE;
+      const S = G.live, target = S.t + dt * TIME_SCALE * slowmoFactor(S);
       let moving = true;
       while (S.t < target) { if (!stepSim(S)) { moving = false; break; } }
       trackSinking(S, now);

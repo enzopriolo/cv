@@ -16,9 +16,9 @@ window.makeTopic = function (t) {
       const a = Math.atan2(s.g.gy - s.cy, s.g.gx - s.cx); let sol = null;
       for (const pw of [0.4, 0.55, 0.7, 0.3, 0.85]) { const S = g.sim(bs, {angle: a, power: pw}); if (g.potted(S, n) && !S.ev.cuePotted) { sol = {angle: a, power: pw}; break; } }
       if (!sol) continue;
-      const lines = i >= 13 ? 'off' : i >= 10 ? 'guide' : undefined;
-      const names = ['Gerade drauf', 'Leichter Schnitt', 'Halbe Kugel', 'Mittelschnitt', 'Ecke anvisieren', 'Weiter Weg', 'Viertelkugel', 'Spitzer Winkel', 'Feinarbeit', 'Hauchdünn', 'Nur Hilfslinie I', 'Nur Hilfslinie II', 'Nur Hilfslinie III', 'Blind gezielt I', 'Blind gezielt II'];
-      lv = {name: names[i], desc: (lines === 'off' ? 'Keine Linien! ' : lines === 'guide' ? 'Nur die einfache Hilfslinie. ' : '') + 'Versenke die ' + n + ' – Schnittwinkel etwa ' + Math.round(cut) + '°.', cue: [g.r2(s.cx), g.r2(s.cy)], balls: [[n, g.r2(s.tx), g.r2(s.ty)]], lines, shots: 2, par: 1, sol: [g.shotOut(sol)]};
+      const lines = i >= 13 ? 'aim' : i >= 10 ? 'guide' : undefined;
+      const names = ['Gerade drauf', 'Leichter Schnitt', 'Halbe Kugel', 'Mittelschnitt', 'Ecke anvisieren', 'Weiter Weg', 'Viertelkugel', 'Spitzer Winkel', 'Feinarbeit', 'Hauchdünn', 'Nur Hilfslinie I', 'Nur Hilfslinie II', 'Nur Hilfslinie III', 'Nur Ziellinie I', 'Nur Ziellinie II'];
+      lv = {name: names[i], desc: (lines === 'aim' ? 'Nur die Ziellinie bis zur Geisterkugel – den Schnitt schätzt du selbst ein. ' : lines === 'guide' ? 'Nur die einfache Hilfslinie. ' : '') + 'Versenke die ' + n + ' – Schnittwinkel etwa ' + Math.round(cut) + '°.', cue: [g.r2(s.cx), g.r2(s.cy)], balls: [[n, g.r2(s.tx), g.r2(s.ty)]], lines, shots: 2, par: 1, sol: [g.shotOut(sol)]};
       if (i >= 6 && i % 3 === 0) lv.pocket = {[n]: s.k}, lv.desc += ' Nur in die markierte Tasche.';
     } else if (t === 1) { // Kombinationen: zwei, später drei Kugeln
       const three = i >= 9, gap = 0.5 + i * 0.6, mis = i * 0.008;

@@ -1,20 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="108dp"
-    android:height="108dp"
-    android:viewportWidth="108"
-    android:viewportHeight="108">
-    <!-- Hilfslinie -->
-    <path android:strokeColor="#CCFFFFFF" android:strokeWidth="2.5"
-        android:pathData="M30,74 L58,46" />
-    <path android:strokeColor="#FFF2B632" android:strokeWidth="2.5"
-        android:pathData="M64,46 L82,28" />
-    <!-- Weiße Kugel -->
-    <path android:fillColor="#FFF6F3EA"
-        android:pathData="M30,74 m-9,0 a9,9 0 1,0 18,0 a9,9 0 1,0 -18,0" />
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <!-- goldene Ziellinie -->
+    <path android:strokeColor="#FFFFC23A" android:strokeWidth="2.6" android:strokeLineCap="round"
+        android:pathData="M37,71 L49,59" />
+    <!-- Schatten der Acht -->
+    <path android:fillColor="#55000000"
+        android:pathData="M61,64 m-19,0 a19,19 0 1,0 38,0 a19,19 0 1,0 -38,0" />
     <!-- Acht -->
-    <path android:fillColor="#FF141414"
-        android:pathData="M63,47 m-11,0 a11,11 0 1,0 22,0 a11,11 0 1,0 -22,0" />
+    <path android:pathData="M60,50 m-18,0 a18,18 0 1,0 36,0 a18,18 0 1,0 -36,0">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="radial" android:centerX="53" android:centerY="42" android:gradientRadius="26">
+                <item android:offset="0" android:color="#FF5A5A5A" />
+                <item android:offset="0.45" android:color="#FF151515" />
+                <item android:offset="1" android:color="#FF000000" />
+            </gradient>
+        </aapt:attr>
+    </path>
     <path android:fillColor="#FFFBFAF5"
-        android:pathData="M63,47 m-5,0 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0" />
+        android:pathData="M58,47 m-8,0 a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0" />
+    <path android:strokeColor="#FF111111" android:strokeWidth="1.7"
+        android:pathData="M58,44.2 m-2.3,0 a2.3,2.3 0 1,0 4.6,0 a2.3,2.3 0 1,0 -4.6,0 M58,49.7 m-2.9,0 a2.9,2.9 0 1,0 5.8,0 a2.9,2.9 0 1,0 -5.8,0" />
+    <!-- Glanzpunkt -->
+    <path android:fillColor="#AAFFFFFF"
+        android:pathData="M51,39 m-3,0 a3,2 0 1,0 6,0 a3,2 0 1,0 -6,0" />
+    <!-- weiße Kugel -->
+    <path android:pathData="M33,75 m-8,0 a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="radial" android:centerX="30" android:centerY="72" android:gradientRadius="11">
+                <item android:offset="0" android:color="#FFFFFFFF" />
+                <item android:offset="0.7" android:color="#FFE9E4D6" />
+                <item android:offset="1" android:color="#FFA9A394" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <path android:fillColor="#FFE0412F"
+        android:pathData="M33,75 m-1.2,0 a1.2,1.2 0 1,0 2.4,0 a1.2,1.2 0 1,0 -2.4,0" />
 </vector>

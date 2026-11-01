@@ -10,17 +10,19 @@ android {
         applicationId 'de.enzo.billard'
         minSdk 26
         targetSdk 35
-        versionCode 23
-        versionName '6.0'
+        versionCode 24
+        versionName '6.1'
     }
 
     signingConfigs {
-        // Fester Schlüssel, damit spätere Versionen als Update installiert werden können.
+        // Für den Play Store: eigener, geheimer Schlüssel über Umgebungsvariablen (GitHub-Secrets).
+        // Ohne Secrets wird der Test-Schlüssel aus dem Repository benutzt (nur für die direkte APK).
         release {
-            storeFile file('billard.jks')
-            storePassword 'billard123'
-            keyAlias 'billard'
-            keyPassword 'billard123'
+            def ks = System.getenv('BILLARD_KEYSTORE')
+            storeFile file(ks ? ks : 'billard.jks')
+            storePassword System.getenv('BILLARD_STORE_PASS') ?: 'billard123'
+            keyAlias System.getenv('BILLARD_KEY_ALIAS') ?: 'billard'
+            keyPassword System.getenv('BILLARD_KEY_PASS') ?: 'billard123'
         }
     }
 

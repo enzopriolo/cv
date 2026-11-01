@@ -25,17 +25,34 @@ jobs:
         with:
           gradle-version: '8.14.3'
 
+      - name: Eigenen Signaturschlüssel einrichten (falls als Secret hinterlegt)
+        env:
+          KS_B64: ${{ secrets.BILLARD_KEYSTORE_BASE64 }}
+        run: |
+          if [ -n "$KS_B64" ]; then
+            echo "$KS_B64" | base64 -d > "$RUNNER_TEMP/upload.jks"
+            echo "BILLARD_KEYSTORE=$RUNNER_TEMP/upload.jks" >> "$GITHUB_ENV"
+          fi
+
       - name: APK bauen
         working-directory: billard-app
-        run: gradle assembleRelease --no-daemon --stacktrace
+        env:
+          BILLARD_STORE_PASS: ${{ secrets.BILLARD_STORE_PASS }}
+          BILLARD_KEY_ALIAS: ${{ secrets.BILLARD_KEY_ALIAS }}
+          BILLARD_KEY_PASS: ${{ secrets.BILLARD_KEY_PASS }}
+        run: gradle assembleRelease bundleRelease --no-daemon --stacktrace
 
-      - name: APK umbenennen
-        run: cp billard-app/app/build/outputs/apk/release/app-release.apk BillardLinien.apk
+      - name: APK und App-Bundle umbenennen
+        run: |
+          cp billard-app/app/build/outputs/apk/release/app-release.apk BillardLinien.apk
+          cp billard-app/app/build/outputs/bundle/release/app-release.aab BillardLinien.aab
 
       - uses: actions/upload-artifact@v4
         with:
           name: BillardLinien-apk
-          path: BillardLinien.apk
+          path: |
+            BillardLinien.apk
+            BillardLinien.aab
 
       - name: Release mit APK erstellen
         uses: softprops/action-gh-release@v2
@@ -46,4 +63,7 @@ jobs:
           body: |
             APK zum Installieren auf Android: **BillardLinien.apk** unten unter *Assets* herunterladen und öffnen.
             Beim ersten Mal muss die Installation aus unbekannten Quellen erlaubt werden.
-          files: BillardLinien.apk
+            **BillardLinien.aab** ist das App-Bundle für den Google Play Store.
+          files: |
+            BillardLinien.apk
+            BillardLinien.aab

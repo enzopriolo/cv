@@ -456,6 +456,12 @@ button{font-family:var(--disp)}
 @keyframes shootGlow{50%{box-shadow:0 0 34px rgba(255,90,40,.65),0 8px 20px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.45),inset 0 -3px 0 rgba(90,10,0,.4)}}
 #rotate{background:radial-gradient(ellipse at 50% 40%,#15314a,#020509)}
 
+/* Flüssigkeit: keine Hintergrund-Unschärfe und keine Mischmodi über animierten Flächen */
+*{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+#menu .lbShade::after{display:none}
+#menu .tile::after{mix-blend-mode:normal;opacity:.28}
+#menu .tile,#carousel .tile{will-change:auto}
+#menu .tile.act{will-change:transform}
 </style>
 </head>
 <body>
@@ -890,11 +896,13 @@ function stepSim(S) {
   return true;
 }
 
-function runSim(balls, shot, withPaths) {
+function runSim(balls, shot, withPaths, maxT) {
   const S = newSim(balls, shot);
   if (withPaths) { S.paths = {}; for (const b of S.balls) S.paths[b.n] = [[b.x, b.y]]; }
   let n = 0;
-  while (stepSim(S) && S.t < 60 && n < 300000) n++;
+  // maxT: so viele Sekunden nach der ersten Berührung (Kugel oder Bande) aufhören
+  let tEnd = 60;
+  while (stepSim(S) && S.t < tEnd && n < 300000) { n++; if (maxT && tEnd === 60 && (S.ev.first !== null || S.ev.kick)) tEnd = Math.min(60, S.t + maxT); }
   if (withPaths) for (const b of S.balls) if (b.on) recPath(S, b, true);
   return S;
 }
@@ -1893,7 +1901,8 @@ function* aiThink() {
 function startAI() { G.state = 'ai'; G.aiGen = aiThink(); G.aiStart = performance.now(); }
 function runAI() {
   const t0 = performance.now();
-  while (performance.now() - t0 < 14) {
+  // kleines Zeitbudget pro Bild, damit die Darstellung flüssig bleibt
+  while (performance.now() - t0 < (isPC() ? 10 : 7)) {
     const r = G.aiGen.next();
     if (r.done) {
       const c = r.value;
@@ -2519,7 +2528,7 @@ function initLobbyBg() {
 }
 function lobbyResize() {
   if (!LB.cv) return;
-  LB.dpr = isPC() ? clamp(Math.max(window.devicePixelRatio || 1, 1.5), 1, 2) : Math.min(window.devicePixelRatio || 1, 2);
+  LB.dpr = isPC() ? 1.5 : Math.min(window.devicePixelRatio || 1, 1.5);
   LB.w = innerWidth; LB.h = innerHeight;
   LB.cv.width = Math.round(LB.w * LB.dpr); LB.cv.height = Math.round(LB.h * LB.dpr);
 }
@@ -3138,7 +3147,7 @@ function layout() {
   document.documentElement.className = 'dev-' + dev;
   // PC: schärfer rendern (auch auf normalen Monitoren), Handy: Auflösung begrenzen für flüssiges Spiel
   const raw = window.devicePixelRatio || 1;
-  DPR = dev === 'pc' ? clamp(Math.max(raw, 1.5), 1, 2) : dev === 'tablet' ? Math.min(raw, 2) : Math.min(raw, 2.5);
+  DPR = dev === 'pc' ? clamp(Math.max(raw, 1.5), 1, 2) : dev === 'tablet' ? Math.min(raw, 2) : Math.min(raw, 2);
   VW = innerWidth; VH = innerHeight;
   $('rotate').style.display = dev !== 'pc' && VH > VW && VW < 820 ? 'flex' : 'none';
   cv.width = Math.round(VW * DPR); cv.height = Math.round(VH * DPR);
@@ -4171,7 +4180,9 @@ function getPrediction() {
   const key = [a, pw, G.sx, G.sy, cue.x, cue.y, G.ver, G.called].join('|');
   if (key !== G.predKey) {
     G.predKey = key;
-    G.pred = runSim(G.balls, shotParams(a, pw), true);
+    // Bei „Alle“ wird bis zum Stillstand gerechnet, sonst reicht der Anfang der Bahnen
+    const full = linesMode() === 'all' || needCall() || (G.mode === 0 && G.solo.type !== 'levels' && G.solo.type !== 'arcade');
+    G.pred = runSim(G.balls, shotParams(a, pw), true, full ? 0 : 1.6);
     G.predInfo = predictVerdict(G.pred);
   }
   return G.pred;
@@ -4474,9 +4485,9 @@ function updateAimView(dt) {
   if (G.aimView === undefined || G.state !== 'aim' && G.state !== 'aipreview') { G.aimView = G.aim; G.powerView = G.power; return; }
   const k = 1 - Math.exp(-dt * 22);
   const d = Math.atan2(Math.sin(G.aim - G.aimView), Math.cos(G.aim - G.aimView));
-  G.aimView = Math.abs(d) < 1e-6 ? G.aim : G.aimView + d * k;
+  G.aimView = Math.abs(d) < 2e-5 ? G.aim : G.aimView + d * k;
   const dp = G.power - G.powerView;
-  G.powerView = Math.abs(dp) < 1e-4 ? G.power : G.powerView + dp * k;
+  G.powerView = Math.abs(dp) < 5e-4 ? G.power : G.powerView + dp * k;
 }
 // Welcher Queue gehört zum Spieler am Zug?
 function cueFor(i) {
@@ -5029,7 +5040,7 @@ function syncMenu() {
     seg.querySelectorAll('button').forEach(b => b.classList.toggle('sel', String(CFG[k]) === b.dataset.v));
   });
   $('bResume').classList.toggle('hidden', !G || G.state === 'over');
-  renderLobby();
+  renderLobby(); CAR_DIRTY = true;
 }
 document.querySelectorAll('.seg[data-k]').forEach(seg => seg.addEventListener('click', e => {
   const b = e.target.closest('button'); if (!b) return;
@@ -5195,7 +5206,7 @@ window.onAndroidBack = () => {
 };
 
 // ===================== Hauptschleife =====================
-let lastT = performance.now(), LAST_DT = 0;
+let lastT = performance.now(), LAST_DT = 0, CAR_DIRTY = true, PAUSE_DRAWN = false;
 function frame(now) {
   const dt = Math.min(0.05, (now - lastT) / 1000); lastT = now; LAST_DT = dt;
   const paused = G && !G.online && ['menu', 'shop', 'stats', 'settings', 'levels', 'rules', 'online', 'track', 'inv', 'quests', 'wheel'].some(id => !$(id).classList.contains('hidden'));
@@ -5224,12 +5235,12 @@ function frame(now) {
       shoot();
     }
   }
-  if (!$('menu').classList.contains('hidden')) { drawLobbyBg(now, dt); drawHeroBall($('heroBall'), 8, dt, 0.7); updateCarousel(); }
-  else draw();
+  if (!$('menu').classList.contains('hidden')) { drawLobbyBg(now, dt); drawHeroBall($('heroBall'), 8, dt, 0.7); if (CAR_DIRTY) { CAR_DIRTY = false; updateCarousel(); } PAUSE_DRAWN = false; }
+  else if (!paused || !PAUSE_DRAWN) { draw(); PAUSE_DRAWN = paused; }
   applyShake();
   requestAnimationFrame(frame);
 }
-window.addEventListener('resize', () => { layout(); });
+window.addEventListener('resize', () => { layout(); CAR_DIRTY = true; PAUSE_DRAWN = false; });
 CLOTH_RGB = activeCloth().rgb;
 grantLevelRewards();
 layout(); syncMenu(); updateUI(); show('menu');

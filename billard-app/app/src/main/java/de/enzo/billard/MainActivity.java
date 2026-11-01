@@ -70,6 +70,7 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onPause() {
+        web.evaluateJavascript("window.onAppPause && window.onAppPause()", null);
         web.onPause();
         super.onPause();
     }
@@ -78,6 +79,7 @@ public class MainActivity extends Activity {
     protected void onResume() {
         super.onResume();
         web.onResume();
+        web.evaluateJavascript("window.onAppResume && window.onAppResume()", null);
     }
 
     // Teilen, Kopieren und Einfügen der Verbindungscodes für das Online-Spiel

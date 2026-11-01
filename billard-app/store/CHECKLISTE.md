@@ -11,7 +11,7 @@
    Ab dem nächsten Build wird damit signiert. Die Datei `upload.jks` sicher aufbewahren und **nie** ins Repository legen.
 3. **App-Bundle** `BillardLinien.aab` aus dem neuesten GitHub-Release herunterladen und in der Play Console unter *Produktion → Neues Release* hochladen. „Play App-Signatur“ aktiviert lassen.
 4. **Paketname** ist `de.enzo.billard` – nach der ersten Veröffentlichung nicht mehr änderbar.
-5. **Store-Eintrag** mit den Texten aus `STORE-TEXTE.md`, App-Symbol (512 × 512, aus dem Spiel exportieren) und den Bildern aus `screenshots/` füllen. Eine Vorstellungsgrafik (1024 × 500) wird zusätzlich verlangt.
+5. **Store-Eintrag** mit den Texten aus `STORE-TEXTE.md` füllen. Bilder liegen bereit: `app-symbol-512.png`, `vorstellungsgrafik-1024x500.png` und die Screenshots in `screenshots/`.
 6. **Datenschutzerklärung** aus `DATENSCHUTZ-VORLAGE.md` ergänzen, online stellen und den Link eintragen.
 7. **Datensicherheit** (Formular): keine Daten erhoben/geteilt außer im Online-Modus (Spielername und Spielzüge, nicht gespeichert, Übertragung verschlüsselt per WSS).
 8. **Inhaltseinstufung** und **Zielgruppe** ausfüllen (keine Werbung, keine Käufe, kein Echtgeld-Glücksspiel).

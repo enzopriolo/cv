@@ -10,15 +10,15 @@ Realistisches Billard mit Hilfslinien, Liga, Turnieren und Online-Duellen.
 Billard Linien ist Pool-Billard mit echter Physik – und Hilfslinien, die dir genau zeigen, wohin die Kugeln laufen.
 
 🎱 ECHTE BILLARD-PHYSIK
-Kugeln gleiten und rollen wie auf einem echten Tisch. Nachläufer, Rückläufer und Stoppball, Seiteneffet an der Bande, Throw beim Schnitt – und ein Fehlstoß, wenn du die Weiße zu weit außen triffst.
+Kugeln gleiten und rollen wie auf einem echten Tisch – mit Rollgeräusch und echtem Klick. Nachläufer, Rückläufer und Stoppball, Seiteneffet an der Bande, Throw beim Schnitt – und ein Fehlstoß, wenn du die Weiße zu weit außen triffst.
 
 📏 HILFSLINIEN IN DREI STUFEN
-„Alle“ zeigt jede Bahn bis zum Stillstand, „Einfach“ nur die Ziellinie bis zur ersten Kugel, „Aus“ ist für Profis.
+„Alle“ zeigt jede Bahn bis zum Stillstand, „Einfach“ die Linie bis zur ersten Kugel (auch über Banden), „Aus“ ist für Profis. Beim Feinzielen hilft eine Präzisions-Lupe.
 
 🏆 SPIELMODI
-• 8-Ball und 9-Ball nach den offiziellen Regeln
-• Gegen den Computer in vier Stärken – bis zum Profi
-• Online gegen Freunde per Raumcode oder Link
+• 8-Ball, 9-Ball und 10-Ball nach den offiziellen Regeln
+• Gegen den Computer in vier Stärken – von Lea bis Profi Kaiser
+• Online gegen zufällige Gegner oder Freunde per Raumcode – mit automatischem Wiederverbinden
 • 2 Spieler an einem Gerät
 • Turnier: Viertelfinale, Halbfinale, Finale
 • Zeitrennen, Trefferserie, Zielscheibe und Glücksstoß

@@ -73,7 +73,7 @@ window.makeTopic = function (t) {
       const type = i % 3, n = pick();
       const s = g.shotSetup(Math.min(25, i * 2), 35 + g.rnd() * 30 + i * 2, {pockets: [0, 2, 3, 5], dp: [25, 60]}); if (!s) continue;
       const bs = g.mk([s.cx, s.cy], [[n, s.tx, s.ty]]), a = Math.atan2(s.g.gy - s.cy, s.g.gx - s.cx);
-      const sy = type === 0 ? -(0.2 + g.rnd() * 0.25) : type === 1 ? 0.45 + g.rnd() * 0.35 : -(0.55 + g.rnd() * 0.3);
+      const sy = type === 0 ? -(0.2 + g.rnd() * 0.25) : type === 1 ? 0.45 + g.rnd() * 0.33 : -(0.5 + g.rnd() * 0.28); // Effet nie im Fehlstoß-Bereich (> 0,8)
       const pw = type === 0 ? 0.25 + g.rnd() * 0.2 : 0.3 + g.rnd() * 0.35;
       const S = g.sim(bs, {angle: a, power: pw, sy}); if (!g.potted(S, n) || S.ev.cuePotted) continue;
       const c = S.balls.find(b => b.n === 0), r = Math.max(5, 10 - i * 0.35);
@@ -88,7 +88,7 @@ window.makeTopic = function (t) {
     } else if (t === 4) { // Seiteneffet: über die Bande in den Zielkreis
       const n = pick(), s = g.shotSetup(Math.min(30, 5 + i * 2), 30 + g.rnd() * 30, {pockets: [0, 2, 3, 5], dp: [25, 60]}); if (!s) continue;
       const bs = g.mk([s.cx, s.cy], [[n, s.tx, s.ty]]), a = Math.atan2(s.g.gy - s.cy, s.g.gx - s.cx);
-      const sx = (g.rnd() < 0.5 ? -1 : 1) * (0.5 + g.rnd() * 0.3), sy = (g.rnd() - 0.3) * 0.6, pw = 0.55 + g.rnd() * 0.35;
+      const sx = (g.rnd() < 0.5 ? -1 : 1) * (0.45 + g.rnd() * 0.25), sy = (g.rnd() - 0.3) * 0.5, pw = 0.55 + g.rnd() * 0.35;
       const S = g.sim(bs, {angle: a, power: pw, sx, sy}); if (!g.potted(S, n) || S.ev.cuePotted) continue;
       const c = S.balls.find(b => b.n === 0), r = Math.max(6, 11 - i * 0.3);
       if (!g.inTable(c.x, c.y, 1)) continue;

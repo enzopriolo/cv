@@ -82,6 +82,8 @@ window.GEN = (() => {
   }
   // Prüft das fertige Level genau so, wie es gespeichert wird (gerundete Werte)
   function validate(lv) {
+    // Lösungen dürfen den Effet nie im Fehlstoß-Bereich (über 0,8) verwenden
+    if (lv.sol.some(s => Math.hypot(s.sx || 0, s.sy || 0) > 0.79)) return false;
     let bs = mk(lv.cue, lv.balls);
     for (const s of lv.sol) {
       const on = new Set(bs.filter(b => b.on && b.n > 0).map(b => b.n)), need = targetsOf(lv, on);
